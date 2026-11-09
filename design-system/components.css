@@ -1,0 +1,428 @@
+/* =========================================================
+   DECK SEVEN — Components v4
+   Load order: tokens.css → components.css → stage.js, dialog.js
+   Naming: BEM. Change state with an .is-* class and the matching ARIA attribute together.
+     .is-selected  ↔ aria-selected="true"   (▶ cursor)
+     .is-visited                              (✓ + lilac)
+     .is-disabled  ↔ aria-disabled="true"   (— + dark lilac)
+   Never signal state with colour alone: a mark (▶ ✓ — ★) or a word always comes with it.
+   ========================================================= */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+.ds {
+  font-family: var(--font-pixel);
+  font-size: var(--fs-ui);
+  line-height: var(--lh-ui);
+  color: var(--c-text);
+  background: var(--c-canvas);
+  -webkit-font-smoothing: none;          /* macOS: no anti-aliased glyph edges */
+  font-synthesis: none;                  /* no faux bold/italic (breaks the pixel shapes) */
+  font-kerning: none;
+  text-rendering: optimizeSpeed;
+}
+.ds-ko { font-family: var(--font-ko); }
+/* Resets are wrapped in :where() for zero specificity, so component classes always win */
+:where(.ds) :where(img, .portrait, .stage) { image-rendering: pixelated; }
+:where(.ds) :where(p, h1, h2, h3) { margin: 0; font-weight: 400; }
+:where(.ds) :where(button) { font: inherit; color: inherit; }
+:where(.ds) :where(b, strong) { font-weight: 400; color: var(--c-text-title); }  /* colour instead of bold */
+
+/* Keyboard focus: a pixel outline instead of the browser's blue ring (same language as selection) */
+:where(.ds) :focus { outline: none; }
+:where(.ds) :focus-visible { outline: var(--bw-inner) solid var(--c-focus); outline-offset: var(--u); }
+
+/* ---------------------------------------------------------
+   STAGE — the 1920×1080 stage. stage.js sets the scale.
+   Leftover space is letterboxed with the canvas colour (never stretched).
+   --------------------------------------------------------- */
+.stage-viewport {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background: var(--c-canvas);
+}
+.stage-viewport--fullscreen { position: fixed; inset: 0; aspect-ratio: auto; height: 100dvh; }
+.stage {
+  position: absolute; top: 0; left: 0;
+  width: var(--stage-w); height: var(--stage-h);
+  transform: translate(var(--stage-x, 0), var(--stage-y, 0)) scale(var(--stage-scale, 0.5));
+  transform-origin: 0 0;
+  background: var(--c-canvas) center / cover no-repeat;
+  overflow: hidden;
+  font-size: var(--fs-ui);          /* so large-text mode is recomputed inside the stage */
+  line-height: var(--lh-ui);
+}
+.stage--night { background-image: url("assets/night-deck-bg.png"); }
+
+/* Main screen: HUD/menu → map/list → dialogue → key hints */
+.layout-main {
+  display: grid;
+  grid-template-columns: var(--win-map-w) var(--win-side-w);
+  grid-template-rows: var(--win-hud-h) 40px var(--win-main-h) 56px var(--win-dialog-h) var(--hint-h);
+  column-gap: var(--sp-5);
+  padding: var(--stage-top) var(--stage-gutter) 0;
+  height: 100%;
+}
+.layout-main > .hud-window    { grid-area: 1 / 1; justify-self: start; }
+.layout-main > .menu-window   { grid-area: 1 / 2; justify-self: end; align-self: start; }
+.layout-main > .map-window    { grid-area: 3 / 1; }
+.layout-main > .side-window   { grid-area: 3 / 2; }
+.layout-main > .dialog-window { grid-area: 5 / 1 / 6 / 3; justify-self: center; }
+.layout-main > .keyhints      { grid-area: 6 / 1 / 7 / 3; justify-self: end; align-self: end; margin-right: 112px; }
+
+/* ---------------------------------------------------------
+   WINDOW — double-bordered window
+   --------------------------------------------------------- */
+.win {
+  position: relative;
+  background: var(--c-surface);
+  border: var(--bw-outer) solid var(--c-line);
+  padding: var(--sp-4) var(--sp-5);
+  z-index: var(--z-window);
+}
+.win::before {
+  content: "";
+  position: absolute;
+  inset: calc(var(--frame-inset) - var(--bw-outer));   /* 4px inside the outer line */
+  border: var(--bw-inner) solid var(--c-line);
+  pointer-events: none;
+}
+.win--single::before { display: none; }
+.win--solid { --surface-alpha: 1; }
+
+.win__title {
+  margin-bottom: var(--sp-4);
+  font-size: var(--fs-ui);
+  line-height: var(--lh-ui);
+  letter-spacing: var(--ls-title);
+  text-transform: uppercase;              /* uppercase for titles only; body and dialogue use mixed case */
+  color: var(--c-text-title);
+}
+
+.hud-window    { width: var(--win-hud-w);  height: var(--win-hud-h);  padding: var(--sp-3) var(--sp-4); }
+.menu-window   { width: var(--win-menu-w); height: var(--win-menu-h); padding: var(--sp-3) var(--sp-4); }
+.map-window    { width: var(--win-map-w);  height: var(--win-main-h); padding-bottom: var(--sp-3); }
+.side-window   { width: var(--win-side-w); height: var(--win-main-h); display: flex; flex-direction: column; }
+.dialog-window { width: var(--win-dialog-w); height: var(--win-dialog-h); padding: 40px 48px; cursor: pointer; }
+
+/* ---------------------------------------------------------
+   NAME TAB — who is speaking (XAG 104: speaker identification)
+   Overlaps the top-left of the dialogue window by 16px. Narration shows CASE FILE.
+   --------------------------------------------------------- */
+.name-tab {
+  position: absolute;
+  left: var(--tab-offset-x);
+  top: calc(var(--tab-h) * -1 + var(--tab-overlap) - var(--bw-outer));
+  height: var(--tab-h);
+  padding: 8px var(--sp-4);
+  letter-spacing: var(--ls-title);
+  text-transform: uppercase;
+  color: var(--c-text-title);
+  white-space: nowrap;
+  z-index: var(--z-tab);
+}
+.name-tab--narration { color: var(--c-text-info); }
+
+/* ---------------------------------------------------------
+   HUD — time + progress segments (progress shown as bars and text together)
+   --------------------------------------------------------- */
+.hud__time { color: var(--c-text-title); white-space: pre; }
+.segments { display: flex; gap: var(--seg-gap); margin-top: 16px; }
+.segments > i { width: var(--seg-w); height: var(--seg-h); background: var(--c-line-dim); }
+.segments > i.is-past    { background: var(--c-text-info); }
+.segments > i.is-current { width: var(--seg-w-current); background: var(--c-accent); }
+
+/* ---------------------------------------------------------
+   MENU BAR
+   --------------------------------------------------------- */
+.menubar { display: flex; align-items: center; gap: var(--sp-3); white-space: nowrap; }
+.menubar__item {
+  background: none; border: 0; padding: 0; cursor: pointer;
+  text-transform: uppercase; color: var(--c-text);
+}
+.menubar__item:hover { color: var(--c-accent); }
+.menubar__count {
+  display: inline-block; min-width: 1.25em; margin-left: var(--sp-2);
+  text-align: center; color: var(--c-cursor-ink); background: var(--c-text);
+}
+.menubar__count.is-new { background: var(--c-accent); }   /* a new clue arrived */
+.menubar__sep { color: var(--c-text-disabled); }
+
+/* ---------------------------------------------------------
+   DECK MAP
+   --------------------------------------------------------- */
+.deck__rooms { display: flex; }
+.deck__hull { display: block; width: 1116px; height: var(--hull-h); }
+
+.cell {
+  position: relative;
+  flex: 0 0 var(--cell-w);
+  height: var(--cell-h);
+  margin-left: calc(var(--bw-inner) * -1);
+  padding-top: 56px;
+  display: flex; flex-direction: column; align-items: center;
+  background: var(--c-surface-cell);
+  border: var(--bw-inner) solid var(--c-line);
+  cursor: pointer;
+}
+.cell:first-child { margin-left: 0; }
+.cell--wide { flex-basis: var(--cell-w-wide); }
+.cell__label { position: absolute; top: 4px; left: 12px; text-transform: uppercase; }
+.cell__people { display: flex; gap: 16px; }
+.cell__person { display: flex; flex-direction: column; align-items: center; }
+.cell__status { height: 40px; display: flex; align-items: center; justify-content: center; }
+.cell__name { margin-top: 8px; white-space: nowrap; }
+
+.cell:not(.cell--empty):hover { background: var(--c-surface-hover); }
+.cell.is-selected { outline: var(--bw-outer) solid var(--c-accent); outline-offset: calc(var(--u) * -5); }
+.cell__person.is-visited .portrait { filter: var(--fx-visited); }
+.cell__person.is-visited .cell__name { color: var(--c-text-visited); }
+
+.cell--empty {
+  justify-content: center; padding-top: 0;
+  background: transparent;
+  border-style: dashed;
+  color: var(--c-text-info);
+  cursor: default;
+}
+.cell--empty::after { content: "(empty)"; }
+
+/* ---------------------------------------------------------
+   PORTRAIT — slot for character art
+   · Character designs are not final. The design system only defines the frame:
+     sizes (120 / 96 / 360), 4px white border, states (visited, selected).
+   · Default is a placeholder (checkerboard + initial):  <span class="portrait" data-initial="R"></span>
+   · Once art exists, put an <img> inside, or use .portrait--sheet + --sx/--sy for a sprite sheet
+   --------------------------------------------------------- */
+.portrait {
+  --sx: 0; --sy: 0;
+  position: relative;
+  display: grid; place-items: center;
+  width: var(--portrait-md); aspect-ratio: 1;
+  border: var(--bw-outer) solid var(--c-line);
+  overflow: hidden;
+  /* placeholder: checkerboard of 4-art-pixel squares */
+  background-color: var(--c-surface-cell);
+  background-image: conic-gradient(var(--c-surface-hover) 25%, transparent 0 50%, var(--c-surface-hover) 0 75%, transparent 0);
+  background-size: calc(var(--u) * 8) calc(var(--u) * 8);
+  color: var(--c-text-info);
+  font-size: var(--fs-hero);
+}
+.portrait::after { content: attr(data-initial); }
+.portrait > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.portrait--sheet {                                   /* temporary mock-up art (3×2 sheet) */
+  background-image: var(--portrait-sheet, url("assets/portraits.png"));
+  background-size: 333.333% 222.222%;
+  background-position: calc(2.38% + var(--sx) * 47.62%) calc(4.55% + var(--sy) * 90.9%);
+}
+.portrait--sm { width: var(--portrait-sm); font-size: var(--fs-ui); }
+.portrait--lg { width: 360px; font-size: var(--fs-display); }
+.portrait.is-visited { filter: var(--fx-visited); }
+.portrait.is-selected { outline: var(--bw-outer) solid var(--c-accent); outline-offset: var(--bw-outer); }
+
+/* ---------------------------------------------------------
+   MARKS / BADGES — state = mark + colour
+   --------------------------------------------------------- */
+.mark { display: inline-block; line-height: 1; }
+.mark--star  { color: var(--c-accent); }
+.mark--check { color: var(--c-check); }
+.mark--dash  { color: var(--c-text-disabled); }
+.mark--cost  { color: var(--c-gem); }
+.mark--star::before  { content: "★"; }
+.mark--check::before { content: "✓"; }
+.mark--dash::before  { content: "—"; }
+.mark--cost::before  { content: "◆"; }             /* a choice that spends one question */
+
+.badge-new { color: var(--c-accent); white-space: nowrap; }
+.badge-new::before { content: "★"; margin-right: 0.25em; }
+
+.tag {
+  display: inline-block;
+  padding: 0 var(--sp-2);
+  border: var(--bw-inner) solid currentColor;
+  text-transform: uppercase;
+}
+.tag--accent  { color: var(--c-accent); }
+.tag--info    { color: var(--c-text-info); }
+.tag--danger  { color: var(--c-danger); }
+.tag--danger::before { content: "! "; }            /* readable without seeing red */
+.tag--success { color: var(--c-success); }
+.tag--success::before { content: "✓ "; }
+
+/* ---------------------------------------------------------
+   CHOICE LIST
+   · ↑↓ and mouse hover move the same cursor (one cursor)
+   · Number keys 1–9 pick directly; .choice__key shows the number
+   --------------------------------------------------------- */
+.choices { list-style: none; margin: 0; padding: 0; }
+.choice {
+  display: grid;
+  grid-template-columns: var(--list-cursor) 1fr auto;
+  align-items: center;
+  column-gap: 16px;
+  height: var(--list-row);
+  padding-right: var(--sp-2);
+  white-space: pre;
+  cursor: pointer;
+  user-select: none;
+}
+.choice__label { display: flex; gap: 0.5em; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.choice__key { color: var(--c-text-disabled); }
+.choice::before { content: ""; }
+.choice.is-selected::before {
+  content: "";
+  width: var(--list-cursor); height: var(--list-cursor);
+  border: var(--bw-inner) solid var(--c-line);
+  background-color: var(--c-cursor);
+  background-image:
+    linear-gradient(to bottom left, transparent 50%, var(--c-cursor-ink) 50%),
+    linear-gradient(to top left,    transparent 50%, var(--c-cursor-ink) 50%);
+  background-size: 8px 6px, 8px 6px;
+  background-position: 8px 6px, 8px 12px;
+  background-repeat: no-repeat;
+  animation: ds-nudge var(--blink) var(--ease-step) infinite;
+}
+.choice.is-selected { background: var(--c-surface-hover); }
+.choice.is-visited  { color: var(--c-text-visited); }
+.choice.is-disabled { color: var(--c-text-disabled); cursor: not-allowed; }
+.choice.is-disabled.is-selected { background: transparent; }
+
+/* Remaining questions ◆◆◇ 2/3 — icons + number */
+.gems { display: flex; align-items: center; gap: var(--sp-3); color: var(--c-text-info); white-space: nowrap; }
+.side-window > .gems { margin-top: auto; }
+.gems__row { display: inline-flex; gap: 6px; }
+.gems__row > i { width: 0.5em; height: 0.5em; background: var(--c-gem); transform: rotate(45deg); }
+.gems__row > i.is-empty { background: transparent; box-shadow: inset 0 0 0 var(--bw-inner) var(--c-gem-empty); }
+.gems.is-empty { color: var(--c-danger); }
+
+/* ---------------------------------------------------------
+   DIALOG
+   · First input completes the current line; the next input shows the next line
+   · ▼ appears only once the line is fully shown (hidden while typing)
+   · At most 3 lines per screen and 60 characters per line (2 lines in large-text mode)
+   --------------------------------------------------------- */
+.dialog__text {
+  font-size: var(--fs-hero);
+  line-height: var(--lh-hero);
+  max-width: 60ch;                 /* 60 characters per line at most */
+}
+.dialog__text em  { font-style: normal; color: var(--c-accent); }
+.dialog__text em::before, .dialog__text em::after { content: ""; }
+.dialog__text del { text-decoration: none; color: var(--c-danger); border-bottom: var(--bw-inner) dashed currentColor; }
+.dialog__next {
+  position: absolute; right: 40px; bottom: 24px;
+  animation: ds-blink var(--blink) steps(1, end) infinite;
+}
+.dialog__next::before { content: "▼"; }
+.dialog-window.is-typing .dialog__next { visibility: hidden; }
+
+/* ---------------------------------------------------------
+   KEY HINTS — show only the controls available right now
+   <span class="key">↑↓</span> Select
+   --------------------------------------------------------- */
+.keyhints { display: flex; gap: var(--sp-5); color: var(--c-text-info); white-space: nowrap; }
+.keyhints > span { display: inline-flex; align-items: center; gap: var(--sp-2); }
+.key {
+  display: inline-grid; place-items: center;
+  min-width: 1.5em; height: 1.5em; padding: 0 6px;
+  color: var(--c-cursor-ink);
+  background: var(--c-text);
+  box-shadow: 0 var(--bw-inner) 0 0 var(--c-line-dim);   /* hard pixel shadow, no blur */
+  line-height: 1;
+}
+
+/* ---------------------------------------------------------
+   BUTTON — minimum height 64 (43px in a 1280px browser)
+   --------------------------------------------------------- */
+.btn {
+  position: relative;
+  display: inline-flex; align-items: center; gap: var(--sp-2);
+  height: 64px; padding: 0 var(--sp-5);
+  letter-spacing: var(--ls-title);
+  text-transform: uppercase;
+  color: var(--c-text);
+  background: var(--c-surface);
+  border: var(--bw-outer) solid var(--c-line);
+  cursor: pointer;
+}
+.btn::before {
+  content: ""; position: absolute; inset: calc(var(--frame-inset) - var(--bw-outer));
+  border: var(--bw-inner) solid var(--c-line); pointer-events: none;
+}
+.btn:hover, .btn.is-selected { color: var(--c-accent); background: var(--c-surface-hover); }
+.btn:active { transform: translateY(var(--u)); }
+.btn--primary { color: var(--c-text-title); }
+.btn--danger  { color: var(--c-danger); }
+.btn:disabled, .btn[aria-disabled="true"] { color: var(--c-text-disabled); cursor: not-allowed; background: var(--c-surface); }
+.btn:disabled::after, .btn[aria-disabled="true"]::after { content: "—"; }
+
+/* ---------------------------------------------------------
+   MODAL — confirm before an irreversible action (ACCUSE)
+   · State the consequence in a sentence  · Default focus on the safe option (cancel)
+   · Esc = cancel
+   --------------------------------------------------------- */
+.modal-scrim {
+  position: absolute; inset: 0; z-index: var(--z-modal);
+  display: grid; place-items: center;
+  background: var(--c-scrim);
+}
+.modal-scrim[hidden] { display: none; }
+.modal { width: 880px; padding: var(--sp-6); --surface-alpha: 1; display: grid; gap: var(--sp-5); }
+.modal__body { line-height: var(--lh-hero); }
+.modal__suspect { display: flex; gap: var(--sp-5); align-items: center; }
+.modal__actions { display: flex; gap: var(--sp-4); justify-content: flex-end; }
+
+/* ---------------------------------------------------------
+   TOAST — short feedback (e.g. clue found). Disappears after 3s; the notebook count changes too
+   --------------------------------------------------------- */
+.toast {
+  position: absolute; top: 176px; left: 50%; z-index: var(--z-toast);
+  transform: translateX(-50%);
+  display: flex; gap: var(--sp-3); align-items: center;
+  padding: var(--sp-3) var(--sp-5);
+  --surface-alpha: 1;
+  color: var(--c-text);
+  animation: ds-toast 3s steps(1, end) forwards;
+}
+.toast[hidden] { display: none; }
+
+/* ---------------------------------------------------------
+   CLUE CARD — notebook entry
+   --------------------------------------------------------- */
+.clue {
+  display: grid; grid-template-columns: auto 1fr; gap: var(--sp-3);
+  align-items: start;
+  padding: var(--sp-3);
+  background: var(--c-surface-cell);
+  border: var(--bw-inner) solid var(--c-line);
+}
+.clue__body { display: grid; gap: var(--sp-1); }
+.clue__title { color: var(--c-text-title); }
+.clue.is-new { border-color: var(--c-accent); }
+.clue.is-contradiction { border-color: var(--c-danger); border-style: dashed; }
+
+/* ---------------------------------------------------------
+   SETTINGS — stepped options (text speed, contrast, text size)
+   --------------------------------------------------------- */
+.setting { display: grid; grid-template-columns: 320px 1fr; align-items: center; gap: var(--sp-4); }
+.stepper { display: flex; gap: var(--sp-2); }
+.stepper > button {
+  height: 56px; padding: 0 var(--sp-4);
+  background: var(--c-surface-cell);
+  border: var(--bw-inner) solid var(--c-line-dim);
+  color: var(--c-text-info); cursor: pointer;
+}
+.stepper > [aria-pressed="true"] { border-color: var(--c-accent); color: var(--c-text); background: var(--c-surface-hover); }
+.stepper > [aria-pressed="true"]::before { content: "▶ "; color: var(--c-accent); }
+
+/* ---------------------------------------------------------
+   MOTION — stepped, below 3Hz, respects reduced motion
+   --------------------------------------------------------- */
+@keyframes ds-blink { 50% { opacity: 0; } }
+@keyframes ds-nudge { 50% { transform: translateX(var(--u)); } }
+@keyframes ds-toast { 0% { opacity: 1; } 100% { opacity: 0; visibility: hidden; } }
+@media (prefers-reduced-motion: reduce) {
+  .dialog__next, .choice.is-selected::before { animation: none; }
+}

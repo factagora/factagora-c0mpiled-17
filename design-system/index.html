@@ -1,0 +1,335 @@
+<!doctype html>
+<html lang="en" data-text-speed="normal">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deck Seven DS</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="components.css">
+<style>
+  /* Gallery-only styles (not used by game screens) */
+  body { margin: 0; }
+  .screen { height: 100dvh; aspect-ratio: auto; }
+  .doc { max-width: 1280px; margin: 0 auto; padding: 48px 32px 96px; display: grid; gap: 64px; font-size: 16px; line-height: 1.6; }
+  .doc h1 { font-size: 32px; color: var(--c-text-title); letter-spacing: var(--ls-title); }
+  .doc h2 { font-size: 32px; color: var(--c-text-title); letter-spacing: var(--ls-title); margin-bottom: 8px; }
+  .doc h3 { font-size: 16px; color: var(--c-text-info); margin: 32px 0 12px; }
+  .doc code { font-family: var(--font-pixel); color: var(--p-lilac-200); }
+  .lead { color: var(--c-text-info); max-width: 880px; }
+  .row { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 8px 12px; border-bottom: 2px dashed var(--c-line-dim); vertical-align: middle; }
+  th { color: var(--c-text-info); font-weight: 400; }
+  .chip { display: inline-block; width: 32px; height: 32px; border: 2px solid var(--c-line-dim); vertical-align: middle; margin-right: 8px; }
+  .pass { color: var(--c-success); } .pass::before { content: "✓ "; }
+  .specimen { zoom: 0.5; display: grid; gap: 24px; font-size: var(--fs-ui); line-height: var(--lh-ui); }        /* 0.5 maps the 2px grid to 1 screen px, still sharp */
+  .specimen h3 { font-size: 32px; margin: 48px 0 0; }
+  .rules { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; }
+  .rule { border: 2px solid var(--c-line-dim); padding: 16px; }
+  .rule b { display: block; margin-bottom: 4px; }
+  @media (max-width: 700px) { .doc { padding: 32px 16px 64px; } }
+</style>
+</head>
+<body class="ds">
+
+<!-- ================= 1. Main screen (interactive) ================= -->
+<div class="stage-viewport screen" id="main">
+  <div class="stage stage--night">
+    <div class="layout-main">
+
+      <div class="win hud-window">
+        <p class="hud__time">THE NIGHT  23:40</p>
+        <div class="segments" role="img" aria-label="Chapter 3 of 4"><i class="is-past"></i><i class="is-past"></i><i class="is-current"></i><i></i></div>
+      </div>
+
+      <nav class="win menu-window" aria-label="Menu">
+        <div class="menubar">
+          <button class="menubar__item">Notebook<span class="menubar__count" id="nb-count">4</span></button>
+          <span class="menubar__sep">|</span>
+          <button class="menubar__item" id="accuse-btn">Accuse</button>
+        </div>
+      </nav>
+
+      <section class="win map-window" aria-label="Deck 7 map">
+        <h2 class="win__title">Deck 7</h2>
+        <div class="deck">
+          <div class="deck__rooms">
+            <div class="cell cell--empty" data-room="stern"><span class="cell__label">Stern</span></div>
+            <div class="cell" data-room="701"><span class="cell__label">701</span>
+              <div class="cell__person is-visited"><div class="cell__status"><span class="mark mark--check"></span></div><span class="portrait portrait--sheet" style="--sx:0;--sy:0"></span><span class="cell__name">Gus</span></div></div>
+            <div class="cell" data-room="702"><span class="cell__label">702</span>
+              <div class="cell__person"><div class="cell__status"><span class="badge-new">NEW</span></div><span class="portrait portrait--sheet" style="--sx:1;--sy:0"></span><span class="cell__name">Rosalind</span></div></div>
+            <div class="cell" data-room="703"><span class="cell__label">703</span>
+              <div class="cell__person"><div class="cell__status"></div><span class="portrait portrait--sheet" style="--sx:2;--sy:0"></span><span class="cell__name">Martin</span></div></div>
+            <div class="cell" data-room="704"><span class="cell__label">704</span>
+              <div class="cell__person is-visited"><div class="cell__status"><span class="mark mark--check"></span></div><span class="portrait portrait--sheet" style="--sx:0;--sy:1"></span><span class="cell__name">Vivian</span></div></div>
+            <div class="cell cell--wide" data-room="lounge"><span class="cell__label">Lounge</span>
+              <div class="cell__people">
+                <div class="cell__person"><div class="cell__status"></div><span class="portrait portrait--sm portrait--sheet" style="--sx:1;--sy:1"></span><span class="cell__name">Theo</span></div>
+                <div class="cell__person"><div class="cell__status"><span class="badge-new">NEW</span></div><span class="portrait portrait--sm portrait--sheet" style="--sx:2;--sy:1"></span><span class="cell__name">Lawyer</span></div>
+              </div></div>
+          </div>
+          <img class="deck__hull" src="assets/ship-hull.svg" width="1116" height="90" alt="">
+        </div>
+      </section>
+
+      <section class="win side-window" aria-labelledby="where-title">
+        <h2 class="win__title" id="where-title">Where will you go?</h2>
+        <ul class="choices" id="where" role="listbox" aria-labelledby="where-title">
+          <li class="choice" role="option" data-room="702"><span class="choice__label"><span class="choice__key">1</span><span>702</span><span>Rosalind</span></span><span class="mark mark--star"></span></li>
+          <li class="choice" role="option" data-room="lounge"><span class="choice__label"><span class="choice__key">2</span><span>Lounge</span><span>Theo / Lawyer</span></span><span class="mark mark--star"></span></li>
+          <li class="choice" role="option" data-room="703"><span class="choice__label"><span class="choice__key">3</span><span>703</span><span>Martin</span></span><span class="mark mark--cost"></span></li>
+          <li class="choice is-visited" role="option" data-room="701"><span class="choice__label"><span class="choice__key">4</span><span>701</span><span>Gus</span></span><span class="mark mark--check"></span></li>
+          <li class="choice is-visited" role="option" data-room="704"><span class="choice__label"><span class="choice__key">5</span><span>704</span><span>Vivian</span></span><span class="mark mark--check"></span></li>
+          <li class="choice is-disabled" role="option" aria-disabled="true" data-room="stern"><span class="choice__label"><span class="choice__key">6</span><span>Stern deck</span></span><span class="mark mark--dash"></span></li>
+        </ul>
+        <div class="gems" id="gems">Free questions <span class="gems__row"><i></i><i></i><i></i></span> <span>3/3</span></div>
+      </section>
+
+      <section class="win dialog-window" id="narration" aria-label="Dialogue">
+        <div class="win name-tab">Case File</div>
+        <p class="dialog__text"></p>
+        <span class="dialog__next" aria-hidden="true"></span>
+      </section>
+
+      <div class="keyhints" id="hints">
+        <span><span class="key">↑↓</span>Select</span>
+        <span><span class="key">Enter</span>Go</span>
+        <span><span class="key">Space</span>Next line</span>
+        <span><span class="key">A</span>Accuse</span>
+      </div>
+    </div>
+
+    <div class="win toast" id="toast" hidden role="status"><span class="badge-new">NEW</span><span id="toast-text"></span></div>
+
+    <div class="modal-scrim" id="modal" hidden>
+      <div class="win modal" role="alertdialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-body">
+        <h2 class="win__title" id="modal-title" style="margin:0">Accuse Rosalind?</h2>
+        <div class="modal__suspect">
+          <span class="portrait portrait--sheet" style="--sx:1;--sy:0"></span>
+          <p class="modal__body" id="modal-body">You can't take this back.<br>If you're wrong, <b>the culprit walks free</b>.</p>
+        </div>
+        <div class="modal__actions">
+          <button class="btn" id="modal-cancel">Not yet</button>
+          <button class="btn btn--danger" id="modal-ok">Accuse</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="doc">
+  <header>
+    <h1>DECK SEVEN · DESIGN SYSTEM v4</h1>
+    <p class="lead">위 화면은 실제로 조작할 수 있다: ↑↓·숫자키로 고르기, Enter로 이동(단서 알림이 뜨고 수첩 숫자가 바뀜), Space나 클릭으로 대사 넘기기, A로 지목 확인창(Esc로 취소).
+      규칙과 출처는 <a href="RULES.md" style="color:var(--p-lilac-200)">RULES.md</a>에 있다.</p>
+  </header>
+
+  <!-- Settings -->
+  <section>
+    <h2>SETTINGS</h2>
+    <p class="lead">설정은 <code>&lt;html&gt;</code> 속성 하나로 페이지 전체에 적용된다. Screen의 기본값은 Fill screen(웹): 화면을 꽉 채우되 1배를 넘기지 않는다. Pixel perfect는 정수 배율이라 또렷하지만 여백이 크게 남는다. Text size의 Large는 메뉴 글자 24→32, 대사 32→40.</p>
+    <div class="specimen" style="zoom:.5">
+      <div class="setting"><span>Text speed</span>
+        <div class="stepper" data-attr="textSpeed">
+          <button data-v="slow" aria-pressed="false">Slow</button><button data-v="normal" aria-pressed="true">Normal</button><button data-v="instant" aria-pressed="false">Instant</button>
+        </div></div>
+      <div class="setting"><span>Text size</span>
+        <div class="stepper" data-attr="textSize">
+          <button data-v="" aria-pressed="true">Standard</button><button data-v="large" aria-pressed="false">Large</button>
+        </div></div>
+      <div class="setting"><span>Screen</span>
+        <div class="stepper" data-attr="scale">
+          <button data-v="" aria-pressed="true">Fill screen</button><button data-v="crisp" aria-pressed="false">Pixel perfect</button>
+        </div></div>
+      <div class="setting"><span>Contrast</span>
+        <div class="stepper" data-attr="contrast">
+          <button data-v="" aria-pressed="true">Standard</button><button data-v="high" aria-pressed="false">High</button>
+        </div></div>
+    </div>
+  </section>
+
+  <!-- Rules summary -->
+  <section>
+    <h2>RULES</h2>
+    <div class="rules">
+      <div class="rule"><b>정수 픽셀</b>1 아트 픽셀 = 무대 2px. 치수는 2의 배수, 화면 배율도 정수. 남는 곳은 레터박스.</div>
+      <div class="rule"><b>웹 글자 24 · 32 · 48</b>무대 값. 1440px 화면에서 18 · 24 · 36px. 정보 글자는 브라우저 16px 아래로 내려가지 않는다(자동 큰 글자).</div>
+      <div class="rule"><b>크기 대신 색으로 위계</b>제목 = 호박 + 대문자. 굵게·기울임 금지.</div>
+      <div class="rule"><b>투명한 글자 금지</b>흐리게 = 팔레트 다음 색. 반투명은 창 바탕에만.</div>
+      <div class="rule"><b>최악 대비로 검사</b>창 뒤가 흰색일 때 본문 4.5 · 비활성 2.5 · 고대비 7 이상.</div>
+      <div class="rule"><b>색 + 기호</b>▶ 선택 · ✓ 본 것 · — 불가 · ★ 새것 · ! 모순 · ◆ 질문 소모.</div>
+      <div class="rule"><b>커서 하나</b>마우스와 키보드가 같은 선택을 움직인다. 숫자키로 바로 고르기.</div>
+      <div class="rule"><b>대사 2단 입력</b>첫 입력 = 줄 완성, 다음 입력 = 다음 줄. 속도 3단계. 화자 항상 표시.</div>
+      <div class="rule"><b>되돌릴 수 없으면 확인</b>결과를 문장으로 말하고, 기본 포커스는 취소, Esc = 취소.</div>
+    </div>
+  </section>
+
+  <!-- Colour -->
+  <section>
+    <h2>COLOR · CONTRAST</h2>
+    <p class="lead">대비는 창(86%) 뒤가 흰색인 최악 기준. 고대비 모드를 켜면 아래 견본도 바뀐다.</p>
+    <table>
+      <tr><th>토큰</th><th>값</th><th>쓰임</th><th>최악 대비</th><th>기준</th></tr>
+      <tr><td><span class="chip" style="background:var(--c-text)"></span><code>--c-text</code></td><td>#f4f1ff</td><td>본문</td><td>13.3</td><td class="pass">4.5</td></tr>
+      <tr><td><span class="chip" style="background:var(--c-text-title)"></span><code>--c-text-title</code></td><td>#ffc35a</td><td>제목 · ★ · 선택</td><td>9.3</td><td class="pass">4.5</td></tr>
+      <tr><td><span class="chip" style="background:var(--c-text-visited)"></span><code>--c-text-visited</code></td><td>#9c8cff</td><td>본 항목 · 보조 정보</td><td>5.4</td><td class="pass">4.5</td></tr>
+      <tr><td><span class="chip" style="background:var(--c-text-disabled)"></span><code>--c-text-disabled</code></td><td>#7a6fcc</td><td>고를 수 없음</td><td>3.5</td><td class="pass">2.5</td></tr>
+      <tr><td><span class="chip" style="background:var(--c-danger)"></span><code>--c-danger</code></td><td>#ff6b6b</td><td>모순 · 위험</td><td>5.3</td><td class="pass">4.5</td></tr>
+      <tr><td><span class="chip" style="background:var(--c-success)"></span><code>--c-success</code></td><td>#7ee0a4</td><td>알리바이 확인</td><td>9.2</td><td class="pass">4.5</td></tr>
+      <tr><td><span class="chip" style="background:var(--c-line-dim)"></span><code>--c-line-dim</code></td><td>#807c9c</td><td>남은 단계 · 빈 ◆</td><td>3.7</td><td class="pass">3 (그래픽)</td></tr>
+      <tr><td><span class="chip" style="background:var(--c-surface-cell)"></span><code>--c-surface-cell</code></td><td>#1a1640</td><td>방 칸 · 카드 (불투명)</td><td>—</td><td></td></tr>
+    </table>
+  </section>
+
+  <!-- Type -->
+  <section>
+    <h2>TYPE · WEB</h2>
+    <p class="lead">글자 크기는 '브라우저에서 몇 px로 보이나'로 정한다. 웹 기본은 화면 꽉 채우기(최대 1배)라서, 무대 값에 배율을 곱한 값이 실제 크기다. 아래 견본은 1440px 화면 기준(×0.75)으로 보여 준다.</p>
+    <table>
+      <tr><th>토큰</th><th>무대</th><th>1280</th><th>1440</th><th>1920</th><th>쓰는 곳</th><th>견본 (1440 기준)</th></tr>
+      <tr><td><code>--fs-display</code></td><td>48</td><td>32</td><td>36</td><td>48</td><td>장 제목</td><td style="font-size:36px;color:var(--c-text-title)">CASE CLOSED</td></tr>
+      <tr><td><code>--fs-hero</code></td><td>32</td><td>21</td><td>24</td><td>32</td><td>대사</td><td style="font-size:24px;line-height:1.5">Someone on this deck is lying.</td></tr>
+      <tr><td><code>--fs-ui</code></td><td>24</td><td>16</td><td>18</td><td>24</td><td>메뉴 · 리스트 · 이름</td><td style="font-size:18px">703  Martin</td></tr>
+      <tr><td></td><td>24</td><td></td><td></td><td></td><td>제목 = 색 + 대문자</td><td style="font-size:18px;color:var(--c-text-title);letter-spacing:var(--ls-title)">WHERE WILL YOU GO?</td></tr>
+      <tr><td><code>--fs-deco</code></td><td>16</td><td>11</td><td>12</td><td>16</td><td>장식 전용</td><td style="font-size:12px;color:var(--c-text-disabled)">decoration only</td></tr>
+      <tr><td><code>.ds-ko</code></td><td>24</td><td>16</td><td>18</td><td>24</td><td>한국어판</td><td class="ds-ko" style="font-size:18px">갈무리11 — 누가 거짓말을 하고 있다</td></tr>
+    </table>
+    <p class="lead" style="margin-top:16px">큰 글자(설정 또는 화면 폭 1280px 미만이면 자동): 메뉴 32 · 대사 40.</p>
+  </section>
+
+  <!-- Components -->
+  <section>
+    <h2>COMPONENTS</h2>
+    <p class="lead">실제 크기의 50%.</p>
+    <div class="specimen">
+      <h3>.choice — 선택 · 기본 · 질문 소모 · 본 것 · 불가</h3>
+      <div class="win" style="width:616px">
+        <ul class="choices">
+          <li class="choice is-selected"><span class="choice__label"><span class="choice__key">1</span><span>The door</span><span>23:15</span></span><span class="mark mark--star"></span></li>
+          <li class="choice"><span class="choice__label"><span class="choice__key">2</span><span>Sunglasses</span></span><span></span></li>
+          <li class="choice"><span class="choice__label"><span class="choice__key">3</span><span>Ask again</span></span><span class="mark mark--cost"></span></li>
+          <li class="choice is-visited"><span class="choice__label"><span class="choice__key">4</span><span>Where were you?</span></span><span class="mark mark--check"></span></li>
+          <li class="choice is-disabled"><span class="choice__label"><span class="choice__key">5</span><span>Show evidence</span></span><span class="mark mark--dash"></span></li>
+        </ul>
+      </div>
+
+      <h3>.btn — 기본 · 선택 · primary · danger · disabled(— 붙음)</h3>
+      <div class="row"><button class="btn">Ask</button><button class="btn is-selected">Selected</button><button class="btn btn--primary">Continue</button><button class="btn btn--danger">Accuse</button><button class="btn" disabled>Locked</button></div>
+
+      <h3>.tag · .mark · .gems — 색 + 기호</h3>
+      <div class="row">
+        <span class="tag tag--accent">Clue</span><span class="tag tag--info">Heard</span><span class="tag tag--danger">Contradiction</span><span class="tag tag--success">Alibi</span>
+        <span class="mark mark--star"></span><span class="mark mark--check"></span><span class="mark mark--dash"></span><span class="mark mark--cost"></span><span class="badge-new">NEW</span>
+      </div>
+      <div class="row">
+        <span class="gems">Free questions <span class="gems__row"><i></i><i></i><i class="is-empty"></i></span> 2/3</span>
+        <span class="gems is-empty">Free questions <span class="gems__row"><i class="is-empty"></i><i class="is-empty"></i><i class="is-empty"></i></span> 0/3</span>
+      </div>
+
+      <h3>.keyhints</h3>
+      <div class="keyhints"><span><span class="key">↑↓</span>Select</span><span><span class="key">Enter</span>Confirm</span><span><span class="key">Esc</span>Back</span><span><span class="key">1</span>–<span class="key">9</span>Quick pick</span></div>
+
+      <h3>.portrait — 인물 미확정: 틀만 정의 (자리표시 · sm · 본 것 · 선택). 위 메인 화면의 얼굴은 임시 시안 그림</h3>
+      <div class="row"><span class="portrait" data-initial="M"></span><span class="portrait portrait--sm" data-initial="T"></span><span class="portrait is-visited" data-initial="G"></span><span class="portrait is-selected" data-initial="R"></span></div>
+
+      <h3>.clue — 기본 · 새것 · 모순(빨강 + 점선 + !)</h3>
+      <div class="row" style="align-items:stretch">
+        <div class="clue" style="width:600px"><span class="portrait portrait--sm" data-initial="M"></span><div class="clue__body"><span class="clue__title">Martin's alibi</span><span>"I heard 702's door at 23:15."</span><span><span class="tag tag--info">Heard</span></span></div></div>
+        <div class="clue is-new" style="width:600px"><span class="portrait portrait--sm" data-initial="R"></span><div class="clue__body"><span class="clue__title">Sunglasses</span><span>Worn indoors. At night.</span><span class="badge-new">NEW</span></div></div>
+        <div class="clue is-contradiction" style="width:600px"><span class="portrait portrait--sm" data-initial="V"></span><div class="clue__body"><span class="clue__title">Vivian, 23:20</span><span>"Asleep" — light was on.</span><span><span class="tag tag--danger">Contradiction</span></span></div></div>
+      </div>
+
+      <h3>.dialog — 화자 탭 · 단서 &lt;em&gt; · 모순 &lt;del&gt;</h3>
+      <div class="win dialog-window" style="margin-top:56px">
+        <div class="win name-tab">Rosalind</div>
+        <p class="dialog__text">I was <del>asleep by eleven</del>. Ask <em>Martin</em> if you don't believe me.</p>
+        <span class="dialog__next"></span>
+      </div>
+    </div>
+  </section>
+</main>
+
+<script src="stage.js"></script>
+<script type="module">
+  import { createDialog } from "./dialog.js";
+
+  /* ---- Dialogue ---- */
+  const dialog = createDialog(document.getElementById("narration"), [
+    { text: "Deck 7 is quiet. Everyone says they were in their rooms." },
+    { text: "Someone on this deck is <em>lying</em>." },
+    { speaker: "Rosalind", text: "I was <del>asleep by eleven</del>. Ask <em>Martin</em> if you don't believe me." },
+  ]);
+
+  /* ---- One cursor shared by keyboard and mouse ---- */
+  const list = [...document.querySelectorAll("#where .choice")];
+  const cells = document.querySelectorAll("#main .cell");
+  let idx = 0;
+  const select = (i) => {
+    list.forEach((li) => { li.classList.remove("is-selected"); li.setAttribute("aria-selected", "false"); });
+    idx = (i + list.length) % list.length;
+    list[idx].classList.add("is-selected"); list[idx].setAttribute("aria-selected", "true");
+    cells.forEach((c) => c.classList.toggle("is-selected", c.dataset.room === list[idx].dataset.room));
+  };
+  select(0);
+  list.forEach((li, i) => { li.addEventListener("mouseenter", () => select(i)); li.addEventListener("click", () => { select(i); confirmChoice(); }); });
+  cells.forEach((c) => c.addEventListener("mouseenter", () => { const i = list.findIndex((l) => l.dataset.room === c.dataset.room); if (i >= 0) select(i); }));
+
+  /* ---- Confirm → feedback (toast + notebook count) ---- */
+  const toast = document.getElementById("toast");
+  const nb = document.getElementById("nb-count");
+  const showToast = (msg) => {
+    document.getElementById("toast-text").textContent = msg;
+    toast.hidden = true; void toast.offsetWidth; toast.hidden = false;   // restart the animation
+  };
+  const confirmChoice = () => {
+    const li = list[idx];
+    if (li.classList.contains("is-disabled")) return showToast("The stern deck is locked tonight.");
+    if (!li.classList.contains("is-visited")) {
+      li.classList.add("is-visited");
+      li.querySelector(".mark").className = "mark mark--check";
+      cells.forEach((c) => { if (c.dataset.room === li.dataset.room) c.querySelectorAll(".cell__person").forEach((p) => p.classList.add("is-visited")); });
+      nb.textContent = +nb.textContent + 1; nb.classList.add("is-new");
+      showToast(`Clue added to notebook (${nb.textContent})`);
+    } else showToast("Nothing new here.");
+  };
+
+  /* ---- Accuse confirmation: default focus = cancel, Esc = cancel ---- */
+  const modal = document.getElementById("modal");
+  let lastFocus;
+  const openModal = () => { lastFocus = document.activeElement; modal.hidden = false; document.getElementById("modal-cancel").focus(); };
+  const closeModal = () => { modal.hidden = true; lastFocus?.focus?.(); };
+  document.getElementById("accuse-btn").addEventListener("click", openModal);
+  document.getElementById("modal-cancel").addEventListener("click", closeModal);
+  document.getElementById("modal-ok").addEventListener("click", () => { closeModal(); showToast("Case closed. (demo)"); });
+
+  addEventListener("keydown", (e) => {
+    if (!modal.hidden) {
+      if (e.key === "Escape") closeModal();
+      if (e.key === "ArrowLeft" || e.key === "ArrowRight") {
+        const btns = [...modal.querySelectorAll(".btn")]; const j = btns.indexOf(document.activeElement);
+        btns[(j + 1) % btns.length].focus(); e.preventDefault();
+      }
+      return;                                    // block the screen behind while the modal is open
+    }
+    if (e.target.closest(".doc")) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); select(idx + 1); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); select(idx - 1); }
+    else if (/^[1-9]$/.test(e.key) && list[+e.key - 1]) select(+e.key - 1);
+    else if (e.key === "Enter") confirmChoice();
+    else if (e.key === " ") { e.preventDefault(); dialog.advance(); }
+    else if (e.key.toLowerCase() === "a") openModal();
+  });
+
+  /* ---- Settings: one attribute on <html> ---- */
+  document.querySelectorAll(".stepper").forEach((st) => st.addEventListener("click", (e) => {
+    const b = e.target.closest("button"); if (!b) return;
+    st.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
+    const attr = st.dataset.attr;
+    if (attr === "scale") return window.DeckStage.setMode(b.dataset.v);
+    if (b.dataset.v) document.documentElement.dataset[attr] = b.dataset.v; else delete document.documentElement.dataset[attr];
+    window.DeckStage.refit();
+  }));
+</script>
+</body>
+</html>
