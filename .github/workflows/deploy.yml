@@ -15,6 +15,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Build the React app into web/dist. The server itself needs no packages, so node_modules is not shipped.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm run build
+      - run: rm -rf node_modules
+
       - uses: azure/webapps-deploy@v3
         with:
           app-name: factagora-c0mpiled-17

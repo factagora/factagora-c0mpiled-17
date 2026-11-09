@@ -14,13 +14,8 @@ const verdicts = createVerdictStore();
 const accuseAllowed = createLimiter({ max: 5, windowMs: 60 * 1000 });
 const askAllowed = createLimiter({ max: 30, windowMs: 60 * 1000 });   // one LLM call per question
 
-const GAME_FILE = path.join(__dirname, "game", "index.html");
-const STATIC = {
-  "/game/": path.join(__dirname, "game"),               // game screen: style.css, main.js, store.js
-  "/assets/": path.join(__dirname, "game", "assets"),   // portraits, backgrounds, item icons
-  // Developer pages (chat test) only when DEV_PAGES=1, so production does not serve them.
-  ...(process.env.DEV_PAGES === "1" ? { "/dev/": path.join(__dirname, "dev") } : {}),
-};
+// The React app (web/) is built into web/dist: index.html, app/ (scripts, styles) and assets/ (game art).
+const WEB_DIR = path.join(__dirname, "web", "dist");
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -46,16 +41,15 @@ function sendJson(res, status, body) {
   res.end(JSON.stringify(body));
 }
 
-function serveStatic(prefix, pathname, res) {
-  const dir = STATIC[prefix];
+function serveStatic(pathname, res) {
   let rel;
   try {
-    rel = decodeURIComponent(pathname.slice(prefix.length)) || "index.html";
+    rel = decodeURIComponent(pathname).replace(/^\/+/, "") || "index.html";
   } catch {
     return notFound(res);
   }
-  const file = path.join(dir, rel);
-  if (!file.startsWith(dir + path.sep)) return notFound(res);
+  const file = path.join(WEB_DIR, rel);
+  if (!file.startsWith(WEB_DIR + path.sep)) return notFound(res);
 
   fs.stat(file, (err, stat) => {
     if (err || !stat.isFile()) return notFound(res);
@@ -263,14 +257,8 @@ function handle(req, res) {
       if (!res.headersSent) sendJson(res, 500, { error: "Something went wrong." });
     });
   }
-  const prefix = Object.keys(STATIC).find((p) => pathname.startsWith(p));
-  if (prefix) return serveStatic(prefix, pathname, res);
-
-  if (pathname === "/") {
-    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" });
-    return fs.createReadStream(GAME_FILE).pipe(res);
-  }
-  notFound(res);
+  if (req.method !== "GET" && req.method !== "HEAD") return sendJson(res, 405, { error: "Use GET." });
+  serveStatic(pathname, res);
 }
 
 if (require.main === module) {
