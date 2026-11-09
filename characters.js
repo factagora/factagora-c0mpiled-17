@@ -62,6 +62,7 @@ function systemPrompt(character, timepoint) {
     "아래 [기억]에 있는 것과 이때까지 일어난 일만 안다. 그 뒤의 일은 모른다.",
     "진짜 그 시각, 그 자리에 있는 그 사람처럼 말한다. 게임이나 AI 이야기는 하지 않고, 기억을 목록처럼 읽어 주지 않는다.",
     "어떤 언어로 물어도 반드시 영어로, 말하듯 1~3문장으로 답한다. 사람 이름은 모두 영어 이름으로 부른다.",
+    "이름 대응(기억에는 원래 이름이 나온다): Jisoo/한지수 = Julia Han, Dohyun/강도현 = Daniel Kang, Minjae/오민재 = Marcus Oh, Hana/유하나 = Hannah Yoo, Mr. Kim/김씨 = Ken Kim.",
   ]
     .filter((line, i) => line || i === 1)
     .join("\n");
