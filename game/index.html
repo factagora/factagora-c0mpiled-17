@@ -372,6 +372,11 @@ html:not([data-screen="brief"]) #s-brief{display:none}
 .evinote{margin-top:6px;font-size:13px;line-height:1.4;min-height:1.4em;color:var(--muted)}
 .evinote b{font-weight:400;color:var(--gold)}
 .evinote button{margin-left:6px;background:transparent;border:2px solid var(--gold);color:var(--gold);font-size:12px;padding:0 6px}
+/* SHOW — cards the player shows to people: pinned answers and evidence go with every question */
+.evi button.shown{border-color:var(--gold);box-shadow:inset 0 0 0 2px var(--gold)}
+.msg .acts{display:flex;gap:16px;margin-top:4px}
+.msg .acts .tomemo{margin-top:0}
+.msg .tomemo.on{color:var(--gold)}
 
 /* PLACES — a page of the year's places; go into one, see who is there, search spots for record cards */
 html:not([data-screen="places"]) #s-places{display:none}
@@ -861,6 +866,18 @@ function toMemo(t, p){
 }
 const turnsHere = () => game ? game.turns.filter(t=>t.character===apiId(S.person) && t.timepoint==='T'+S.era) : [];
 
+/* ---------- SHOW CARDS (pinned answers and evidence go with every question; the right ones open locked memories) ---------- */
+const turnCard = t => ({ text: `${PEOPLE[t.character]?.short || t.character} (${t.timepoint.slice(1)}): ${t.answer}`, refs: t.refs || [] });
+const eviCard = e => ({ text: `[evidence] ${e.title}`, refs: e.refs });
+const isShown = card => !!game && game.pins.some(c=>c.text===card.text);
+function toggleShow(card){
+  if (!game) return;
+  if (isShown(card)) G.unpin(game, card.text);
+  else if (!G.pin(game, card)) return toast('you can show 10 cards at most. take one back first.');
+  toast(isShown(card) ? 'you will show this to the people you question' : 'card taken back');
+  renderChat();
+}
+
 /* ---------- EVIDENCE slots (memo window) ---------- */
 let eviSeen=null, eviSel=null;
 // where each clue came from: the first chat turn whose answer used one of its facts, or the place it was searched in
@@ -880,7 +897,7 @@ function renderEvidence(){
   box.innerHTML='';
   EVIDENCE.forEach(e=>{
     const has=e.icon in got;
-    const b=h('button',{type:'button',class:(has?'got':'')+(fresh.includes(e.icon)?' fresh':'')+(eviSel===e.icon?' sel':''),'aria-label': has ? e.title : 'not found yet'},
+    const b=h('button',{type:'button',class:(has?'got':'')+(has && isShown(eviCard(e))?' shown':'')+(fresh.includes(e.icon)?' fresh':'')+(eviSel===e.icon?' sel':''),'aria-label': has ? e.title : 'not found yet'},
       has ? h('img',{src:`/assets/items/${e.icon}.webp`,alt:''}) : '?');
     if (has) b.addEventListener('click', ()=>{ eviSel=e.icon; renderEvidence(); showEvidence(e, got[e.icon]); });
     box.append(b);
@@ -894,7 +911,7 @@ function showEvidence(e, from){
     const memo=$('#memo'), line=`[evidence] ${e.title} (${from})`;
     memo.value = memo.value ? `${memo.value.replace(/\s+$/,'')}\n${line}` : line;
     if (game){ game.memo=memo.value; G.saveGame(game); } toast('added to memo');
-  }}));
+  }}), e.refs.length ? h('button',{type:'button',text: isShown(eviCard(e)) ? 'shown ✓' : 'show',onclick:()=>{ toggleShow(eviCard(e)); showEvidence(e, from); }}) : null);
 }
 
 /* ---------- PLACES page ---------- */
@@ -953,7 +970,10 @@ function renderChat(){
   if (!msgs.length && !asking) log.append(h('p',{class:'intro muted',text:`${p.name} · ${roleOf(S.person, +S.era)} · ${S.era}. Ask anything.`}));
   msgs.forEach(t=>log.append(
     h('div',{class:'msg me'}, h('b',{text:'you'}), t.question),
-    h('div',{class:'msg'}, h('b',{text:p.short}), t.answer, h('button',{type:'button',class:'tomemo',text:'→ memo',onclick:()=>toMemo(t, p)}))));
+    h('div',{class:'msg'}, h('b',{text:p.short}), t.answer, h('div',{class:'acts'},
+      h('button',{type:'button',class:'tomemo',text:'→ memo',onclick:()=>toMemo(t, p)}),
+      h('button',{type:'button',class:'tomemo'+(isShown(turnCard(t))?' on':''),text:isShown(turnCard(t))?'pinned ✓':'pin',onclick:()=>toggleShow(turnCard(t))})))));
+  if (game?.pins.length) log.append(h('p',{class:'intro muted',text:`you are showing ${game.pins.length} card${game.pins.length>1?'s':''}: pinned answers and evidence.`}));
   if (asking) log.append(h('div',{class:'msg me'}, h('b',{text:'you'}), asking), h('p',{class:'intro muted',text:`${p.short} is answering…`}));
   log.scrollTop=log.scrollHeight;
 }
