@@ -57,7 +57,10 @@ const lookOf = (era: Era): Look => (era <= "2016" ? "2016" : era <= "2019" ? "mi
 export function portraitSrc(k: PersonId, era: Era): string | null {
   const p = PEOPLE[k];
   const look = lookOf(era);
-  const use: Look | null = p.face[look] ? look : look === "mid" && p.face["2016"] ? "2016" : null; // Ken has no mid look
+  // A missing look falls back to the latest earlier one: Ken has no mid look (2017 uses 2016), and Julia has
+  // nothing after 2016, so her grayed-out slot in 2025-2026 keeps her 2016 portrait instead of the drawn placeholder.
+  const order: Look[] = ["2026", "mid", "2016"];
+  const use = order.slice(order.indexOf(look)).find((l) => p.face[l]) ?? null;
   return use ? `/assets/portraits/${p.img}_${use}_${p.face[use]}.webp` : null;
 }
 

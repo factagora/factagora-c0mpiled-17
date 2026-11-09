@@ -255,6 +255,21 @@ html[data-screen="board"] #hud,html[data-screen="board"] #s-map{display:none}
   #s-map .memo textarea{min-height:0}
   #s-map .wrap{--topMin:280px;grid-template-rows:minmax(var(--topMin),1fr) min(var(--chatH,clamp(160px,26vh,260px)),max(120px,calc(100% - var(--topMin) - 40px)));row-gap:40px}
   #s-map .mapgrid>.win.memo{overflow-y:auto}   /* evidence + memo scroll inside the window instead of spilling out */
+  /* when a tall chat makes the memo window short: evidence on one row, no helper line, so the memo and accuse button stay in view */
+  #s-map .mapgrid>.win.memo{container:memo/size}
+  @container memo (max-height:440px){   /* #s-map prefixes win over the base .evi rules that come later in the file */
+    #s-map .memo .evi{grid-template-columns:repeat(14,minmax(0,1fr));gap:4px;margin-top:6px}
+    #s-map .memo .evi button{font-size:11px;border-width:1px}
+    #s-map .memo .evinote{margin-top:4px;min-height:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    #s-map .memo small{display:none}
+    #s-map .memo textarea{margin-top:6px;min-height:48px}
+    #s-map .memo .mbtns{margin-top:6px}
+  }
+  @container memo (max-height:300px){
+    #s-map .memo .evinote:not(:has(b)){display:none}   /* keep the line only while a found clue is selected */
+    #s-map .memo .mbtns .pbtn{min-height:34px}
+  }
+
   /* drag the chat's top edge to change its height; the tab label stays above the grip */
   #s-map .chatgrip{display:block;position:absolute;left:0;right:0;top:-30px;height:34px;cursor:row-resize;touch-action:none;z-index:1}
   /* the whole top edge lights up on hover/drag, like an editor's panel divider */
