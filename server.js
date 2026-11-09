@@ -48,6 +48,8 @@ function serveStatic(pathname, res) {
   } catch {
     return notFound(res);
   }
+  // A null byte makes fs throw, which would take the whole server down.
+  if (rel.includes("\0")) return notFound(res);
   const file = path.join(WEB_DIR, rel);
   if (!file.startsWith(WEB_DIR + path.sep)) return notFound(res);
 
@@ -58,7 +60,8 @@ function serveStatic(pathname, res) {
       "Content-Length": stat.size,
       "Cache-Control": "no-cache",
     });
-    fs.createReadStream(file).pipe(res);
+    // An unreadable file must end this one response, not crash the server.
+    fs.createReadStream(file).on("error", () => res.destroy()).pipe(res);
   });
 }
 
@@ -225,7 +228,13 @@ async function handleRegister(req, res) {
 }
 
 function handle(req, res) {
-  const { pathname, searchParams } = new URL(req.url, "http://localhost");
+  let url;
+  try {
+    url = new URL(req.url, "http://localhost");
+  } catch {
+    return sendJson(res, 400, { error: "Bad request URL." });   // e.g. "GET http://[ HTTP/1.1" makes new URL throw
+  }
+  const { pathname, searchParams } = url;
 
   if (pathname === "/api/characters") {
     const timepoints = Object.entries(TIMEPOINTS).map(([id, t]) => ({ id, label: t.label }));
@@ -265,4 +274,4 @@ if (require.main === module) {
   http.createServer(handle).listen(port, () => console.log(`http://localhost:${port}`));
 }
 
-module.exports = { parseAsk };
+module.exports = { parseAsk, handle };

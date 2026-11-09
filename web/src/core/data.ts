@@ -99,16 +99,20 @@ export function placesOf(era: Era): Place[] {
   ];
 }
 
-// Each place shows a crop of existing background art: [image, x%, y%].
-const ART: Record<string, [string, number, number]> = {
-  dev_floor: ["bg_office_2016", 14, 52], ceo_room: ["bg_office_2016", 74, 36], server_room: ["bg_server_hall", 30, 45], lounge: ["bg_office_2016", 48, 34],
-  lobby: ["bg_office_2016", 88, 34], elsewhere: ["bg_seoul_2026", 70, 45],
-  "moonlight hq": ["bg_seoul_2026", 27, 40], "nova hq": ["bg_seoul_2026", 40, 40], newsroom: ["bg_office_2016", 36, 42],
-  "ken's home": ["bg_seoul_2026", 88, 44], "vc office": ["bg_office_2016", 72, 32], "evidence storage": ["bg_evidence_room", 50, 50],
+// Each place zooms into its own part of the existing background art: [image, x%, y%, zoom].
+// zoom is the art's height relative to the card, so 300 shows about a third of the picture.
+const ART: Record<string, [string, number, number, number]> = {
+  dev_floor: ["bg_office_2016", 10, 58, 280], ceo_room: ["bg_office_2016", 78, 36, 380], server_room: ["bg_server_hall", 30, 42, 190],
+  lounge: ["bg_office_2016", 52, 30, 380], lobby: ["bg_office_2016", 90, 32, 420], elsewhere: ["bg_seoul_2026", 72, 46, 240],
+  "moonlight hq": ["bg_seoul_2026", 24, 34, 320], "nova hq": ["bg_seoul_2026", 46, 36, 340], newsroom: ["bg_office_2016", 34, 46, 320],
+  "ken's home": ["bg_seoul_2026", 94, 46, 380], "vc office": ["bg_office_2016", 64, 24, 420], "evidence storage": ["bg_evidence_room", 40, 58, 220],
 };
+// --azr: rooms are taller boxes, so less zoom shows the same part
 export function artStyle(key: string): CSSProperties {
   const a = ART[key];
-  return a ? ({ "--art": `url("/assets/bg/${a[0]}.webp")`, "--ax": `${a[1]}%`, "--ay": `${a[2]}%` } as CSSProperties) : {};
+  return a
+    ? ({ "--art": `url("/assets/bg/${a[0]}.webp")`, "--ax": `${a[1]}%`, "--ay": `${a[2]}%`, "--az": `auto ${a[3]}%`, "--azr": `auto ${Math.max(140, (a[3] * 0.55) | 0)}%` } as CSSProperties)
+    : {};
 }
 
 // Record cards: found by searching a place, only after visiting `from` or later on the radio.

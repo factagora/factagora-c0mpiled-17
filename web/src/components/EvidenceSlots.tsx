@@ -46,7 +46,7 @@ export function EvidenceSlots() {
           const cls = [has && "got", has && isPinned(pins, evidenceCard(e)) && "shown", fresh.includes(e.icon) && "fresh", selected?.icon === e.icon && "sel"].filter(Boolean).join(" ");
           return (
             <button key={e.icon} type="button" className={cls} aria-label={has ? e.title : "not found yet"} onClick={() => has && setSelected(e)}>
-              {has ? <img src={itemSrc(e.icon)} alt="" /> : "?"}
+              {has ? <img src={itemSrc(e.icon)} alt="" decoding="async" /> : "?"}
             </button>
           );
         })}

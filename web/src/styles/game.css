@@ -58,9 +58,15 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .ph{--suit:#3b2f7a;position:relative;background:radial-gradient(circle at 50% 40%,var(--skin) 0 19%,transparent 20%),radial-gradient(circle at 50% 30%,var(--hair,#2a1d14) 0 23%,transparent 24%),radial-gradient(ellipse at 50% 108%,var(--suit) 0 46%,transparent 47%),var(--portrait);border:2px solid var(--fg);box-sizing:border-box;display:flex;align-items:flex-end;justify-content:flex-end;padding:2px 4px;font-size:12px;color:var(--fg);image-rendering:pixelated}
 .ph.art{background:var(--portrait);padding:0;font-size:0;overflow:hidden}
 .ph img{width:100%;height:100%;object-fit:cover;display:block;image-rendering:auto}   /* painted pixel-style art: smooth sampling */
+/* year change: the next look fades in over the old one, then the old one is removed */
+.ph img.next{position:absolute;inset:0;opacity:0;transition:opacity .45s ease}
+.ph img.next.on{opacity:1}
+.cell.slot .note{transition:opacity .25s ease}
+.cell.slot .note.swap{opacity:0}
+@media (prefers-reduced-motion:reduce){.ph img.next{transition:none}}
 .pol{position:relative;background:transparent;border:0;padding:24px 0 0;display:flex;flex-direction:column;align-items:center;gap:6px;width:104px;font-size:16px;transition:transform .15s steps(2),filter .35s ease}
 .pol .ph{width:96px;height:96px}
-.pol:hover{transform:translateY(-3px)}
+.pol:hover{transform:none}   /* no lift on hover: the row stays still, the gold frame shows the target */
 .pol:hover .ph{border-color:var(--gold)}
 .pol.done{color:var(--muted)}
 .pol.done .ph{border-color:var(--dim);filter:saturate(.6) brightness(.8)}
@@ -393,7 +399,7 @@ html[data-screen="places"] #s-map{display:none}
 #s-places .wrap{padding-block:clamp(8px,1.6vh,14px) 24px}
 .pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:14px}
 .pcard{position:relative;min-height:170px;border:3px solid var(--fg);padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:4px;cursor:pointer;color:var(--fg);
-  background:linear-gradient(rgba(11,9,44,.78),rgba(20,16,70,.3) 45%,rgba(11,9,44,.86)),var(--art) var(--ax) var(--ay)/cover no-repeat;image-rendering:auto}
+  background:linear-gradient(rgba(11,9,44,.78),rgba(20,16,70,.3) 45%,rgba(11,9,44,.86)),var(--art) var(--ax) var(--ay)/var(--az,cover) no-repeat;image-rendering:auto}
 .pcard:hover{outline:3px solid var(--gold);outline-offset:-6px}
 .pcard .lbl{text-transform:uppercase;letter-spacing:.04em;text-shadow:2px 2px 0 var(--solid)}
 .pcard .sub{font-size:13px;color:var(--muted);text-shadow:1px 1px 0 var(--solid)}
@@ -401,7 +407,7 @@ html[data-screen="places"] #s-map{display:none}
 .pcard .faces img{width:40px;height:40px;border:2px solid var(--fg);image-rendering:auto}
 .pcard .go{position:absolute;right:10px;bottom:8px;color:var(--gold);font-size:14px;text-shadow:1px 1px 0 var(--solid)}
 .room{position:relative;border:3px solid var(--fg);margin-top:14px;min-height:min(62vh,560px);overflow:hidden;
-  background:linear-gradient(rgba(11,9,44,.55),rgba(20,16,70,.15) 40%,rgba(11,9,44,.8)),var(--art) var(--ax) var(--ay)/cover no-repeat;image-rendering:auto}
+  background:linear-gradient(rgba(11,9,44,.55),rgba(20,16,70,.15) 40%,rgba(11,9,44,.8)),var(--art) var(--ax) var(--ay)/var(--azr,cover) no-repeat;image-rendering:auto}
 .room[hidden],.pgrid[hidden]{display:none!important}
 .room-head{position:absolute;inset:10px 12px auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;z-index:2}
 .room-head .back{background:var(--solid);border:2px solid var(--fg);color:var(--fg);padding:2px 10px;min-height:32px}
