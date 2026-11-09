@@ -1,7 +1,7 @@
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
-const { TIMEPOINTS, NAMES, appearsAt, spacesOf, hiddenRefs, systemPrompt } = require("./characters");
+const { TIMEPOINTS, NAMES, appearsAt, spacesOf, hiddenRefs, systemPrompt, screenText } = require("./characters");
 const { judgeScored } = require("./scoring");
 const { createLeaderboard, createVerdictStore, parseNick } = require("./leaderboard");
 const { createLimiter, clientKey } = require("./ratelimit");
@@ -243,7 +243,7 @@ async function handleAccuse(req, res) {
   const entry = nick ? board.add({ nick, ending: result.ending, score: result.total_score }) : null;
   const verdictId = nick ? null : verdicts.save({ ending: result.ending, score: result.total_score });
   console.log(JSON.stringify({ event: "accuse", who: body.who, nick, ending: result.ending, score: result.score, total_score: result.total_score, source: result.source, rank: entry?.rank ?? null, ms: Date.now() - started }));
-  sendJson(res, 200, { ...result, verdictId, entry });
+  sendJson(res, 200, { ...screenText(result), verdictId, entry });
 }
 
 // Registers a judged verdict under a nick. The score comes from the stored verdict, so the browser cannot choose it.
@@ -269,7 +269,7 @@ function handle(req, res) {
 
   if (pathname === "/api/characters") {
     const timepoints = Object.entries(TIMEPOINTS).map(([id, t]) => ({ id, label: t.label }));
-    const characters = Object.fromEntries(Object.entries(NAMES).map(([id, name]) => [id, { name, timepoints: timepointsOf(id) }]));
+    const characters = Object.fromEntries(Object.entries(NAMES).map(([id, name]) => [id, { name: id === "kim" ? "Ken Kim" : screenText(name), timepoints: timepointsOf(id) }]));
     return sendJson(res, 200, { timepoints, characters });
   }
   if (pathname === "/api/ask") {

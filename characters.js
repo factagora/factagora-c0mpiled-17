@@ -85,4 +85,19 @@ function systemPrompt(character, timepoint) {
     .join("\n");
 }
 
-module.exports = { TIMEPOINTS, NAMES, appearsAt, spacesOf, hiddenRefs, systemPrompt };
+// The case data and story text use the story names (Jisoo, Dohyun, ...); the game screen uses English names (Julia, Daniel, ...).
+// screenText rewrites story names in text bound for the screen. Full names first, so "Jisoo Han" becomes "Julia Han", not "Julia Han Han".
+const SCREEN_NAMES = [
+  ["Jisoo Han", "Julia Han"], ["Dohyun Kang", "Daniel Kang"], ["Minjae Oh", "Marcus Oh"], ["Hana Yoo", "Hannah Yoo"],
+  ["Mr. Kim", "Ken"], ["Jisoo", "Julia"], ["Dohyun", "Daniel"], ["Minjae", "Marcus"], ["Hana", "Hannah"],
+];
+const NAME_RE = new RegExp(`\\b(${SCREEN_NAMES.map(([from]) => from.replace(".", "\\.")).join("|")})(?![\\w])`, "g");
+const NAME_TO = Object.fromEntries(SCREEN_NAMES);
+function screenText(value) {
+  if (typeof value === "string") return value.replace(NAME_RE, (m) => NAME_TO[m]);
+  if (Array.isArray(value)) return value.map(screenText);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, screenText(v)]));
+  return value;
+}
+
+module.exports = { TIMEPOINTS, NAMES, appearsAt, spacesOf, hiddenRefs, systemPrompt, screenText };
