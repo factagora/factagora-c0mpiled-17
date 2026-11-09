@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="ko">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -17,24 +17,24 @@
   </style>
 </head>
 <body>
-  <h1>대화 테스트</h1>
-  <p class="muted">게임 화면이 아니라 연결 확인용 페이지입니다. 기록은 이 브라우저에만 저장됩니다.</p>
+  <h1>Chat test</h1>
+  <p class="muted">A connection check, not the game screen. Turns are saved in this browser only.</p>
 
   <div class="row">
-    <label>시점 <select id="timepoint"></select></label>
-    <label>인물 <select id="character"></select></label>
-    <button id="reset" type="button">새 게임</button>
+    <label>Time <select id="timepoint"></select></label>
+    <label>Person <select id="character"></select></label>
+    <button id="reset" type="button">New game</button>
   </div>
   <form id="ask">
-    <input name="question" placeholder="질문을 입력하세요" required maxlength="500" autocomplete="off">
-    <button>보내기</button>
+    <input name="question" placeholder="Ask something" required maxlength="500" autocomplete="off">
+    <button>Send</button>
   </form>
   <p id="error" class="muted"></p>
 
-  <h2>핀한 카드 <span class="muted">(질문할 때 증거로 함께 보냅니다, 최대 10장)</span></h2>
+  <h2>Pinned cards <span class="muted">(sent as evidence with every question, up to 10)</span></h2>
   <ul id="pins"></ul>
 
-  <h2>사건 기록 <span class="muted">(모든 시점, 게임 속 시각 순)</span></h2>
+  <h2>Case log <span class="muted">(all time points, in in-game time order)</span></h2>
   <div id="log"></div>
 
   <script type="module">
@@ -72,7 +72,7 @@
       pinsEl.replaceChildren(
         ...game.pins.map((card) => {
           const li = document.createElement("li");
-          li.append(card, button("빼기", () => { unpin(game, card); render(); }));
+          li.append(card, button("Unpin", () => { unpin(game, card); render(); }));
           return li;
         }),
       );
@@ -87,12 +87,12 @@
         }
         const q = document.createElement("p");
         q.className = "muted";
-        q.textContent = `서진 → ${names[t.character] || t.character}: ${t.question}`;
+        q.textContent = `You → ${names[t.character] || t.character}: ${t.question}`;
         const a = document.createElement("p");
         const who = document.createElement("span");
         who.className = "who";
         who.textContent = `${names[t.character] || t.character}: `;
-        a.append(who, t.answer, button("핀", () => { if (!pin(game, t, names)) errorEl.textContent = "이미 핀했거나 10장이 찼습니다."; render(); }));
+        a.append(who, t.answer, button("Pin", () => { if (!pin(game, t, names)) errorEl.textContent = "Already pinned, or 10 cards are pinned."; render(); }));
         logEl.append(q, a);
       }
     }
@@ -112,7 +112,7 @@
         await ask(game, charSel.value, tpSel.value, question);
         render();
       } catch (e) {
-        errorEl.textContent = `오류: ${e.message}`;
+        errorEl.textContent = `Error: ${e.message}`;
       } finally {
         form.querySelector("button").disabled = false;
       }
