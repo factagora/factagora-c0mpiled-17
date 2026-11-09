@@ -2,6 +2,7 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 const { TIMEPOINTS, NAMES, appearsAt, spacesOf, systemPrompt } = require("./characters");
+const { judge } = require("./accuse");
 
 const port = process.env.PORT || 3000;
 
@@ -191,6 +192,16 @@ function handle(req, res) {
       console.error(JSON.stringify({ event: "ask_failed", error: e.message }));
       if (!res.headersSent) sendJson(res, 500, { error: "Something went wrong." });
     });
+  }
+  if (pathname === "/api/accuse") {
+    if (req.method !== "POST") return sendJson(res, 405, { error: "Use POST." });
+    return readJson(req).then(
+      (b) => {
+        const result = judge(b?.who, b?.motive);
+        sendJson(res, result ? 200 : 400, result || { error: "Send a suspect id and a motive." });
+      },
+      (e) => sendJson(res, 400, { error: e.message })
+    );
   }
   const prefix = Object.keys(STATIC).find((p) => pathname.startsWith(p));
   if (prefix) return serveStatic(prefix, pathname, res);

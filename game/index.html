@@ -97,6 +97,48 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .memo textarea::placeholder{color:var(--dim)}
 .memo textarea:focus-visible{outline:none;border-top-color:var(--gold)}
 .memo small{color:var(--muted);font-size:13px;margin-top:6px}
+.mview{flex:1;min-height:0;display:flex;flex-direction:column}
+.mview[hidden]{display:none}
+.mbtns{display:flex;justify-content:flex-end;gap:10px;margin-top:10px}
+.pbtn{background:transparent;border:3px solid var(--gold);color:var(--gold);padding:0 18px;min-height:44px;text-transform:uppercase;letter-spacing:.06em}
+.pbtn:hover:not(:disabled){background:var(--gold);color:var(--solid)}
+.pbtn:disabled{border-color:var(--dim);color:var(--dim);cursor:default}
+.pbtn.ghostb{border-color:var(--muted);color:var(--muted)}
+.pbtn.ghostb:hover{background:var(--muted);color:var(--solid)}
+/* ACCUSE — replaces the memo: pick a suspect, write the motive, submit */
+.mstep{color:var(--fg);font-size:15px;margin-top:10px;padding:0}
+.suslist{border:0;margin:0;padding:0;min-width:0;flex:0 1 auto;min-height:0;overflow-y:auto}
+#susOpts{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.sus{display:flex;align-items:center;gap:10px;padding:3px 6px;border:2px solid transparent;cursor:pointer;font-size:15px;line-height:1.3}
+.sus input{position:absolute;opacity:0;pointer-events:none}
+.sus .ph{width:36px;height:36px;flex:none;border-width:2px}
+.sus small{display:block;margin:0;font-size:12px}
+.sus:hover{border-color:var(--muted)}
+.sus:has(input:checked){border-color:var(--gold);color:var(--gold)}
+.sus:has(input:focus-visible){outline:3px solid var(--gold);outline-offset:1px}
+.sus:has(input:disabled){cursor:default}
+#motive{flex:1 0 80px}   /* keep room to write even when the one-screen layout squeezes the panel */
+#accuseView.done .wtitle{color:var(--cyan)}
+/* VERDICT — modal result after the accusation is judged by the server */
+.verdict{color:var(--fg);background:var(--solid);width:min(680px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow-y:auto;padding:26px 30px}
+.verdict::backdrop{background:rgba(5,4,24,.78)}
+.verdict[open]{animation:enter .5s steps(6)}
+.vkicker{margin:0;color:var(--muted);font-size:14px;text-transform:uppercase;letter-spacing:.08em}
+.verdict h2{font-size:clamp(30px,5vw,48px);color:var(--gold);letter-spacing:.06em;line-height:1.1;margin:4px 0 14px}
+.verdict.bad h2{color:var(--red)}
+.vrows{display:grid;grid-template-columns:7em minmax(0,1fr);gap:8px 14px;margin:0;border-block:2px dashed var(--dim);padding-block:12px}
+.vrows dt{color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.vrows dd{margin:0}
+#vMark.ok{color:var(--gold)} #vMark.no{color:var(--red)}
+.segments{display:flex;gap:4px;margin:6px 0}
+.segments i{flex:1;max-width:28px;height:12px;background:var(--dim)}
+.segments i.on{background:var(--gold)}
+#vMotives{list-style:none;margin:0;padding:0;font-size:14px}
+#vMotives li{display:flex;justify-content:space-between;gap:12px;color:var(--muted)}
+#vMotives li.on{color:var(--fg)}
+.verdict blockquote{margin:14px 0 0;padding:8px 14px;border-left:4px solid var(--cyan);color:var(--cyan);font-size:15px}
+#vSummary p{margin:10px 0 0;line-height:1.5}
+.vfoot{font-size:13px;margin:14px 0 0}
 
 /* CHAT — talk to the selected person (answers come from /api/ask) */
 .chat{display:flex;flex-direction:column;min-height:220px;margin-top:40px;padding:clamp(14px,2vh,22px) 24px clamp(10px,1.6vh,16px)}
@@ -224,7 +266,7 @@ html:not([data-screen="title"]) #s-title{display:none}
     <nav class="win navbox" aria-label="menu">
       <button data-go="map" aria-current="true">map</button><span class="sep">|</span>
       <button data-soon>case log <b id="logCount">0</b></button><span class="sep">|</span>
-      <button data-soon>accuse</button>
+      <button data-go="accuse">accuse</button>
     </nav>
   </div>
 </header>
@@ -268,9 +310,26 @@ html:not([data-screen="title"]) #s-title{display:none}
         </div>
       </div>
       <div class="win memo">
-        <label class="wtitle" for="memo">memo</label>
-        <textarea id="memo" placeholder="write anything here…&#10;who lied, what time, what to ask next." spellcheck="false"></textarea>
-        <small>notes stay until you reload the page.</small>
+        <div class="mview" id="memoView">
+          <label class="wtitle" for="memo">memo</label>
+          <textarea id="memo" placeholder="write anything here…&#10;who lied, what time, what to ask next." spellcheck="false"></textarea>
+          <small>notes stay until you reload the page.</small>
+          <div class="mbtns"><button type="button" class="pbtn" id="toAccuse">accuse ▶</button></div>
+        </div>
+        <form class="mview" id="accuseView" hidden novalidate>
+          <span class="wtitle" id="accuseTitle">accuse</span>
+          <fieldset class="suslist" aria-labelledby="susLegend">
+            <legend id="susLegend" class="mstep">1. who did it?</legend>
+            <div id="susOpts"></div>
+          </fieldset>
+          <label class="mstep" for="motive">2. why? write the motive.</label>
+          <textarea id="motive" placeholder="what did they want, and what made them do it at 23:23?" spellcheck="false"></textarea>
+          <small id="accuseMsg" aria-live="polite">pick one person and write the motive to submit.</small>
+          <div class="mbtns">
+            <button type="button" class="pbtn ghostb" id="toMemo">◀ memo</button>
+            <button class="pbtn" id="accuseSubmit">submit</button>
+          </div>
+        </form>
       </div>
     </div>
     <div class="win chat">
@@ -284,6 +343,19 @@ html:not([data-screen="title"]) #s-title{display:none}
   </div>
 </section>
 </main>
+
+<dialog class="win verdict" id="verdict" aria-labelledby="vTitle">
+  <p class="vkicker">case 2016-0315 · verdict</p>
+  <h2 id="vTitle"></h2>
+  <dl class="vrows">
+    <dt>culprit</dt><dd><span id="vWho"></span> <b id="vMark"></b></dd>
+    <dt>motive</dt><dd><span id="vScore"></span><div class="segments" id="vSeg" aria-hidden="true"></div><ul id="vMotives"></ul></dd>
+  </dl>
+  <blockquote id="vQuote"></blockquote>
+  <div id="vSummary"></div>
+  <p class="muted vfoot">no retry. reload the page to start over.</p>
+  <div class="mbtns"><button type="button" class="pbtn" id="vClose">close</button></div>
+</dialog>
 
 <div id="toast" role="status" aria-live="polite"></div>
 <div class="scanlines" aria-hidden="true"></div>
@@ -465,6 +537,56 @@ $('#chatform').addEventListener('submit', async e=>{
   catch (err) { toast(err.message || 'no answer, try again'); $('#chatInput').value=v; }
   finally { asking=false; updateLogCount(); renderChat(); $('#chatInput').focus(); }
 });
+
+/* ---------- ACCUSE (swaps the memo panel; one submission, judged by /api/accuse) ---------- */
+const SUSPECTS = Object.keys(PEOPLE).filter(k=>k!=='jisu');   // jisu is the victim
+SUSPECTS.forEach(k=>{ const p=PEOPLE[k];
+  $('#susOpts').append(h('label',{class:'sus'}, h('input',{type:'radio',name:'suspect',value:k}), phEl(k), h('span',{}, p.name, h('small',{class:'muted',text:p.r16}))));
+});
+function showAccuse(on){
+  $('#memoView').hidden=on; $('#accuseView').hidden=!on;
+  (on ? ($('#accuseView input:checked') || $('#accuseView input')) : $('#memo')).focus();
+}
+$('#toAccuse').addEventListener('click', ()=>showAccuse(true));
+$('#toMemo').addEventListener('click', ()=>showAccuse(false));
+document.querySelector('[data-go="accuse"]').addEventListener('click', ()=>showAccuse(true));
+$('#accuseView').addEventListener('submit', e=>{
+  e.preventDefault();
+  const pick=$('#accuseView input:checked'), why=$('#motive').value.trim(), msg=$('#accuseMsg');
+  if (!pick){ msg.textContent='step 1: pick who did it.'; $('#accuseView input').focus(); return; }
+  if (!why){ msg.textContent='step 2: write the motive.'; $('#motive').focus(); return; }
+  const lock = on => $('#accuseView').querySelectorAll('input,textarea,#accuseSubmit').forEach(el=>el.disabled=on);
+  lock(true); msg.textContent='sending…';
+  fetch('/api/accuse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({who:pick.value, motive:why})})
+    .then(r=>{ if (!r.ok) throw new Error(r.status); return r.json(); })
+    .then(v=>{
+      S.verdict=v;
+      $('#accuseView').classList.add('done');
+      $('#accuseTitle').textContent='accusation sent';
+      msg.textContent=`you named ${PEOPLE[pick.value].name}.`;
+      $('#toMemo').before(h('button',{type:'button',class:'pbtn ghostb',text:'verdict',onclick:()=>$('#verdict').showModal()}));
+      showVerdict(v, pick.value);
+    })
+    .catch(()=>{ lock(false); msg.textContent='could not reach the case server. try again.'; });
+});
+function showVerdict(v, who){
+  const d=$('#verdict');
+  d.classList.toggle('bad', !v.correct);
+  $('#vTitle').textContent=v.title;
+  $('#vWho').textContent=PEOPLE[who].name;
+  $('#vMark').textContent = v.correct ? '✓ correct' : '! wrong';
+  $('#vMark').className = v.correct ? 'ok' : 'no';
+  $('#vScore').textContent = `${v.score} / 100`;
+  const seg=$('#vSeg'); seg.innerHTML='';
+  for (let i=0;i<10;i++) seg.append(h('i',{class: i < v.score/10 ? 'on' : ''}));
+  const ul=$('#vMotives'); ul.innerHTML='';
+  if (!v.motives.length) ul.append(h('li',{text:'no known motive found in what you wrote.'}));
+  v.motives.forEach(m=>ul.append(h('li',{class:m.counted?'on':''}, h('span',{text:(m.counted?'✓ ':'— ')+m.label}), h('span',{text:m.counted?m.points:0}))));
+  $('#vQuote').textContent=`${PEOPLE[who].short}: “${v.reaction}”`;
+  const sm=$('#vSummary'); sm.innerHTML=''; v.summary.forEach(t=>sm.append(h('p',{text:t})));
+  d.showModal();
+}
+$('#vClose').addEventListener('click', ()=>$('#verdict').close());
 
 /* ---------- TITLE: tune to 11.23 MHz, answer, then the map opens ---------- */
 const TARGET=11.23, LOCK=0.04, FMIN=9, FMAX=13;
