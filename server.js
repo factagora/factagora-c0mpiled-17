@@ -219,7 +219,7 @@ ${list(facts.filter((m) => m.type === "claim"), true)}`;
   sendJson(res, 200, { answer: answer.trim(), refs });
 }
 
-// Judges the accusation (right or wrong culprit, motive score 1-100). The response keeps the shape the game screen reads and adds
+// Judges the accusation (right or wrong culprit, motive score 1-100). The player's memo is read as the motive. The response keeps the shape the game screen reads and adds
 // a verdictId to register the score later. With a nick it registers right away and there is no verdictId.
 async function handleAccuse(req, res) {
   const started = Date.now();
@@ -233,14 +233,15 @@ async function handleAccuse(req, res) {
   const { nick, error } = parseNick(body?.nick);
   if (error) return sendJson(res, 400, { error });
 
-  const result = await judgeScored(body?.who, body?.motive, {
+  const result = await judgeScored(body?.who, body?.memo ?? body?.motive, {
     chat,
     onFallback: (e) => console.error(JSON.stringify({ event: "scoring_fallback", error: e.message })),
   });
-  if (!result) return sendJson(res, 400, { error: "Send a suspect id and a motive." });
+  if (!result) return sendJson(res, 400, { error: "Send a suspect id (who) and the memo text." });
 
-  const entry = nick ? board.add({ nick, ending: result.ending, score: result.score }) : null;
-  const verdictId = nick ? null : verdicts.save(result);
+  // The board ranks the total score (culprit + motive), the same number the verdict screen shows.
+  const entry = nick ? board.add({ nick, ending: result.ending, score: result.total_score }) : null;
+  const verdictId = nick ? null : verdicts.save({ ending: result.ending, score: result.total_score });
   console.log(JSON.stringify({ event: "accuse", who: body.who, nick, ending: result.ending, score: result.score, total_score: result.total_score, source: result.source, rank: entry?.rank ?? null, ms: Date.now() - started }));
   sendJson(res, 200, { ...result, verdictId, entry });
 }
