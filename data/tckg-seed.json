@@ -1,7 +1,7 @@
 {
   "tenant": "hackathon-c0mpiled",
   "case_id": "moonlight",
-  "query_rule": "Agent <char>.<T> = public (learned_at <= T) + char.<char> where learned_at <= T (knowledge) or said_at == T (claims). Never query truth for agents.",
+  "query_rule": "Agent <char>.<T> = public (learned_at <= T) + char.<char> where learned_at <= T (knowledge) or said_at <= T (claims: a character remembers everything it said up to T). Never query truth for agents.",
   "spaces": [
     {
       "name": "moonlight.truth",

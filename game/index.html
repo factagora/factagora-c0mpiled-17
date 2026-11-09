@@ -18,6 +18,16 @@ html,body{height:100%}
 body{background:var(--sky1);color:var(--fg);font-family:var(--px);font-size:17px;line-height:1.6;-webkit-font-smoothing:none}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--sky1)}
 #sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;image-rendering:pixelated}
+/* map background by timepoint: 2015-2019 office at night, 2025-2026 seoul; a scrim keeps the windows readable */
+#eraBg{position:fixed;inset:0;z-index:0;background:center/cover no-repeat;image-rendering:auto;display:none}
+#eraBg::after{content:"";position:absolute;inset:0;background:rgba(11,9,44,.55)}
+html[data-screen="map"] #eraBg{display:block}
+html[data-bg="office"] #eraBg{background-image:url("/assets/bg/bg_office_2016.jpg")}
+html[data-bg="seoul"] #eraBg{background-image:url("/assets/bg/bg_seoul_2026.jpg")}
+/* radio timepoints: a light static over portraits (in person in 2026, so no static) */
+#plan.radio .ph.art::after{content:"";position:absolute;inset:0;background-image:var(--snow);background-size:48px 48px;opacity:.28;mix-blend-mode:screen;animation:snow .5s steps(4) infinite;pointer-events:none}
+@keyframes snow{0%{background-position:0 0}25%{background-position:-17px 9px}50%{background-position:11px -21px}75%{background-position:-7px 14px}}
+@media (prefers-reduced-motion:reduce){#plan.radio .ph.art::after{animation:none}}
 #noise{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:65;opacity:0;image-rendering:pixelated;transition:opacity .25s}
 .scanlines{position:fixed;inset:0;pointer-events:none;z-index:70;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px 3px)}
 button,input{font:inherit;color:inherit}
@@ -38,9 +48,9 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .timebox{padding:12px 22px 14px;display:flex;flex-direction:column;gap:8px}
 .timebox .tt{font-size:clamp(20px,2.4vw,28px);color:var(--gold);letter-spacing:.06em;font-variant-numeric:tabular-nums}
 .bars{display:flex;gap:8px;align-items:center}
-.bars i{display:block;width:36px;height:8px;background:var(--dim)}
-.bars i.on{background:var(--gold);width:60px}
-.bars i.on26{background:var(--cyan);width:60px}
+.bars i{display:block;width:24px;height:8px;background:var(--dim)}
+.bars i.on{background:var(--gold);width:44px}
+.bars i.on26{background:var(--cyan);width:44px}
 .navbox{padding:12px 22px;display:flex;align-items:center;gap:14px;font-size:clamp(17px,2vw,22px);text-transform:uppercase;letter-spacing:.04em}
 .navbox button{background:transparent;border:0;padding:4px 2px;min-height:40px}
 .navbox button:hover,.navbox button[aria-current="true"]{color:var(--gold)}
@@ -60,7 +70,7 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .pol:hover .ph{border-color:var(--gold)}
 .pol.done{color:var(--muted)}
 .pol.done .ph{border-color:var(--dim);filter:saturate(.6) brightness(.8)}
-.pol .mark,.pol .new{position:absolute;top:0;left:0;right:0;text-align:center;font-size:15px}
+.pol .mark,.pol .new{position:absolute;top:0;left:50%;translate:-50% 0;text-align:center;font-size:15px;white-space:nowrap}
 .pol .mark{color:var(--muted)}
 .pol .new{color:var(--gold)}
 .ghost{position:fixed;z-index:80;pointer-events:none;margin:0}
@@ -157,6 +167,7 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .msg{max-width:72%;padding:6px 12px;border:2px solid var(--muted);font-size:clamp(15px,1.4vw,18px);line-height:1.45;align-self:flex-start}
 .msg b{display:block;font-weight:400;font-size:13px;color:var(--muted)}
 .msg.me{align-self:flex-end;border-color:var(--gold);color:var(--gold)}
+.chatgrip{display:none}
 .chatform{display:flex;gap:10px;margin-top:10px}
 .chatform input{flex:1;min-width:0;background:transparent;border:3px solid var(--muted);padding:8px 12px;font-size:16px}
 .chatform input:focus-visible{outline:none;border-color:var(--gold)}
@@ -215,11 +226,30 @@ html[data-screen="board"] #hud,html[data-screen="board"] #s-map{display:none}
   #s-map .cell .inv{display:none}
   /* one portrait size for every room: limited by the row height (minus label, sub line, badge, name) and by a column's width */
   #s-map .pol{padding-top:20px;gap:2px;width:auto;font-size:15px}
-  #s-map .pol .ph{width:clamp(40px,min(100cqh - 124px,100cqw / 7 - 24px),96px);height:clamp(40px,min(100cqh - 124px,100cqw / 7 - 24px),96px)}
+  /* rooms are as wide as their headcount (--cols, set by renderMap; --u = total share), so people in a room stay on one row
+     and every portrait in a year has the same size and the same top */
+  #s-map .plan[style*="--cols"]{grid-template-columns:var(--cols)}
+  #s-map .cell .who{flex-wrap:nowrap;gap:8px}
+  #s-map .pol{min-width:0}
+  #s-map .pol>span:not(.new):not(.mark){max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #s-map .pol .ph{--sz:clamp(40px,min(100cqh - 124px,100cqw / var(--u,7) - 32px),96px);width:var(--sz);height:var(--sz)}
   #s-map .pol .new,#s-map .pol .mark{font-size:13px}
   #s-map .chat{margin-top:0;min-height:0}
   #s-map .memo textarea{min-height:0}
-  #s-map .wrap{grid-template-rows:minmax(0,1fr) clamp(160px,26vh,260px);row-gap:40px}
+  #s-map .wrap{grid-template-rows:minmax(0,1fr) var(--chatH,clamp(160px,26vh,260px));row-gap:40px}
+  /* drag the chat's top edge to change its height; the tab label stays above the grip */
+  #s-map .chatgrip{display:block;position:absolute;left:0;right:0;top:-34px;height:40px;cursor:row-resize;touch-action:none;z-index:1}
+  /* the whole top edge lights up on hover/drag, like an editor's panel divider */
+  #s-map .chatgrip::before{content:"";position:absolute;left:0;right:0;bottom:3px;height:3px;background:var(--gold);opacity:0;transition:opacity .15s}
+  #s-map .chatgrip:hover::before,#s-map .chatgrip:focus-visible::before,#s-map .chatgrip.drag::before{opacity:1}
+  #s-map .chatgrip:focus-visible{outline:none}
+  /* a visible tab in the middle of the edge: up/down arrows + label say "drag me up or down" */
+  #s-map .griptab{position:absolute;left:50%;top:2px;translate:-50% 0;display:flex;align-items:center;gap:12px;padding:3px 18px;background:var(--solid);border:3px solid var(--muted);color:var(--fg);font-size:16px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+  #s-map .griptab i{width:0;height:0;border:7px solid transparent}
+  #s-map .griptab i:first-child{border-bottom-color:var(--gold);margin-top:-7px}
+  #s-map .griptab i:last-child{border-top-color:var(--gold);margin-top:7px}
+  #s-map .chatgrip:hover .griptab,#s-map .chatgrip:focus-visible .griptab,#s-map .chatgrip.drag .griptab{border-color:var(--gold);color:var(--gold)}
+  #s-map .chat .tablabel{z-index:2}
   #s-map .mapgrid>.win.memo{padding-bottom:clamp(10px,1.6vh,18px)}
 }
 
@@ -235,17 +265,27 @@ html:not([data-screen="title"]) #s-title{display:none}
 .t-logo.live{animation:tflick 2.4s steps(1,end) infinite}
 @keyframes tflick{0%,100%{color:var(--gold)}7%{color:var(--cyan)}8%{color:var(--gold)}61%{color:var(--fg)}62%{color:var(--gold)}}
 .t-radio{display:flex;gap:32px;align-items:center;padding:32px 40px;max-width:100%}
-.t-speaker{flex:none;width:96px;height:96px;border:2px solid var(--dim)}
+.t-speaker{flex:none;width:96px;height:96px;border:2px solid var(--dim);background:var(--solid);overflow:hidden}
+.t-speaker canvas{display:block;width:100%;height:100%;image-rendering:pixelated}   /* static lives only in the speaker, not over the whole screen */
+.t-speaker.live{border-color:var(--gold)}
 .t-body{display:flex;flex-direction:column;gap:12px;text-align:left;min-width:0}
 .t-clock{align-self:flex-start;border:2px solid var(--gold);color:var(--gold);padding:0 12px;font-size:clamp(24px,2.6vw,32px);font-variant-numeric:tabular-nums}
 .t-clock.live i{animation:blinkb 1s steps(1) infinite}
-.t-tuner{position:relative;width:min(520px,60vw);height:40px;border:2px solid var(--dim)}
+.t-dialbox{position:relative;width:min(520px,60vw);padding-bottom:36px;cursor:grab}
+.t-dialbox:active{cursor:grabbing}
+.t-tuner{position:relative;height:40px;border:2px solid var(--dim)}
 .t-tuner.live{border-color:var(--gold)}
 .t-needle{position:absolute;top:0;bottom:0;left:25%;width:4px;background:var(--red);pointer-events:none}
 .t-ticks{position:absolute;left:8px;right:8px;bottom:2px;display:flex;justify-content:space-between;font-size:16px;color:var(--muted);pointer-events:none}
-#dial{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:ew-resize}   /* the whole tuner bar is the dial */
-#dial:focus-visible+.t-needle{outline:3px solid var(--gold);outline-offset:2px}
-.t-hint{margin:0;color:var(--muted);font-size:20px}
+#dial{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:inherit;z-index:2}   /* the tuner bar and knob track are one big dial */
+/* knob under the needle: a big handle with arrows, nudging until the player first touches it */
+.t-knob{position:absolute;bottom:0;left:25%;translate:-50% 0;display:flex;align-items:center;gap:6px;padding:2px 10px;background:var(--gold);color:var(--solid);font-size:18px;line-height:1.3;white-space:nowrap;pointer-events:none}
+.t-knob::before{content:"";position:absolute;left:50%;top:-8px;translate:-50% 0;border:6px solid transparent;border-top:0;border-bottom:8px solid var(--gold)}
+.t-dialbox:not(.touched) .t-knob{animation:tnudge 1.2s steps(2,end) infinite}
+@keyframes tnudge{0%,100%{translate:-50% 0}50%{translate:calc(-50% + 10px) 0}}
+#dial:focus-visible~.t-knob{outline:3px solid var(--fg);outline-offset:2px}
+.t-target{color:var(--gold)}
+.t-hint{margin:0;color:var(--fg);font-size:20px}
 .t-hint.live{color:var(--gold)}
 .t-lede{margin:0;font-size:clamp(18px,2vw,24px)}
 .t-answer{background:var(--panel);border:3px solid var(--fg);box-shadow:inset 0 0 0 3px var(--solid),inset 0 0 0 5px var(--fg);color:var(--gold);padding:10px 32px;min-height:56px;font-size:clamp(18px,2vw,24px)}
@@ -254,7 +294,7 @@ html:not([data-screen="title"]) #s-title{display:none}
 .t-keys{position:absolute;right:clamp(16px,6vw,112px);bottom:24px;display:flex;gap:24px;font-size:16px;color:var(--muted)}
 .t-keys b{font-weight:400;border:2px solid var(--muted);padding:0 6px;margin-right:8px;color:var(--fg)}
 @media (max-width:600px){.t-radio{padding:20px}.t-speaker{display:none}.t-keys{display:none}}
-@media (prefers-reduced-motion:reduce){.t-logo.live{animation:none}}
+@media (prefers-reduced-motion:reduce){.t-logo.live,.t-dialbox .t-knob{animation:none}}
 
 /* VHS */
 #vhs{position:fixed;inset:0;z-index:75;pointer-events:none;display:none;overflow:hidden}
@@ -288,6 +328,7 @@ html:not([data-screen="title"]) #s-title{display:none}
 </head>
 <body>
 <canvas id="sky" aria-hidden="true"></canvas>
+<div id="eraBg" aria-hidden="true"></div>
 <canvas id="noise" width="160" height="90" aria-hidden="true"></canvas>
 <div id="vhs" aria-hidden="true"></div>
 
@@ -313,15 +354,18 @@ html:not([data-screen="title"]) #s-title{display:none}
     <p class="t-eyebrow">Moonlight Labs · cold case 2016-0315</p>
     <h1 class="t-logo" id="tLogo">11:23</h1>
     <div class="win t-radio" role="group" aria-label="radio">
-      <div class="t-speaker" aria-hidden="true"></div>
+      <div class="t-speaker" id="tSpeaker" aria-hidden="true"><canvas id="tStatic" width="48" height="48"></canvas></div>
       <div class="t-body">
         <div class="t-clock" id="tClock"><span id="tTime">23:22:41</span> <i aria-hidden="true">■</i></div>
-        <div class="t-tuner" id="tTuner">
-          <input type="range" id="dial" min="0" max="1000" value="250" aria-label="radio frequency">
-          <i class="t-needle" id="tNeedle"></i>
-          <div class="t-ticks" aria-hidden="true"><span>9.0</span><span>10.0</span><span>11.23</span><span>12.0</span><span>13.0</span></div>
+        <div class="t-dialbox" id="tDialbox">
+          <input type="range" id="dial" min="0" max="1000" value="250" aria-label="radio frequency, tune to 11.23">
+          <div class="t-tuner" id="tTuner">
+            <i class="t-needle" id="tNeedle"></i>
+            <div class="t-ticks" aria-hidden="true"><span>9.0</span><span>10.0</span><span class="t-target">▼11.23</span><span>12.0</span><span>13.0</span></div>
+          </div>
+          <span class="t-knob" id="tKnob" aria-hidden="true">◀ drag ▶</span>
         </div>
-        <p class="t-hint" id="tStatus" role="status">Drag the dial until the static clears</p>
+        <p class="t-hint" id="tStatus" role="status">Drag the knob to ▼11.23 until the static clears</p>
       </div>
     </div>
     <p class="t-lede">Every night at 11:23, a dead radio picks up a woman who died ten years ago.</p>
@@ -339,9 +383,9 @@ html:not([data-screen="title"]) #s-title{display:none}
         <div class="plan" id="plan"></div>
         <div class="timeslider">
           <label class="wtitle" for="timeRange">time</label>
-          <input type="range" id="timeRange" min="0" max="5" step="1" value="2" aria-describedby="timeOut">
+          <input type="range" id="timeRange" min="0" max="6" step="1" value="1" aria-describedby="timeOut">
           <output id="timeOut" for="timeRange"></output>
-          <div class="tsticks" aria-hidden="true"><span>21:00</span><span>22:30</span><span>22:50</span><span>23:00</span><span>23:23</span><span>2026</span></div>
+          <div class="tsticks" aria-hidden="true"><span>2015</span><span>2016</span><span>2017</span><span>2018</span><span>2019</span><span>2025</span><span>2026</span></div>
         </div>
       </div>
       <div class="win memo">
@@ -368,6 +412,7 @@ html:not([data-screen="title"]) #s-title{display:none}
       </div>
     </div>
     <div class="win chat">
+      <div class="chatgrip" id="chatGrip" role="separator" aria-orientation="horizontal" aria-label="resize chat" title="drag up or down to resize · double-click to reset" tabindex="0"><span class="griptab" aria-hidden="true"><i></i>drag to resize<i></i></span></div>
       <span class="win tablabel" id="chatTab">CASE FILE</span>
       <div class="chatlog" id="chatlog" aria-live="polite"></div>
       <form class="chatform" id="chatform">
@@ -431,37 +476,71 @@ const h = (tag, attrs, ...kids) => {
   return el;
 };
 
-/* ---------- DATA (story facts follow the Notion page) ---------- */
+/* ---------- DATA (timepoints, places and who is where follow data/case.json) ---------- */
 const PEOPLE = {
-  jisu:   {name:'Julia Han',   short:'Julia',   ini:'JH', r16:'co-founder, cto', r26:'(deceased)',          hair:'#1a1230', suit:'#2f6f8f', img:'jisoo',  face:{'2016':'neutral'}},
-  dohyun: {name:'Daniel Kang', short:'Daniel',  ini:'DK', r16:'ceo, co-founder', r26:'ceo, now a unicorn',  hair:'#2a1d14', suit:'#4a4a6a', img:'dohyun', face:{'2016':'neutral','2026':'defensive'}},
-  minjae: {name:'Marcus Oh',   short:'Marcus',  ini:'MO', r16:'lead developer',  r26:'ceo, nova ai',        hair:'#141018', suit:'#6a3a5a', img:'minjae', face:{'2016':'neutral','2026':'neutral'}},
-  hana:   {name:'Hannah Yoo',  short:'Hannah',  ini:'HY', r16:'design intern',   r26:'it reporter',         hair:'#5a2e1a', suit:'#c9a24a', img:'hana',   face:{'2016':'neutral','2026':'neutral'}},
-  kim:    {name:'Ken Kim',     short:'Ken',     ini:'KK', r16:'building guard',  r26:'retired',             hair:'#b8b4c8', suit:'#3a5a3a', img:'kim',    face:{'2016':'neutral','2026':'guilty'}},
-  grace:  {name:'Grace Lee',   short:'Grace',   ini:'GL', r16:'investor',        r26:'investor',            hair:'#3a2418', suit:'#8a2a3a', img:'grace',  face:{'2016':'neutral','2026':'neutral'}}
+  jisoo:  {name:'Julia Han',   short:'Julia',  ini:'JH', hair:'#1a1230', suit:'#2f6f8f', img:'jisoo',  face:{'2016':'neutral'}},
+  dohyun: {name:'Daniel Kang', short:'Daniel', ini:'DK', hair:'#2a1d14', suit:'#4a4a6a', img:'dohyun', face:{'2016':'neutral','mid':'neutral','2026':'defensive'}},
+  minjae: {name:'Marcus Oh',   short:'Marcus', ini:'MO', hair:'#141018', suit:'#6a3a5a', img:'minjae', face:{'2016':'neutral','mid':'neutral','2026':'neutral'}},
+  hana:   {name:'Hannah Yoo',  short:'Hannah', ini:'HY', hair:'#5a2e1a', suit:'#c9a24a', img:'hana',   face:{'2016':'neutral','mid':'neutral','2026':'neutral'}},
+  kim:    {name:'Ken Kim',     short:'Ken',    ini:'KK', hair:'#b8b4c8', suit:'#3a5a3a', img:'kim',    face:{'2016':'neutral','2026':'guilty'}},
+  grace:  {name:'Grace Lee',   short:'Grace',  ini:'GL', hair:'#3a2418', suit:'#8a2a3a', img:'grace',  face:{'2016':'neutral','2026':'neutral'}}
 };
-// portrait art: /assets/portraits/{id}_{look}_{expression}.png (360x360); the map shows the 2016 and 2026 looks
-const portraitSrc = (k, era) => { const p=PEOPLE[k], f=p.face[era]; return f ? `/assets/portraits/${p.img}_${era}_${f}.png` : null; };
-const CELLS = {
-  '2016':[
-    {lbl:'dev room',          people:['minjae'], cls:'tall'},
-    {lbl:'ceo office',        people:['dohyun']},
-    {lbl:'design desk',       people:['hana']},
-    {lbl:'server room',       people:['jisu'], cls:'tall hot', room:true, sub:'deploy-bot logs live here'},
-    {lbl:'lobby · guard desk',people:['kim','grace'], cls:'wide', sub:'grace is on the phone line'}
-  ],
-  '2026':[
-    {lbl:'moonlight hq',     sub:'pangyo · a unicorn now',          people:['dohyun']},
-    {lbl:'nova ai',          sub:'the competitor',                  people:['minjae']},
-    {lbl:'newsroom',         sub:'it desk',                         people:['hana']},
-    {lbl:'home',             sub:'retired, wants to talk',          people:['kim']},
-    {lbl:'vc office',        sub:'keeps her last email',            people:['grace']},
-    {lbl:'evidence storage', sub:'case 2016-0315, boxed since 2016',people:[], cls:'hot', room:true, empty:'(julia · not reachable)'}
-  ]
+// role shown in the chat intro, by year
+function roleOf(k, y){
+  return ({
+    jisoo:  'co-founder, cto',
+    dohyun: y<2025 ? 'ceo, co-founder' : 'ceo, now a unicorn',
+    minjae: y<=2017 ? 'lead developer' : y<2025 ? 'now at nova ai' : 'ceo, nova ai',
+    hana:   y===2016 ? 'design intern' : y===2017 ? 'former intern' : 'it reporter',
+    kim:    y<=2017 ? 'building guard' : 'retired',
+    grace:  'investor'
+  })[k];
+}
+// seven timepoints: March 15 at 22:50 by radio, 2026 in person
+const ERAS = ['2015','2016','2017','2018','2019','2025','2026'];
+const ERA_NOTE = {
+  '2015':'year one, prototype all-nighter', '2016':'33 minutes before', '2017':"first memorial, ken's last shift",
+  '2018':"second memorial, hannah's first article", '2019':'third memorial, fellowship prep',
+  '2025':'ninth memorial, after hannah finds the contract', '2026':'present'
 };
-const S = {era:'2016', t:2, visited:new Set(), person:null};
-// time slider stops: index → HUD label; the last stop is 2026
-const STOPS = ['3/15  21:00','3/15  22:30','3/15  22:50','3/15  23:00','3/15  23:23','NOW  2026'];
+// portrait looks: 2016 covers 2015-2016, mid covers 2017-2019, 2026 covers 2025-2026 (/assets/portraits/{id}_{look}_{expression}.png)
+const lookOf = era => era<='2016' ? '2016' : era<='2019' ? 'mid' : '2026';
+function portraitSrc(k, era){
+  const p=PEOPLE[k], look=lookOf(era), use = p.face[look] ? look : (look==='mid' && p.face['2016'] ? '2016' : null);   // ken has no mid look: 2017 uses 2016
+  return use ? `/assets/portraits/${p.img}_${use}_${p.face[use]}.png` : null;
+}
+// static tile for portraits on radio timepoints, drawn once and used as a CSS background
+(()=>{ const c=document.createElement('canvas'); c.width=c.height=48; const x=c.getContext('2d'), d=x.createImageData(48,48);
+  for (let i=0;i<d.data.length;i+=4){ const v=Math.random()*255|0; d.data[i]=d.data[i+1]=d.data[i+2]=v; d.data[i+3]=255; }
+  x.putImageData(d,0,0); document.documentElement.style.setProperty('--snow', `url(${c.toDataURL()})`); })();
+// preload every look so switching years never shows an empty frame
+const portraitCache = Object.keys(PEOPLE).flatMap(k=>ERAS.map(e=>portraitSrc(k,e))).filter((v,i,a)=>v && a.indexOf(v)===i).map(src=>Object.assign(new Image(),{src}));
+// who is where (data/case.json "positions"); place ids are case.json places, offsite people carry the place they name
+const POS = {
+  '2015':{jisoo:'dev_floor', minjae:'dev_floor', dohyun:'ceo_room', kim:'lobby'},
+  '2016':{jisoo:'dev_floor', hana:'dev_floor', kim:'lobby', dohyun:'@home', minjae:'@home', grace:'@home'},
+  '2017':{dohyun:'lounge', minjae:'lounge', hana:'lounge', kim:'lobby'},
+  '2018':{dohyun:'lounge', hana:'lounge', minjae:'@nova office'},
+  '2019':{dohyun:'ceo_room', minjae:'lounge', hana:'lounge'},
+  '2025':{dohyun:'lounge', hana:'lounge', minjae:'@nova hq'},
+  '2026':{dohyun:'@moonlight hq', minjae:'@nova hq', hana:'@newsroom', kim:"@ken's home", grace:'@vc office'}
+};
+const ROOMS = [['dev_floor','dev floor'],['ceo_room','ceo room'],['server_room','server room'],['lounge','lounge'],['lobby','lobby · security desk']];
+const SUB26 = {'moonlight hq':'pangyo · a unicorn now', 'nova hq':'the competitor', 'newsroom':'it desk', "ken's home":'retired, wants to talk', 'vc office':'keeps her last email'};
+// six cells per year: five office rooms + elsewhere by radio, or five places + evidence storage in 2026
+function cellsOf(era){
+  const pos=POS[era], at=place=>Object.keys(pos).filter(k=>pos[k]===place);
+  const away=[...new Set(Object.values(pos).filter(v=>v[0]==='@'))];
+  if (era==='2026') return [
+    ...away.map(pl=>({lbl:pl.slice(1), sub:SUB26[pl.slice(1)], people:at(pl)})),
+    {lbl:'evidence storage', sub:'case 2016-0315, boxed since 2016', people:[], cls:'hot', room:true, empty:'(julia · not reachable)'}
+  ];
+  return [
+    ...ROOMS.map(([id,lbl])=>({lbl, people:at(id), cls: id==='server_room' && era==='2016' ? 'hot' : '', room: id==='server_room', sub: id==='server_room' ? 'deploy-bot logs live here' : ''})),
+    {lbl:'elsewhere', sub: away.length ? away.map(v=>v.slice(1)).join(' · ')+' · by radio' : 'by radio', people: away.flatMap(at)}
+  ];
+}
+const S = {era:'2016', visited:new Set(), person:null};
 
 /* ---------- SKY (pixel stars, moon, horizon) ---------- */
 const sky=$('#sky'), sctx=sky.getContext('2d'); let stars=[], SW=0, SH=0, frame=0;
@@ -492,10 +571,11 @@ let toastT; function toast(m){ const t=$('#toast'); t.textContent=m; t.classList
 let typeTok=0;
 function typeInto(el, text, speed){ const tok=++typeTok; if (reduced){ el.textContent=text; return Promise.resolve(); } el.textContent=''; return new Promise(res=>{ let i=0; (function step(){ if (tok!==typeTok) return res(); el.textContent=text.slice(0, ++i); if (i<text.length) setTimeout(step, speed||22); else res(); })(); }); }
 function phEl(k, style){ const p=PEOPLE[k], el=h('div',{class:'ph',text:p.ini,style:`--hair:${p.hair};--suit:${p.suit};${style||''}`}); setFace(el, k, S.era); return el; }
-// swap the drawn placeholder for the portrait of this era; keeps the initials if the art is missing
+// swap the drawn placeholder for the portrait of this era. With no art for this era (julia in 2026) keep the
+// current picture, so the leaving portrait fades out as itself; the initials show only if a file fails to load
 function setFace(ph, k, era){
   const src=portraitSrc(k, era); let img=ph.querySelector('img');
-  if (!src){ img?.remove(); ph.classList.remove('art'); return; }
+  if (!src) return;
   if (!img){ img=h('img',{alt:'',decoding:'async'}); img.addEventListener('error',()=>{ img.remove(); ph.classList.remove('art'); }); ph.append(img); }
   if (img.getAttribute('src')!==src) img.src=src;
   ph.classList.add('art');
@@ -505,26 +585,27 @@ function setFace(ph, k, era){
 const soon = () => toast('coming next: this screen is not built yet');
 document.addEventListener('click', e=>{ if (e.target.closest('[data-soon]')) soon(); });
 function updateHud(){
-  $('#hudTime').textContent = (S.era==='2016' ? 'RADIO  ' : '') + STOPS[S.t];
-  $('#timeOut').textContent = STOPS[S.t].replace('  ',' ');
-  ['#timeOut','#timeRange'].forEach(q=>$(q).classList.toggle('y26', S.era==='2026'));
+  const now=S.era==='2026', i=ERAS.indexOf(S.era);
+  $('#hudTime').textContent = now ? 'NOW  2026' : `RADIO  ${S.era}-03-15  22:50`;
+  $('#timeOut').textContent = now ? 'in person' : 'radio 22:50';
+  ['#timeOut','#timeRange'].forEach(q=>$(q).classList.toggle('y26', now));
   const bars=$('#bars'); bars.innerHTML='';
-  if (S.era==='2016') ['','','on',''].forEach(c=>bars.append(h('i',{class:c}))); else bars.append(h('i',{class:'on26'}));
+  ERAS.forEach((e,j)=>bars.append(h('i',{class: j===i ? (now?'on26':'on') : ''})));
 }
 
 /* ---------- ERA ---------- */
 function setEra(era){
   if (era===S.era) return;
-  const vhs=$('#vhs'); vhs.innerHTML='';
-  if (!reduced){ for (let i=0;i<4;i++) vhs.append(h('div',{class:'band',style:`top:${i*-30}%;animation-delay:${i*0.08}s`})); vhs.append(h('div',{class:'label',text: era==='2016' ? '◀◀ REWIND 2016' : '▶▶ FWD 2026'})); vhs.classList.add('run'); burst(380); }
+  const back = era < S.era, vhs=$('#vhs'); vhs.innerHTML='';
+  if (!reduced){ for (let i=0;i<4;i++) vhs.append(h('div',{class:'band',style:`top:${i*-30}%;animation-delay:${i*0.08}s`})); vhs.append(h('div',{class:'label',text:(back ? '◀◀ REWIND ' : '▶▶ FWD ')+era})); vhs.classList.add('run'); burst(380); }
   setTimeout(()=>{
     S.era=era;
-    if (S.person && !CELLS[era].some(c=>c.people.includes(S.person))) S.person=null;   // julia is not reachable in 2026
+    if (S.person && !(S.person in POS[era])) S.person=null;   // only people present in that year can be asked
     updateHud(); renderMap(true); renderChat();
   }, reduced?0:230);
   setTimeout(()=>vhs.classList.remove('run'), 720);
 }
-$('#timeRange').addEventListener('input', e=>{ S.t=+e.target.value; const era = S.t===STOPS.length-1 ? '2026' : '2016'; if (era!==S.era) setEra(era); else updateHud(); });
+$('#timeRange').addEventListener('input', e=>setEra(ERAS[+e.target.value]));
 
 /* ---------- MAP (main screen) ---------- */
 const pols={};
@@ -537,15 +618,19 @@ function renderMap(animate){
   Object.entries(pols).forEach(([k,el])=>setFace(el.querySelector('.ph'), k, era));
   if (animate) Object.entries(pols).forEach(([k,el])=>{ if (el.isConnected) first[k]=el.getBoundingClientRect(); });
   plan.classList.toggle('y26', era==='2026');
-  $('#planTitle').textContent = era==='2016' ? 'Moonlight Labs · Pangyo' : 'Seoul · 2026';
-  $('#planDate').textContent = era==='2016' ? '2016-03-15 · 22:50' : 'where are they now';
+  plan.classList.toggle('radio', era!=='2026');
+  document.documentElement.dataset.bg = era>='2025' ? 'seoul' : 'office';
+  $('#planTitle').textContent = era==='2026' ? 'Seoul · 2026' : 'Moonlight Labs · Pangyo';
+  $('#planDate').textContent = era==='2026' ? 'where are they now' : `${era}-03-15 · 22:50 · ${ERA_NOTE[era]}`;
   plan.innerHTML='';
   const placed=new Set();
-  CELLS[era].forEach(c=>{
+  const cells=cellsOf(era), share=cells.map(c=>c.people.length || .7);   // empty rooms stay narrow
+  plan.style.setProperty('--cols', share.map(n=>`minmax(0,${n}fr)`).join(' ')); plan.style.setProperty('--u', share.reduce((a,b)=>a+b,0));
+  cells.forEach(c=>{
     const who=h('div',{class:'who'});
-    plan.append(h('div',{class:'cell '+(c.cls||'')}, h('span',{class:'lbl',text:c.lbl}), c.sub?h('span',{class:'sub',text:c.sub}):null, who));
+    plan.append(h('div',{class:'cell '+(c.cls||'')}, h('span',{class:'lbl',text:c.lbl}), h('span',c.sub?{class:'sub',text:c.sub}:{class:'sub',text:'\u00a0','aria-hidden':'true'}), who));   // every room keeps a sub line so portraits line up across rooms
     c.people.forEach(p=>{ who.append(pols[p]); placed.add(p); });
-    if (c.empty) who.append(h('span',{class:'empty',text:c.empty}));
+    if (c.empty || !c.people.length) who.append(h('span',c.empty ? {class:'empty',text:c.empty} : {class:'empty',text:'—','aria-label':'nobody here'}));
     if (c.room) who.append(h('button',{class:'inv',text:'search ▶',onclick:soon}));
   });
   polBadges();
@@ -559,44 +644,64 @@ function renderMap(animate){
 }
 /* ---------- CHAT (answers from /api/ask; turns are kept in localStorage by /client/game.js) ---------- */
 // The case data calls Julia "jisoo"; the map era picks the case time point.
-const apiId = k => k==='jisu' ? 'jisoo' : k;
-const TP = {'2016':'T2016','2026':'T2026'};
+const apiId = k => k;   // screen ids are the case data ids (jisoo, dohyun, ...)
 let G=null, game=null, asking=false;
 import('/client/game.js').then(m=>{ G=m; game=G.loadGame(); updateLogCount(); renderChat(); }).catch(()=>toast('could not load the chat'));
-const turnsHere = () => game ? game.turns.filter(t=>t.character===apiId(S.person) && t.timepoint===TP[S.era]) : [];
+const turnsHere = () => game ? game.turns.filter(t=>t.character===apiId(S.person) && t.timepoint==='T'+S.era) : [];
 function updateLogCount(){ $('#logCount').textContent = game ? game.turns.length : 0; }
-const INTRO = {
-  '2016':'The radio is live. Everyone is honest in 2016, but nobody knows what is coming. Pick someone on the map to talk.',
-  '2026':'Ten years later. The survivors remember less and hide more. Ask the same things and listen for what changed.'
-};
+const introOf = era => era==='2026'
+  ? 'Ten years later. The survivors remember less and hide more. Ask the same things and listen for what changed.'
+  : `March 15, ${era}, 22:50 · ${ERA_NOTE[era]}. The radio is live and nobody knows what is coming. Pick someone on the map to talk.`;
 function renderChat(){
   const log=$('#chatlog'), p=PEOPLE[S.person]; log.innerHTML='';
   $('#chatTab').textContent = p ? `chat · ${p.short} · ${S.era}` : 'CASE FILE';
   $('#chatInput').disabled = $('#chatSend').disabled = !p || !game || asking;
-  $('#chatInput').placeholder = p ? `message ${p.short} (${S.era === '2016' ? 'by radio' : 'in person'})…` : 'pick someone on the map to talk';
-  if (!p) { log.append(h('p',{class:'intro',text:INTRO[S.era]})); return; }
+  $('#chatInput').placeholder = p ? `message ${p.short} (${S.era === '2026' ? 'in person' : 'by radio'})…` : 'pick someone on the map to talk';
+  if (!p) { log.append(h('p',{class:'intro',text:introOf(S.era)})); return; }
   const msgs = turnsHere();
-  if (!msgs.length && !asking) log.append(h('p',{class:'intro muted',text:`${p.name} · ${S.era==='2016' ? p.r16 : p.r26}. Ask anything.`}));
+  if (!msgs.length && !asking) log.append(h('p',{class:'intro muted',text:`${p.name} · ${roleOf(S.person, +S.era)} · ${S.era}. Ask anything.`}));
   msgs.forEach(t=>log.append(
     h('div',{class:'msg me'}, h('b',{text:'you'}), t.question),
     h('div',{class:'msg'}, h('b',{text:p.short}), t.answer)));
   if (asking) log.append(h('div',{class:'msg me'}, h('b',{text:'you'}), asking), h('p',{class:'intro muted',text:`${p.short} is answering…`}));
   log.scrollTop=log.scrollHeight;
 }
+/* chat height: drag the grip or use arrow keys; kept only for this page load */
+{
+  const grip=$('#chatGrip'), chat=grip.parentElement, wrap=chat.parentElement;
+  const setH=px=>{
+    const max=wrap.clientHeight-240;   // leave room for the map and memo row
+    const v=Math.round(Math.max(120, Math.min(max, px)));
+    wrap.style.setProperty('--chatH', v+'px'); grip.setAttribute('aria-valuenow', v);
+  };
+  grip.addEventListener('pointerdown', e=>{
+    grip.setPointerCapture(e.pointerId);
+    const bottom=chat.getBoundingClientRect().bottom;
+    const move=ev=>setH(bottom-ev.clientY);
+    grip.addEventListener('pointermove', move);
+    grip.classList.add('drag');
+    grip.addEventListener('lostpointercapture', ()=>{ grip.removeEventListener('pointermove', move); grip.classList.remove('drag'); }, {once:true});
+  });
+  grip.addEventListener('dblclick', ()=>{ wrap.style.removeProperty('--chatH'); grip.removeAttribute('aria-valuenow'); });
+  grip.addEventListener('keydown', e=>{
+    const d={ArrowUp:20,ArrowDown:-20}[e.key]; if (!d) return;
+    e.preventDefault(); setH(chat.offsetHeight+d);
+  });
+}
 $('#chatform').addEventListener('submit', async e=>{
   e.preventDefault();
   const v=$('#chatInput').value.trim(); if (!v || !S.person || !game || asking) return;
   const who=S.person, era=S.era;
   asking=v; $('#chatInput').value=''; renderChat();
-  try { await G.ask(game, apiId(who), TP[era], v); }
+  try { await G.ask(game, apiId(who), 'T'+era, v); }
   catch (err) { toast(err.message || 'no answer, try again'); $('#chatInput').value=v; }
   finally { asking=false; updateLogCount(); renderChat(); $('#chatInput').focus(); }
 });
 
 /* ---------- ACCUSE (swaps the memo panel; one submission, judged by /api/accuse) ---------- */
-const SUSPECTS = Object.keys(PEOPLE).filter(k=>k!=='jisu');   // jisu is the victim
+const SUSPECTS = Object.keys(PEOPLE).filter(k=>k!=='jisoo');   // jisoo (Julia) is the victim
 SUSPECTS.forEach(k=>{ const p=PEOPLE[k];
-  $('#susOpts').append(h('label',{class:'sus'}, h('input',{type:'radio',name:'suspect',value:k}), phEl(k), h('span',{}, p.name, h('small',{class:'muted',text:p.r16}))));
+  $('#susOpts').append(h('label',{class:'sus'}, h('input',{type:'radio',name:'suspect',value:k}), phEl(k), h('span',{}, p.name, h('small',{class:'muted',text:roleOf(k, 2016)}))));
 });
 // the suspect list folds under its toggle so the motive box gets the room
 function openSus(on){ $('#susOpts').hidden=!on; $('#susToggle').setAttribute('aria-expanded', on); }
@@ -713,18 +818,29 @@ $('#bAgain').addEventListener('click', ()=>location.reload());
 
 /* ---------- TITLE: tune to 11.23 MHz, answer, then the map opens ---------- */
 const TARGET=11.23, LOCK=0.04, FMIN=9, FMAX=13;
-const dial=$('#dial'); let tuned=false, answered=false, tSecs=41;
+const dial=$('#dial'); let tuned=false, answered=false, tSecs=41, tStaticLevel=1;
+// speaker static: a small canvas inside the radio, drawn at ~12fps while the title is up
+const tsc=$('#tStatic').getContext('2d');
+(function speakerStatic(){
+  if (answered) return;
+  const img=tsc.createImageData(48,48);
+  for (let i=0;i<img.data.length;i+=4){ const v=Math.random()*255*tStaticLevel|0; img.data[i]=v*.85|0; img.data[i+1]=v*.8|0; img.data[i+2]=v; img.data[i+3]=255; }
+  tsc.putImageData(img,0,0);
+  if (!reduced) setTimeout(()=>requestAnimationFrame(speakerStatic), 80);
+})();
+const touch = () => $('#tDialbox').classList.add('touched');
+['pointerdown','keydown','input'].forEach(ev=>dial.addEventListener(ev, touch));
 const mhz = () => FMIN + dial.value/1000*(FMAX-FMIN);
 function tune(){
   const f=mhz(), d=Math.abs(f-TARGET), ok=d<LOCK;
-  $('#tNeedle').style.left = dial.value/10+'%';
+  $('#tNeedle').style.left = $('#tKnob').style.left = dial.value/10+'%';
   dial.setAttribute('aria-valuetext', f.toFixed(2)+' MHz');
-  setNoise(ok ? 0 : Math.min(.35, .05 + d/2*.35));   // static fades as the dial nears 11.23
+  tStaticLevel = ok ? 0 : Math.min(1, .25 + d/2);   // speaker static fades as the dial nears 11.23
   if (ok===tuned) return;
   tuned=ok;
-  ['#tClock','#tLogo','#tTuner'].forEach(q=>$(q).classList.toggle('live', ok));
+  ['#tClock','#tLogo','#tTuner','#tSpeaker'].forEach(q=>$(q).classList.toggle('live', ok));
   $('#tStatus').classList.toggle('live', ok);
-  $('#tStatus').textContent = ok ? '…something is on this channel.' : 'Drag the dial until the static clears';
+  $('#tStatus').textContent = ok ? '…something is on this channel. Answer it.' : 'Drag the knob to ▼11.23 until the static clears';
   $('#tAnswer').disabled = !ok;
   if (ok) $('#tTime').textContent='23:23:00';
 }
@@ -741,11 +857,11 @@ $('#tAnswer').addEventListener('click', answer);
 addEventListener('keydown', e=>{
   if (document.documentElement.dataset.screen!=='title') return;
   if (e.key==='Enter' && document.activeElement!==$('#tAnswer')) answer();
-  if (!dial.disabled && (e.key==='ArrowLeft'||e.key==='ArrowRight') && document.activeElement!==dial){ dial.value=+dial.value+(e.key==='ArrowRight'?5:-5); tune(); }
+  if (!dial.disabled && (e.key==='ArrowLeft'||e.key==='ArrowRight') && document.activeElement!==dial){ dial.value=+dial.value+(e.key==='ArrowRight'?5:-5); touch(); tune(); }
 });
 tune();
 
-$('#timeRange').value=S.t; updateHud(); renderMap(false); renderChat();
+$('#timeRange').value=ERAS.indexOf(S.era); updateHud(); renderMap(false); renderChat();
 })();
 </script>
 </body>
