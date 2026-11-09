@@ -32,9 +32,6 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .tablabel{position:absolute;top:-30px;left:36px;padding:4px 18px;font-size:clamp(17px,2vw,22px);color:var(--gold);letter-spacing:.08em}
 .tablabel.win{padding:6px 20px}
 .muted{color:var(--muted)}
-.diamonds{color:var(--muted);letter-spacing:.1em}
-.diamonds b{color:#c9b8ff;font-weight:400}
-
 /* HUD */
 #hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:50}
 #hud .wrap{padding-block:16px 6px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:14px}
@@ -44,10 +41,6 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .bars i{display:block;width:36px;height:8px;background:var(--dim)}
 .bars i.on{background:var(--gold);width:60px}
 .bars i.on26{background:var(--cyan);width:60px}
-.seg{display:flex;gap:4px;margin-left:auto}
-.seg button{background:transparent;border:2px solid var(--dim);padding:2px 10px;min-height:36px;font-size:14px;color:var(--muted)}
-.seg button[aria-pressed="true"].y16{border-color:var(--gold);color:var(--solid);background:var(--gold)}
-.seg button[aria-pressed="true"].y26{border-color:var(--cyan);color:var(--solid);background:var(--cyan)}
 .navbox{padding:12px 22px;display:flex;align-items:center;gap:14px;font-size:clamp(17px,2vw,22px);text-transform:uppercase;letter-spacing:.04em}
 .navbox button{background:transparent;border:0;padding:4px 2px;min-height:40px}
 .navbox button:hover,.navbox button[aria-current="true"]{color:var(--gold)}
@@ -85,20 +78,42 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .inv{align-self:center;background:transparent;border:2px solid var(--cyan);color:var(--cyan);padding:6px 12px;min-height:40px;font-size:15px;animation:blinkb 1.4s steps(1) infinite}
 .inv:hover{background:var(--cyan);color:var(--solid)}
 @keyframes blinkb{50%{border-color:transparent}}
-.golist{list-style:none;margin:18px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
-.golist button{width:100%;display:grid;grid-template-columns:1.4em minmax(0,1fr) auto;gap:10px;align-items:center;background:transparent;border:0;padding:8px 4px;min-height:46px;text-align:left;font-size:clamp(17px,1.9vw,22px)}
-.golist button .cur{color:var(--gold);visibility:hidden}
-.golist button:hover .cur,.golist button:focus-visible .cur,.golist li:first-child button .cur.first{visibility:visible}
-.golist button:hover{color:var(--gold)}
-.golist .st{color:var(--gold)}
-.golist .done{color:var(--dim)}
-.golist .done .st{color:var(--muted)}
-.golist .room{color:var(--cyan)}
-.casebox{margin-top:54px;min-height:150px;display:flex;flex-direction:column;justify-content:center}
-.casebox p{margin:0;font-size:clamp(19px,2.3vw,28px);line-height:1.7;letter-spacing:.02em}
-.more{position:absolute;right:28px;bottom:16px;color:var(--fg);animation:more 1s steps(2) infinite}
 
-/* MAP fits one laptop screen: HUD on top, map + list fill the rest, case file at the bottom. No page scroll. */
+/* TIME SLIDER — under the people: scrub 2016 moments, last stop jumps to 2026 */
+.timeslider{margin-top:clamp(8px,1.4vh,16px);border:3px solid var(--fg);box-shadow:inset 0 0 0 3px var(--solid),inset 0 0 0 5px var(--fg);padding:6px 18px;flex:none;display:grid;grid-template-columns:auto minmax(0,1fr) 9.5em;column-gap:16px;align-items:center}
+.timeslider .wtitle{font-size:clamp(15px,1.5vw,20px);grid-row:span 2}
+.timeslider output{grid-row:span 2;text-align:right;color:var(--gold);font-size:clamp(15px,1.5vw,20px);font-variant-numeric:tabular-nums}
+.timeslider output.y26{color:var(--cyan)}
+#timeRange{width:100%;margin:2px 0 0;accent-color:var(--gold);min-height:28px}
+#timeRange.y26{accent-color:var(--cyan)}
+.tsticks{grid-column:2;display:flex;justify-content:space-between;font-size:13px;color:var(--muted);border-top:2px dashed var(--dim);padding-top:2px}
+.tsticks span:last-child{color:var(--cyan)}
+
+/* MEMO — free notes, kept only until reload */
+.memo{display:flex;flex-direction:column}
+.memo textarea{flex:1;min-height:200px;margin-top:12px;resize:none;background:repeating-linear-gradient(transparent 0 calc(1.6em - 2px),rgba(236,234,255,.12) calc(1.6em - 2px) 1.6em);border:0;border-top:2px dashed var(--dim);padding:6px 2px;color:var(--fg);font:inherit;font-size:clamp(15px,1.4vw,18px);line-height:1.6em;background-attachment:local}
+.memo textarea::placeholder{color:var(--dim)}
+.memo textarea:focus-visible{outline:none;border-top-color:var(--gold)}
+.memo small{color:var(--muted);font-size:13px;margin-top:6px}
+
+/* CHAT — talk to the selected person (UI only, not connected yet) */
+.chat{display:flex;flex-direction:column;min-height:220px;margin-top:40px;padding:clamp(14px,2vh,22px) 24px clamp(10px,1.6vh,16px)}
+.chatlog{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:6px}
+.chatlog .intro{margin:0;font-size:clamp(16px,1.6vw,22px);line-height:1.5}
+.msg{max-width:72%;padding:6px 12px;border:2px solid var(--muted);font-size:clamp(15px,1.4vw,18px);line-height:1.45;align-self:flex-start}
+.msg b{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+.msg.me{align-self:flex-end;border-color:var(--gold);color:var(--gold)}
+.chatform{display:flex;gap:10px;margin-top:10px}
+.chatform input{flex:1;min-width:0;background:transparent;border:3px solid var(--muted);padding:8px 12px;font-size:16px}
+.chatform input:focus-visible{outline:none;border-color:var(--gold)}
+.chatform input:disabled{border-color:var(--dim)}
+.chatform button{background:transparent;border:3px solid var(--gold);color:var(--gold);padding:0 20px;min-height:44px;text-transform:uppercase;letter-spacing:.06em}
+.chatform button:hover:not(:disabled){background:var(--gold);color:var(--solid)}
+.chatform button:disabled{border-color:var(--dim);color:var(--dim);cursor:default}
+.pol.sel .ph{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold)}
+.pol.sel{color:var(--gold)}
+
+/* MAP fits one laptop screen: HUD on top, map + memo fill the rest, chat at the bottom. No page scroll. */
 @media (min-width:901px){
   html[data-screen="map"],html[data-screen="map"] body{height:100%;overflow:hidden}
   html[data-screen="map"] body{display:flex;flex-direction:column}
@@ -108,24 +123,27 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
   html[data-screen="map"] .navbox{padding:8px 18px}
   html[data-screen="map"] main{flex:1;min-height:0;display:flex}
   html[data-screen="map"] #s-map{flex:1;min-height:0;display:flex}
-  #s-map .wrap{flex:1;min-height:0;width:100%;display:grid;grid-template-rows:minmax(0,1fr) auto;padding-block:clamp(8px,1.6vh,14px) clamp(10px,2vh,18px)}
+  #s-map .wrap{flex:1;min-height:0;width:100%;display:grid;padding-block:clamp(8px,1.6vh,14px) clamp(10px,2vh,18px)}
   #s-map .mapgrid{margin-top:0;min-height:0;gap:clamp(16px,2vw,28px)}
   #s-map .mapgrid>.win{min-height:0;display:flex;flex-direction:column;padding:clamp(12px,2vh,22px) clamp(16px,1.8vw,24px)}
-  #s-map .plan{flex:1;min-height:0;margin-top:clamp(6px,1.2vh,14px);grid-template-rows:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(0,1fr)}
+  #s-map .plan,#s-map .plan.y26{flex:1;min-height:0;margin-top:clamp(6px,1.2vh,14px);grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:minmax(0,1fr)}
+  #s-map .cell.tall{grid-row:auto}
   #s-map .plan{container-type:size}
   #s-map .cell{min-height:0;padding:clamp(6px,1vh,10px) 12px;gap:2px;overflow:hidden}
-  /* one portrait size for every room, from the height of one row: row minus label, sub line, badge and name */
+  #s-map .cell .lbl,#s-map .cell .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}   /* one line each, so every room has the same overhead */
+  #s-map .cell .lbl{position:relative}
+  /* shortcut: the room-search button is hidden in the one-screen layout until the search screen exists */
+  #s-map .cell .inv{display:none}
+  /* one portrait size for every room: limited by the row height (minus label, sub line, badge, name) and by a column's width */
   #s-map .pol{padding-top:20px;gap:2px;width:auto;font-size:15px}
-  #s-map .pol .ph{width:clamp(40px,calc(50cqh - 116px),96px);height:clamp(40px,calc(50cqh - 116px),96px)}
+  #s-map .pol .ph{width:clamp(40px,min(100cqh - 124px,100cqw / 7 - 24px),96px);height:clamp(40px,min(100cqh - 124px,100cqw / 7 - 24px),96px)}
   #s-map .pol .new,#s-map .pol .mark{font-size:13px}
-  #s-map .golist{margin-top:clamp(6px,1.2vh,18px);flex:1;min-height:0;gap:0;justify-content:space-between}
-  #s-map .golist button{min-height:0;padding:clamp(2px,.6vh,8px) 4px;font-size:clamp(15px,1.5vw,20px);line-height:1.3}
-  #s-map .golist small{display:inline!important;margin-left:.6em}   /* place on the same line keeps 7 rows short */
-  #s-map .diamonds{margin-top:clamp(6px,1.2vh,18px)!important}
-  #s-map .casebox{margin-top:34px;min-height:0;padding:clamp(12px,2vh,22px) 24px}
-  #s-map .casebox p{font-size:clamp(16px,1.6vw,22px);line-height:1.5;min-height:3em}
+  #s-map .chat{margin-top:0;min-height:0}
+  #s-map .memo textarea{min-height:0}
+  #s-map .wrap{grid-template-rows:minmax(0,1fr) clamp(160px,26vh,260px);row-gap:40px}
+  #s-map .mapgrid>.win.memo{padding-bottom:clamp(10px,1.6vh,18px)}
 }
-@keyframes more{50%{transform:translateY(4px)}}
+}
 
 /* VHS */
 #vhs{position:fixed;inset:0;z-index:75;pointer-events:none;display:none;overflow:hidden}
@@ -144,7 +162,6 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
   .plan,.plan.y26{grid-template-columns:repeat(2,minmax(0,1fr))}
   .cell.tall{grid-row:auto}
   .win{padding:18px 16px}
-  .seg{margin-left:0}
   #hud{position:relative}
   #hud .wrap{gap:10px}
   .timebox{padding:10px 14px 12px;flex:1 1 100%}
@@ -167,10 +184,6 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
   <div class="wrap">
     <div class="win timebox">
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px"><span class="tt" id="hudTime"></span>
-        <div class="seg" id="eraSeg" role="group" aria-label="year">
-          <button class="y16" data-era="2016" aria-pressed="true">2016</button>
-          <button class="y26" data-era="2026" aria-pressed="false">2026</button>
-        </div>
       </div>
       <div class="bars" id="bars"></div>
     </div>
@@ -190,17 +203,26 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
       <div class="win">
         <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px"><span class="wtitle" id="planTitle"></span><span class="muted" id="planDate"></span></div>
         <div class="plan" id="plan"></div>
+        <div class="timeslider">
+          <label class="wtitle" for="timeRange">time</label>
+          <input type="range" id="timeRange" min="0" max="5" step="1" value="2" aria-describedby="timeOut">
+          <output id="timeOut" for="timeRange"></output>
+          <div class="tsticks" aria-hidden="true"><span>21:00</span><span>22:30</span><span>22:50</span><span>23:00</span><span>23:23</span><span>2026</span></div>
+        </div>
       </div>
-      <div class="win">
-        <p class="wtitle" style="margin:0">where will you go?</p>
-        <ul class="golist" id="golist"></ul>
-        <p style="margin:18px 0 0;font-size:17px" class="diamonds" id="diamonds"></p>
+      <div class="win memo">
+        <label class="wtitle" for="memo">memo</label>
+        <textarea id="memo" placeholder="write anything here…&#10;who lied, what time, what to ask next." spellcheck="false"></textarea>
+        <small>notes stay until you reload the page.</small>
       </div>
     </div>
-    <div class="win casebox">
-      <span class="win tablabel">CASE FILE</span>
-      <p id="caseText"></p>
-      <span class="more" aria-hidden="true">▼</span>
+    <div class="win chat">
+      <span class="win tablabel" id="chatTab">CASE FILE</span>
+      <div class="chatlog" id="chatlog" aria-live="polite"></div>
+      <form class="chatform" id="chatform">
+        <input id="chatInput" autocomplete="off" placeholder="pick someone on the map to talk" aria-label="message" disabled>
+        <button id="chatSend" disabled>send</button>
+      </form>
     </div>
   </div>
 </section>
@@ -251,7 +273,9 @@ const CELLS = {
     {lbl:'evidence storage', sub:'case 2016-0315, boxed since 2016',people:[], cls:'hot', room:true, empty:'(jisu · not reachable)'}
   ]
 };
-const S = {era:'2016', visited:new Set(), contradictions:0};
+const S = {era:'2016', t:2, visited:new Set(), person:null, chats:{}};
+// time slider stops: index → HUD label; the last stop is 2026
+const STOPS = ['3/15  21:00','3/15  22:30','3/15  22:50','3/15  23:00','3/15  23:23','NOW  2026'];
 
 /* ---------- SKY (pixel stars, moon, horizon) ---------- */
 const sky=$('#sky'), sctx=sky.getContext('2d'); let stars=[], SW=0, SH=0, frame=0;
@@ -287,7 +311,9 @@ function phEl(k, style){ const p=PEOPLE[k]; return h('div',{class:'ph',text:p.in
 const soon = () => toast('coming next: this screen is not built yet');
 document.addEventListener('click', e=>{ if (e.target.closest('[data-soon]')) soon(); });
 function updateHud(){
-  $('#hudTime').textContent = S.era==='2016' ? 'RADIO  3/15  22:50' : 'NOW  2026';
+  $('#hudTime').textContent = (S.era==='2016' ? 'RADIO  ' : '') + STOPS[S.t];
+  $('#timeOut').textContent = STOPS[S.t].replace('  ',' ');
+  ['#timeOut','#timeRange'].forEach(q=>$(q).classList.toggle('y26', S.era==='2026'));
   const bars=$('#bars'); bars.innerHTML='';
   if (S.era==='2016') ['','','on',''].forEach(c=>bars.append(h('i',{class:c}))); else bars.append(h('i',{class:'on26'}));
 }
@@ -299,32 +325,19 @@ function setEra(era){
   if (!reduced){ for (let i=0;i<4;i++) vhs.append(h('div',{class:'band',style:`top:${i*-30}%;animation-delay:${i*0.08}s`})); vhs.append(h('div',{class:'label',text: era==='2016' ? '◀◀ REWIND 2016' : '▶▶ FWD 2026'})); vhs.classList.add('run'); burst(380); }
   setTimeout(()=>{
     S.era=era;
-    document.querySelectorAll('#eraSeg button').forEach(b=>b.setAttribute('aria-pressed', b.dataset.era===era));
-    updateHud(); renderMap(true);
+    if (S.person && !CELLS[era].some(c=>c.people.includes(S.person))) S.person=null;   // jisu is not reachable in 2026
+    updateHud(); renderMap(true); renderChat();
   }, reduced?0:230);
   setTimeout(()=>vhs.classList.remove('run'), 720);
 }
-$('#eraSeg').addEventListener('click', e=>{ const b=e.target.closest('button'); if (b) setEra(b.dataset.era); });
+$('#timeRange').addEventListener('input', e=>{ S.t=+e.target.value; const era = S.t===STOPS.length-1 ? '2026' : '2016'; if (era!==S.era) setEra(era); else updateHud(); });
 
 /* ---------- MAP (main screen) ---------- */
 const pols={};
 Object.keys(PEOPLE).forEach(k=>{ const b=h('button',{class:'pol','data-p':k,'aria-label':'question '+PEOPLE[k].name}, phEl(k), h('span',{text:PEOPLE[k].short})); b.addEventListener('click', ()=>openTalk(k)); pols[k]=b; });
-function openTalk(k){ S.visited.add(k+S.era); renderMap(false); soon(); }
+function openTalk(k){ S.visited.add(k+S.era); S.person=k; polBadges(); renderChat(); $('#chatInput').focus(); }
 const status = k => S.visited.has(k+S.era) ? 'some' : 'new';
-function polBadges(){ Object.entries(pols).forEach(([k,el])=>{ el.querySelectorAll('.mark,.new').forEach(n=>n.remove()); if (status(k)==='new') el.append(h('span',{class:'new',text:'★ NEW'})); }); }
-function renderGoList(){
-  const ul=$('#golist'); ul.innerHTML=''; const rows=[];
-  CELLS[S.era].forEach(c=>{ c.people.forEach(p=>rows.push({k:p,place:c.lbl,st:status(p)})); if (c.room) rows.push({room:true,place:c.lbl,st:'room'}); });
-  const order={new:0,room:1,some:2}; rows.sort((a,b)=>order[a.st]-order[b.st]);
-  rows.forEach((r,i)=>{
-    const mark = r.st==='new'?'★':r.st==='room'?'?':'';
-    const label = h('span',null, r.room ? 'search the room' : PEOPLE[r.k].short, h('small',{style:'display:block;font-size:13px;color:var(--muted)',text:r.place}));
-    const b=h('button',{class:r.room?'room':''}, h('span',{class:'cur'+(i===0?' first':''),text:'▶'}), label, h('span',{class:'st',text:mark}));
-    b.addEventListener('click', ()=> r.room ? soon() : openTalk(r.k)); ul.append(h('li',null,b));
-  });
-  const tc=S.contradictions, d=$('#diamonds'); d.innerHTML='';
-  d.append('Contradictions  ', h('b',{text:'◆'.repeat(tc)}), '◇'.repeat(3-tc), '  '+tc+'/3');
-}
+function polBadges(){ Object.entries(pols).forEach(([k,el])=>{ el.querySelectorAll('.mark,.new').forEach(n=>n.remove()); el.classList.toggle('sel', k===S.person); if (status(k)==='new') el.append(h('span',{class:'new',text:'★ NEW'})); }); }
 function renderMap(animate){
   const era=S.era, plan=$('#plan'), first={};
   if (animate) Object.entries(pols).forEach(([k,el])=>{ if (el.isConnected) first[k]=el.getBoundingClientRect(); });
@@ -340,8 +353,7 @@ function renderMap(animate){
     if (c.empty) who.append(h('span',{class:'empty',text:c.empty}));
     if (c.room) who.append(h('button',{class:'inv',text:'search ▶',onclick:soon}));
   });
-  polBadges(); renderGoList();
-  typeInto($('#caseText'), era==='2016' ? 'The radio is live. It is 22:50, 33 minutes before she dies. Everyone is honest in 2016, but nobody knows what is coming.' : 'Ten years later. The survivors remember less and hide more. Ask the same things and listen for what changed.', 22);
+  polBadges();
   if (animate && !reduced){
     Object.entries(pols).forEach(([k,el])=>{
       const f=first[k];
@@ -350,7 +362,31 @@ function renderMap(animate){
     });
   }
 }
-updateHud(); renderMap(false);
+/* ---------- CHAT (UI only: messages stay local, nobody answers yet) ---------- */
+const INTRO = {
+  '2016':'The radio is live. Everyone is honest in 2016, but nobody knows what is coming. Pick someone on the map to talk.',
+  '2026':'Ten years later. The survivors remember less and hide more. Ask the same things and listen for what changed.'
+};
+const chatKey = () => S.person+'-'+S.era;
+function renderChat(){
+  const log=$('#chatlog'), p=PEOPLE[S.person]; log.innerHTML='';
+  $('#chatTab').textContent = p ? `chat · ${p.short} · ${S.era}` : 'CASE FILE';
+  $('#chatInput').disabled = $('#chatSend').disabled = !p;
+  $('#chatInput').placeholder = p ? `message ${p.short} (${S.era === '2016' ? 'by radio' : 'in person'})…` : 'pick someone on the map to talk';
+  if (!p) { log.append(h('p',{class:'intro',text:INTRO[S.era]})); return; }
+  const msgs = S.chats[chatKey()] || [];
+  if (!msgs.length) log.append(h('p',{class:'intro muted',text:`${p.name} · ${S.era==='2016' ? p.r16 : p.r26}. Ask anything.`}));
+  msgs.forEach(m=>log.append(h('div',{class:'msg me'}, h('b',{text:'you'}), m)));
+  log.scrollTop=log.scrollHeight;
+}
+$('#chatform').addEventListener('submit', e=>{
+  e.preventDefault();
+  const v=$('#chatInput').value.trim(); if (!v || !S.person) return;
+  (S.chats[chatKey()] ||= []).push(v);
+  $('#chatInput').value=''; renderChat();
+});
+
+$('#timeRange').value=S.t; updateHud(); renderMap(false); renderChat();
 })();
 </script>
 </body>
