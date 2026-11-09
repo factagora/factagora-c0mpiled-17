@@ -52,7 +52,7 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .bars i.on{background:var(--gold);width:44px}
 .bars i.on26{background:var(--cyan);width:44px}
 .navbox{padding:12px 22px;display:flex;align-items:center;gap:14px;font-size:clamp(17px,2vw,22px);text-transform:uppercase;letter-spacing:.04em}
-.navbox button{background:transparent;border:0;padding:4px 2px;min-height:40px}
+.navbox button{background:transparent;border:0;padding:4px 2px;min-height:40px;white-space:nowrap}
 .navbox button:hover,.navbox button[aria-current="true"]{color:var(--gold)}
 .navbox .sep{color:var(--muted)}
 
@@ -305,6 +305,26 @@ html:not([data-screen="title"]) #s-title{display:none}
 @media (max-width:600px){.t-radio{padding:20px}.t-speaker{display:none}.t-keys{display:none}}
 @media (prefers-reduced-motion:reduce){.t-logo.live,.t-dialbox .t-knob{animation:none}}
 
+/* BRIEF — one short case briefing between the title and the map: the case, the two time rules, how to play */
+html[data-screen="brief"] #hud,html[data-screen="brief"] #s-map{display:none}
+html:not([data-screen="brief"]) #s-brief{display:none}
+#s-brief{position:fixed;inset:0;z-index:1;overflow-y:auto;background:#0b092c url("/assets/bg/bg_evidence_room.jpg") center/cover no-repeat}
+#s-brief::before{content:"";position:fixed;inset:0;background:rgba(11,9,44,.78)}
+#s-brief .wrap{max-width:960px;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:clamp(12px,2.4vh,22px);padding-block:clamp(16px,4vh,40px)}
+.b-head h2{font-size:clamp(24px,3.4vw,38px);color:var(--gold);line-height:1.25;margin-top:4px}
+.b-lede{margin:0;font-size:clamp(15px,1.5vw,18px)}
+.b-report{margin:0;border-left:4px solid var(--red);padding:4px 14px;font-size:clamp(14px,1.3vw,16px)}
+.b-report b{font-weight:400;color:var(--red);text-transform:uppercase;letter-spacing:.06em;margin-right:8px}
+.b-modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.b-modes .win{padding:14px 18px}
+.b-modes h3{font-size:clamp(16px,1.6vw,20px);color:var(--gold);letter-spacing:.06em;text-transform:uppercase}
+.b-modes .now h3{color:var(--cyan)}
+.b-modes p{margin:6px 0 0;font-size:clamp(14px,1.3vw,16px);line-height:1.5}
+.b-steps{margin:0;padding:0 0 0 1.6em;display:grid;gap:4px;font-size:clamp(14px,1.3vw,16px);line-height:1.5}
+.b-steps b{font-weight:400;color:var(--gold)}
+.b-go{align-self:center}
+@media (max-width:700px){.b-modes{grid-template-columns:minmax(0,1fr)}}
+
 /* VHS */
 #vhs{position:fixed;inset:0;z-index:75;pointer-events:none;display:none;overflow:hidden}
 #vhs.run{display:block}
@@ -325,7 +345,7 @@ html:not([data-screen="title"]) #s-title{display:none}
   #hud{position:relative}
   #hud .wrap{gap:10px}
   .timebox{padding:10px 14px 12px;flex:1 1 100%}
-  .navbox{padding:6px 14px;font-size:16px;flex:1 1 100%;justify-content:space-between}
+  .navbox{padding:6px 14px;font-size:16px;flex:1 1 100%;justify-content:space-between;gap:8px}
   .pol{width:84px}
   .pol .ph{width:76px;height:76px}
   .plan,.plan.y26{grid-auto-rows:minmax(150px,auto)}
@@ -350,7 +370,7 @@ html:not([data-screen="title"]) #s-title{display:none}
     </div>
     <nav class="win navbox" aria-label="menu">
       <button data-go="map" aria-current="true">map</button><span class="sep">|</span>
-      <button data-soon>case log <b id="logCount">0</b></button><span class="sep">|</span>
+      <button id="toBrief">briefing</button><span class="sep">|</span>
       <button data-go="accuse">accuse</button>
     </nav>
   </div>
@@ -381,6 +401,35 @@ html:not([data-screen="title"]) #s-title{display:none}
     <button class="t-answer" id="tAnswer" disabled>Answer the radio</button>
   </div>
   <div class="t-keys" aria-hidden="true"><span><b>←→</b>Tune</span><span><b>Enter</b>Answer</span></div>
+</section>
+
+<!-- BRIEF (after the title, before the map): what happened, the two time rules, how to play -->
+<section id="s-brief" class="screen" aria-labelledby="bTitle">
+  <div class="wrap">
+    <div class="b-head">
+      <p class="t-eyebrow">case briefing · 2016-0315</p>
+      <h2 id="bTitle">A murder mystery across ten years: question the past by radio, catch the lies, name the killer.</h2>
+    </div>
+    <p class="b-lede">March 15, 2016, 23:23. Julia Han, co-founder and CTO of Moonlight Labs, is found dead in the server room, the night before the startup signs its first big investment. The police call it an electric shock accident and close the case. Ten years later you are a cold-case detective. In the evidence box you find an old radio, and at 23:23 it turns on. Julia answers, 33 minutes before she dies.</p>
+    <p class="b-report"><b>accident report</b>rack cover open · log server disk missing · no witness statements</p>
+    <div class="b-modes">
+      <div class="win">
+        <h3>📻 by radio · 2015–2025</h3>
+        <p>Every March 15 at 22:50. Talk to anyone in that year, Julia too. They are honest, but they only know what has happened so far.</p>
+      </div>
+      <div class="win now">
+        <h3>🕵️ in person · 2026</h3>
+        <p>The survivors, ten years later. Memories have faded, and some of them lie.</p>
+      </div>
+    </div>
+    <ol class="b-steps">
+      <li><b>Pick a year</b> on the time slider under the map.</li>
+      <li><b>Click someone</b> on the map and ask them anything.</li>
+      <li><b>Compare</b> what the same person says in different years. Keep the lies in your memo.</li>
+      <li><b>Accuse</b> one person and write the motive. You get one try. The motive scores 0–100: the deeper you dig, the higher.</li>
+    </ol>
+    <button class="t-answer b-go" id="bStart">Start the investigation ▶</button>
+  </div>
 </section>
 
 <!-- MAP (main screen) -->
@@ -578,9 +627,6 @@ function setFace(ph, k, era){
   ph.classList.add('art');
 }
 
-// shortcut: talk, room, case log and accuse screens are not built yet; their entry points show a toast
-const soon = () => toast('coming next: this screen is not built yet');
-document.addEventListener('click', e=>{ if (e.target.closest('[data-soon]')) soon(); });
 function updateHud(){
   const now=S.era==='2026', i=ERAS.indexOf(S.era);
   $('#hudTime').textContent = now ? 'NOW  2026' : `RADIO  ${S.era}-03-15  22:50`;
@@ -630,8 +676,8 @@ const apiId = k => k;   // screen ids are the case data ids (jisoo, dohyun, ...)
 let G=null, game=null, asking=false;
 // Every answered radio call is a new game, so people sharing one browser never see each other's chats.
 let fresh=false;
-function startGame(){ fresh=true; $('#memo').value=''; if (!G) return; game=G.newGame(); updateLogCount(); renderChat(); }
-import('/client/game.js').then(m=>{ G=m; game = fresh ? G.newGame() : G.loadGame(); $('#memo').value=game.memo; updateLogCount(); renderChat(); }).catch(()=>toast('could not load the chat'));
+function startGame(){ fresh=true; $('#memo').value=''; if (!G) return; game=G.newGame(); renderChat(); }
+import('/client/game.js').then(m=>{ G=m; game = fresh ? G.newGame() : G.loadGame(); $('#memo').value=game.memo; renderChat(); }).catch(()=>toast('could not load the chat'));
 // The memo is part of the game save; a new game clears it.
 $('#memo').addEventListener('input', e=>{ if (!game) return; game.memo=e.target.value; G.saveGame(game); });
 // Copies one answer into the memo with when and who, so the player can line up statements across time points.
@@ -642,7 +688,6 @@ function toMemo(t, p){
   game.memo=memo.value; G.saveGame(game); memo.scrollTop=memo.scrollHeight; toast('added to memo');
 }
 const turnsHere = () => game ? game.turns.filter(t=>t.character===apiId(S.person) && t.timepoint==='T'+S.era) : [];
-function updateLogCount(){ $('#logCount').textContent = game ? game.turns.length : 0; }
 const introOf = era => era==='2026'
   ? 'Ten years later. The survivors remember less and hide more. Ask the same things and listen for what changed.'
   : `March 15, ${era}, 22:50 · ${ERA_NOTE[era]}. The radio is live and nobody knows what is coming. Pick someone on the map to talk.`;
@@ -689,7 +734,7 @@ $('#chatform').addEventListener('submit', async e=>{
   asking=v; $('#chatInput').value=''; renderChat();
   try { await G.ask(game, apiId(who), 'T'+era, v); }
   catch (err) { toast(err.message || 'no answer, try again'); $('#chatInput').value=v; }
-  finally { asking=false; updateLogCount(); renderChat(); $('#chatInput').focus(); }
+  finally { asking=false; renderChat(); $('#chatInput').focus(); }
 });
 
 /* ---------- ACCUSE (swaps the memo panel; one submission, judged by /api/accuse) ---------- */
@@ -845,8 +890,11 @@ function answer(){
   startGame();
   $('#tStatus').textContent='connecting…';
   burst(reduced?0:420);
-  setTimeout(()=>{ document.documentElement.dataset.screen='map'; renderMap(false); $('#timeRange').focus(); }, reduced?0:420);
+  setTimeout(()=>{ document.documentElement.dataset.screen='brief'; $('#bStart').focus(); }, reduced?0:420);
 }
+$('#bStart').addEventListener('click', ()=>{ document.documentElement.dataset.screen='map'; renderMap(false); $('#timeRange').focus(); });
+// reopen the briefing from the menu; the map keeps its state, so the button just goes back
+$('#toBrief').addEventListener('click', ()=>{ $('#bStart').textContent='Back to the map ▶'; document.documentElement.dataset.screen='brief'; $('#s-brief').scrollTop=0; $('#bStart').focus(); });
 dial.addEventListener('input', tune);
 $('#tAnswer').addEventListener('click', answer);
 addEventListener('keydown', e=>{
