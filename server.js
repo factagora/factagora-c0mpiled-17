@@ -6,6 +6,7 @@ const port = process.env.PORT || 3000;
 
 const DS_PREFIX = "/design-system/";
 const DS_DIR = path.join(__dirname, "design-system");
+const GAME_FILE = path.join(__dirname, "game", "index.html");
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -55,8 +56,8 @@ http
     if (pathname.startsWith(DS_PREFIX)) return serveDesignSystem(pathname, res);
 
     if (pathname === "/") {
-      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8" });
-      return res.end('<h1>factagora-c0mpiled-17</h1><p><a href="/design-system/">Design system</a></p>');
+      res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" });
+      return fs.createReadStream(GAME_FILE).pipe(res);
     }
     notFound(res);
   })
