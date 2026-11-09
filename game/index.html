@@ -18,6 +18,16 @@ html,body{height:100%}
 body{background:var(--sky1);color:var(--fg);font-family:var(--px);font-size:17px;line-height:1.6;-webkit-font-smoothing:none}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--sky1)}
 #sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;image-rendering:pixelated}
+/* map background by timepoint: 2015-2019 office at night, 2025-2026 seoul; a scrim keeps the windows readable */
+#eraBg{position:fixed;inset:0;z-index:0;background:center/cover no-repeat;image-rendering:auto;display:none}
+#eraBg::after{content:"";position:absolute;inset:0;background:rgba(11,9,44,.55)}
+html[data-screen="map"] #eraBg{display:block}
+html[data-bg="office"] #eraBg{background-image:url("/assets/bg/bg_office_2016.jpg")}
+html[data-bg="seoul"] #eraBg{background-image:url("/assets/bg/bg_seoul_2026.jpg")}
+/* radio timepoints: a light static over portraits (in person in 2026, so no static) */
+#plan.radio .ph.art::after{content:"";position:absolute;inset:0;background-image:var(--snow);background-size:48px 48px;opacity:.28;mix-blend-mode:screen;animation:snow .5s steps(4) infinite;pointer-events:none}
+@keyframes snow{0%{background-position:0 0}25%{background-position:-17px 9px}50%{background-position:11px -21px}75%{background-position:-7px 14px}}
+@media (prefers-reduced-motion:reduce){#plan.radio .ph.art::after{animation:none}}
 #noise{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:65;opacity:0;image-rendering:pixelated;transition:opacity .25s}
 .scanlines{position:fixed;inset:0;pointer-events:none;z-index:70;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px 3px)}
 button,input{font:inherit;color:inherit}
@@ -60,7 +70,7 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .pol:hover .ph{border-color:var(--gold)}
 .pol.done{color:var(--muted)}
 .pol.done .ph{border-color:var(--dim);filter:saturate(.6) brightness(.8)}
-.pol .mark,.pol .new{position:absolute;top:0;left:0;right:0;text-align:center;font-size:15px}
+.pol .mark,.pol .new{position:absolute;top:0;left:50%;translate:-50% 0;text-align:center;font-size:15px;white-space:nowrap}
 .pol .mark{color:var(--muted)}
 .pol .new{color:var(--gold)}
 .ghost{position:fixed;z-index:80;pointer-events:none;margin:0}
@@ -269,6 +279,7 @@ html:not([data-screen="title"]) #s-title{display:none}
 </head>
 <body>
 <canvas id="sky" aria-hidden="true"></canvas>
+<div id="eraBg" aria-hidden="true"></div>
 <canvas id="noise" width="160" height="90" aria-hidden="true"></canvas>
 <div id="vhs" aria-hidden="true"></div>
 
@@ -397,7 +408,7 @@ const h = (tag, attrs, ...kids) => {
 
 /* ---------- DATA (timepoints, places and who is where follow data/case.json) ---------- */
 const PEOPLE = {
-  jisu:   {name:'Julia Han',   short:'Julia',  ini:'JH', hair:'#1a1230', suit:'#2f6f8f', img:'jisoo',  face:{'2016':'neutral'}},
+  jisoo:  {name:'Julia Han',   short:'Julia',  ini:'JH', hair:'#1a1230', suit:'#2f6f8f', img:'jisoo',  face:{'2016':'neutral'}},
   dohyun: {name:'Daniel Kang', short:'Daniel', ini:'DK', hair:'#2a1d14', suit:'#4a4a6a', img:'dohyun', face:{'2016':'neutral','mid':'neutral','2026':'defensive'}},
   minjae: {name:'Marcus Oh',   short:'Marcus', ini:'MO', hair:'#141018', suit:'#6a3a5a', img:'minjae', face:{'2016':'neutral','mid':'neutral','2026':'neutral'}},
   hana:   {name:'Hannah Yoo',  short:'Hannah', ini:'HY', hair:'#5a2e1a', suit:'#c9a24a', img:'hana',   face:{'2016':'neutral','mid':'neutral','2026':'neutral'}},
@@ -407,7 +418,7 @@ const PEOPLE = {
 // role shown in the chat intro, by year
 function roleOf(k, y){
   return ({
-    jisu:   'co-founder, cto',
+    jisoo:  'co-founder, cto',
     dohyun: y<2025 ? 'ceo, co-founder' : 'ceo, now a unicorn',
     minjae: y<=2017 ? 'lead developer' : y<2025 ? 'now at nova ai' : 'ceo, nova ai',
     hana:   y===2016 ? 'design intern' : y===2017 ? 'former intern' : 'it reporter',
@@ -428,12 +439,16 @@ function portraitSrc(k, era){
   const p=PEOPLE[k], look=lookOf(era), use = p.face[look] ? look : (look==='mid' && p.face['2016'] ? '2016' : null);   // ken has no mid look: 2017 uses 2016
   return use ? `/assets/portraits/${p.img}_${use}_${p.face[use]}.png` : null;
 }
+// static tile for portraits on radio timepoints, drawn once and used as a CSS background
+(()=>{ const c=document.createElement('canvas'); c.width=c.height=48; const x=c.getContext('2d'), d=x.createImageData(48,48);
+  for (let i=0;i<d.data.length;i+=4){ const v=Math.random()*255|0; d.data[i]=d.data[i+1]=d.data[i+2]=v; d.data[i+3]=255; }
+  x.putImageData(d,0,0); document.documentElement.style.setProperty('--snow', `url(${c.toDataURL()})`); })();
 // preload every look so switching years never shows an empty frame
 const portraitCache = Object.keys(PEOPLE).flatMap(k=>ERAS.map(e=>portraitSrc(k,e))).filter((v,i,a)=>v && a.indexOf(v)===i).map(src=>Object.assign(new Image(),{src}));
 // who is where (data/case.json "positions"); place ids are case.json places, offsite people carry the place they name
 const POS = {
-  '2015':{jisu:'dev_floor', minjae:'dev_floor', dohyun:'ceo_room', kim:'lobby'},
-  '2016':{jisu:'dev_floor', hana:'dev_floor', kim:'lobby', dohyun:'@home', minjae:'@home', grace:'@home'},
+  '2015':{jisoo:'dev_floor', minjae:'dev_floor', dohyun:'ceo_room', kim:'lobby'},
+  '2016':{jisoo:'dev_floor', hana:'dev_floor', kim:'lobby', dohyun:'@home', minjae:'@home', grace:'@home'},
   '2017':{dohyun:'lounge', minjae:'lounge', hana:'lounge', kim:'lobby'},
   '2018':{dohyun:'lounge', hana:'lounge', minjae:'@nova office'},
   '2019':{dohyun:'ceo_room', minjae:'lounge', hana:'lounge'},
@@ -533,6 +548,8 @@ function renderMap(animate){
   Object.entries(pols).forEach(([k,el])=>setFace(el.querySelector('.ph'), k, era));
   if (animate) Object.entries(pols).forEach(([k,el])=>{ if (el.isConnected) first[k]=el.getBoundingClientRect(); });
   plan.classList.toggle('y26', era==='2026');
+  plan.classList.toggle('radio', era!=='2026');
+  document.documentElement.dataset.bg = era>='2025' ? 'seoul' : 'office';
   $('#planTitle').textContent = era==='2026' ? 'Seoul · 2026' : 'Moonlight Labs · Pangyo';
   $('#planDate').textContent = era==='2026' ? 'where are they now' : `${era}-03-15 · 22:50 · ${ERA_NOTE[era]}`;
   plan.innerHTML='';
@@ -543,7 +560,7 @@ function renderMap(animate){
     const who=h('div',{class:'who'});
     plan.append(h('div',{class:'cell '+(c.cls||'')}, h('span',{class:'lbl',text:c.lbl}), h('span',c.sub?{class:'sub',text:c.sub}:{class:'sub',text:'\u00a0','aria-hidden':'true'}), who));   // every room keeps a sub line so portraits line up across rooms
     c.people.forEach(p=>{ who.append(pols[p]); placed.add(p); });
-    if (c.empty || !c.people.length) who.append(h('span',{class:'empty',text:c.empty || '(nobody)'}));
+    if (c.empty || !c.people.length) who.append(h('span',c.empty ? {class:'empty',text:c.empty} : {class:'empty',text:'—','aria-label':'nobody here'}));
     if (c.room) who.append(h('button',{class:'inv',text:'search ▶',onclick:soon}));
   });
   polBadges();
@@ -557,7 +574,7 @@ function renderMap(animate){
 }
 /* ---------- CHAT (answers from /api/ask; turns are kept in localStorage by /client/game.js) ---------- */
 // The case data calls Julia "jisoo"; the map era picks the case time point.
-const apiId = k => k==='jisu' ? 'jisoo' : k;
+const apiId = k => k;   // screen ids are the case data ids (jisoo, dohyun, ...)
 let G=null, game=null, asking=false;
 import('/client/game.js').then(m=>{ G=m; game=G.loadGame(); updateLogCount(); renderChat(); }).catch(()=>toast('could not load the chat'));
 const turnsHere = () => game ? game.turns.filter(t=>t.character===apiId(S.person) && t.timepoint==='T'+S.era) : [];
@@ -590,7 +607,7 @@ $('#chatform').addEventListener('submit', async e=>{
 });
 
 /* ---------- ACCUSE (swaps the memo panel; one submission, judged by /api/accuse) ---------- */
-const SUSPECTS = Object.keys(PEOPLE).filter(k=>k!=='jisu');   // jisu is the victim
+const SUSPECTS = Object.keys(PEOPLE).filter(k=>k!=='jisoo');   // jisoo (Julia) is the victim
 SUSPECTS.forEach(k=>{ const p=PEOPLE[k];
   $('#susOpts').append(h('label',{class:'sus'}, h('input',{type:'radio',name:'suspect',value:k}), phEl(k), h('span',{}, p.name, h('small',{class:'muted',text:roleOf(k, 2016)}))));
 });
