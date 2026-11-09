@@ -60,7 +60,8 @@ function serveStatic(prefix, pathname, res) {
     res.writeHead(200, {
       "Content-Type": MIME[path.extname(file).toLowerCase()] || "application/octet-stream",
       "Content-Length": stat.size,
-      "Cache-Control": "no-cache",
+      // Art in /assets/ changes rarely: let browsers reuse it for an hour and refresh in the background after that.
+      "Cache-Control": prefix === "/assets/" ? "public, max-age=3600, stale-while-revalidate=86400" : "no-cache",
     });
     // An unreadable file must end this one response, not crash the server.
     fs.createReadStream(file).on("error", () => res.destroy()).pipe(res);
