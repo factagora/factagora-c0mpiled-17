@@ -159,7 +159,9 @@ async function handleAsk(req, res) {
   }
 
   const memories = facts.map((f) => `- ${f.statement}`).join("\n") || "- (떠오르는 것이 없다)";
-  let system = `${systemPrompt(character, timepoint)}\n\n[기억]\n${memories}`;
+  // Korean question -> Korean answer; anything else (the English game screen) -> English.
+  const lang = /[가-힣]/.test(question) ? "한국어" : "영어";
+  let system = `${systemPrompt(character, timepoint, lang)}\n\n[기억]\n${memories}`;
   if (evidence.length) system += `\n\n[형사가 보여 주는 증거]\n${evidence.map((e) => `- ${e}`).join("\n")}`;
 
   let answer;
