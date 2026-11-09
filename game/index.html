@@ -107,8 +107,8 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .pbtn.ghostb:hover{background:var(--muted);color:var(--solid)}
 /* ACCUSE — replaces the memo: pick a suspect, write the motive, submit */
 .mstep{color:var(--fg);font-size:15px;margin-top:10px;padding:0}
-.suslist{border:0;margin:0;padding:0;min-width:0;flex:0 1 auto;min-height:0;overflow-y:auto}
-#susOpts{display:flex;flex-direction:column;gap:4px;margin-top:6px}
+.suslist{border:0;margin:0;padding:0;min-width:0;flex:none}
+#susOpts{display:flex;flex-direction:column;gap:4px;margin-top:6px;max-height:96px;padding:4px;overflow-y:auto}   /* two 46px rows + gap; the rest scrolls */
 .sus{display:flex;align-items:center;gap:10px;padding:3px 6px;border:2px solid transparent;cursor:pointer;font-size:15px;line-height:1.3}
 .sus input{position:absolute;opacity:0;pointer-events:none}
 .sus .ph{width:36px;height:36px;flex:none;border-width:2px}
@@ -117,7 +117,17 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .sus:has(input:checked){border-color:var(--gold);color:var(--gold)}
 .sus:has(input:focus-visible){outline:3px solid var(--gold);outline-offset:1px}
 .sus:has(input:disabled){cursor:default}
-#motive{flex:1 0 80px}   /* keep room to write even when the one-screen layout squeezes the panel */
+#susOpts[hidden]{display:none}
+.sustoggle{display:flex;align-items:center;gap:10px;width:100%;background:transparent;border:0;padding:6px 0;min-height:44px;text-align:left;font-size:15px}
+.sustoggle:hover:not(:disabled){color:var(--gold)}
+.sustoggle b{flex:1;font-weight:400;color:var(--muted)}
+.sustoggle b.on{color:var(--gold)}
+.sustoggle i{font-style:normal;transition:transform .15s}
+.sustoggle[aria-expanded="true"] i{transform:rotate(180deg)}
+.sustoggle:disabled{cursor:default}
+/* the motive box grows to 140px when there is room and shrinks to 64px on short screens; below that the form scrolls instead of spilling out of the frame */
+#accuseView #motive{flex:1 1 140px;min-height:64px}
+#accuseView{overflow-y:auto}
 #accuseView.done .wtitle{color:var(--cyan)}
 /* VERDICT — modal result after the accusation is judged by the server */
 .verdict{color:var(--fg);background:var(--solid);width:min(680px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow-y:auto;padding:26px 30px}
@@ -156,6 +166,31 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .chatform button:disabled{border-color:var(--dim);color:var(--dim);cursor:default}
 .pol.sel .ph{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold)}
 .pol.sel{color:var(--gold)}
+/* NICKNAME step inside the verdict, then the LEADERBOARD screen */
+.nickform{display:flex;flex-direction:column;gap:6px;margin-top:16px;border-top:2px dashed var(--dim);padding-top:14px}
+.nickform p{margin:0;font-size:15px}
+.nickform input{background:transparent;border:3px solid var(--muted);padding:8px 12px;font-size:18px;min-height:44px;box-sizing:border-box}
+.nickform input:focus-visible{outline:none;border-color:var(--gold)}
+.nickform input[aria-invalid="true"]{border-color:var(--red)}
+.nickform small{min-height:1.6em;font-size:14px;color:var(--muted)}
+.nickform small.err{color:var(--red)}
+.nickform[hidden],#vBtns[hidden]{display:none}
+html:not([data-screen="board"]) #s-board{display:none}
+html[data-screen="board"] #hud,html[data-screen="board"] #s-map{display:none}
+.board{max-width:760px;margin:clamp(16px,6vh,64px) auto 0}
+.bme{margin:10px 0 14px;color:var(--cyan)}
+.brows{list-style:none;margin:0;padding:0;border-block:2px dashed var(--dim)}
+.brows li{display:grid;grid-template-columns:3em minmax(0,1fr) auto 5.5em;gap:4px 14px;align-items:baseline;padding:8px 6px;border-bottom:1px solid rgba(236,234,255,.12)}
+.brows li:last-child{border-bottom:0}
+.brows .rk{color:var(--muted);font-variant-numeric:tabular-nums}
+.brows li:nth-child(-n+3) .rk{color:var(--gold)}
+.brows .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brows .end{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.brows .end.ok{color:var(--gold)} .brows .end.no{color:var(--red)}
+.brows .sc{text-align:right;font-variant-numeric:tabular-nums}
+.brows li.me{background:rgba(127,214,255,.12);outline:2px solid var(--cyan);color:var(--cyan)}
+.brows li.me .rk{color:var(--cyan)}
+@media (max-width:600px){ .brows li{grid-template-columns:2.4em minmax(0,1fr) 4.5em} .brows .end{grid-column:2;grid-row:2} .brows .sc{grid-row:1;grid-column:3} }
 
 /* MAP fits one laptop screen: HUD on top, map + memo fill the rest, chat at the bottom. No page scroll. */
 @media (min-width:901px){
@@ -319,8 +354,8 @@ html:not([data-screen="title"]) #s-title{display:none}
         <form class="mview" id="accuseView" hidden novalidate>
           <span class="wtitle" id="accuseTitle">accuse</span>
           <fieldset class="suslist" aria-labelledby="susLegend">
-            <legend id="susLegend" class="mstep">1. who did it?</legend>
-            <div id="susOpts"></div>
+            <legend id="susLegend" class="mstep"><button type="button" class="sustoggle" id="susToggle" aria-expanded="false" aria-controls="susOpts">1. who did it? <b id="susPicked">pick one</b> <i aria-hidden="true">▾</i></button></legend>
+            <div id="susOpts" hidden></div>
           </fieldset>
           <label class="mstep" for="motive">2. why? write the motive.</label>
           <textarea id="motive" placeholder="what did they want, and what made them do it at 23:23?" spellcheck="false"></textarea>
@@ -354,8 +389,28 @@ html:not([data-screen="title"]) #s-title{display:none}
   <blockquote id="vQuote"></blockquote>
   <div id="vSummary"></div>
   <p class="muted vfoot">no retry. reload the page to start over.</p>
-  <div class="mbtns"><button type="button" class="pbtn" id="vClose">close</button></div>
+  <div class="mbtns" id="vBtns"><button type="button" class="pbtn ghostb" id="vClose">close</button><button type="button" class="pbtn" id="vRegister">register my score ▶</button></div>
+  <form class="nickform" id="nickForm" hidden novalidate>
+    <label for="nick" class="wtitle">your detective name</label>
+    <p class="muted">it shows on the leaderboard next to your score.</p>
+    <input id="nick" maxlength="12" autocomplete="nickname" spellcheck="false" placeholder="2–12 letters or numbers" aria-describedby="nickMsg">
+    <small id="nickMsg" aria-live="polite"></small>
+    <div class="mbtns"><button type="button" class="pbtn ghostb" id="nickBack">◀ back</button><button class="pbtn" id="nickSubmit">register</button></div>
+  </form>
 </dialog>
+
+<!-- LEADERBOARD (after registering a score) -->
+<section id="s-board" class="screen" aria-labelledby="bTitle">
+  <div class="wrap">
+    <div class="win board">
+      <p class="vkicker">case 2016-0315 · leaderboard</p>
+      <h2 class="wtitle" id="bTitle">top detectives</h2>
+      <p class="bme" id="bMe" role="status"></p>
+      <ol class="brows" id="bRows"></ol>
+      <div class="mbtns"><button type="button" class="pbtn ghostb" id="bBack">◀ back to the case</button><button type="button" class="pbtn" id="bAgain">play again</button></div>
+    </div>
+  </div>
+</section>
 
 <div id="toast" role="status" aria-live="polite"></div>
 <div class="scanlines" aria-hidden="true"></div>
@@ -543,9 +598,17 @@ const SUSPECTS = Object.keys(PEOPLE).filter(k=>k!=='jisu');   // jisu is the vic
 SUSPECTS.forEach(k=>{ const p=PEOPLE[k];
   $('#susOpts').append(h('label',{class:'sus'}, h('input',{type:'radio',name:'suspect',value:k}), phEl(k), h('span',{}, p.name, h('small',{class:'muted',text:p.r16}))));
 });
+// the suspect list folds under its toggle so the motive box gets the room
+function openSus(on){ $('#susOpts').hidden=!on; $('#susToggle').setAttribute('aria-expanded', on); }
+$('#susToggle').addEventListener('click', ()=>{ const on=$('#susOpts').hidden; openSus(on); if (on) ($('#susOpts input:checked') || $('#susOpts input')).focus(); });
+$('#susOpts').addEventListener('change', e=>{
+  const b=$('#susPicked'); b.textContent=PEOPLE[e.target.value].name; b.classList.add('on');
+});
+// fold after a pointer pick only; arrow keys also fire change/click (detail 0) while browsing the list
+$('#susOpts').addEventListener('click', e=>{ if (e.detail>0 && e.target.matches('input')){ openSus(false); $('#motive').focus(); } });
 function showAccuse(on){
   $('#memoView').hidden=on; $('#accuseView').hidden=!on;
-  (on ? ($('#accuseView input:checked') || $('#accuseView input')) : $('#memo')).focus();
+  (on ? $('#susToggle') : $('#memo')).focus();
 }
 $('#toAccuse').addEventListener('click', ()=>showAccuse(true));
 $('#toMemo').addEventListener('click', ()=>showAccuse(false));
@@ -553,9 +616,9 @@ document.querySelector('[data-go="accuse"]').addEventListener('click', ()=>showA
 $('#accuseView').addEventListener('submit', e=>{
   e.preventDefault();
   const pick=$('#accuseView input:checked'), why=$('#motive').value.trim(), msg=$('#accuseMsg');
-  if (!pick){ msg.textContent='step 1: pick who did it.'; $('#accuseView input').focus(); return; }
+  if (!pick){ msg.textContent='step 1: pick who did it.'; openSus(true); $('#susOpts input').focus(); return; }
   if (!why){ msg.textContent='step 2: write the motive.'; $('#motive').focus(); return; }
-  const lock = on => $('#accuseView').querySelectorAll('input,textarea,#accuseSubmit').forEach(el=>el.disabled=on);
+  const lock = on => $('#accuseView').querySelectorAll('input,textarea,#accuseSubmit,#susToggle').forEach(el=>el.disabled=on);
   lock(true); msg.textContent='sending…';
   fetch('/api/accuse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({who:pick.value, motive:why})})
     .then(r=>{ if (!r.ok) throw new Error(r.status); return r.json(); })
@@ -587,6 +650,66 @@ function showVerdict(v, who){
   d.showModal();
 }
 $('#vClose').addEventListener('click', ()=>$('#verdict').close());
+
+/* ---------- REGISTER SCORE → LEADERBOARD ---------- */
+// shortcut: no score API yet; the board is sample data plus this player's entry, kept in memory. Swap for GET/POST /api/scores when the backend exists.
+const BOARD = [
+  {nick:'noir_cat',  ending:'SOLVED',  score:100},
+  {nick:'radio1123', ending:'SOLVED',  score:90},
+  {nick:'jiwonee',   ending:'SOLVED',  score:80},
+  {nick:'sherlock_k',ending:'SOLVED',  score:70},
+  {nick:'minty',     ending:'PARTLY',  score:60},
+  {nick:'detective9',ending:'PARTLY',  score:40},
+  {nick:'hana_fan',  ending:'PARTLY',  score:20},
+  {nick:'static',    ending:'WRONG',   score:50},
+  {nick:'guesswho',  ending:'WRONG',   score:10},
+];
+const ENDING_RANK={SOLVED:0,PARTLY:1,WRONG:2};
+const ENDING_LABEL={SOLVED:'solved',PARTLY:'partly solved',WRONG:'wrong suspect'};
+// a right culprit always beats a wrong one; ties keep the earlier entry first
+const rankBoard = rows => rows.slice().sort((a,b)=>ENDING_RANK[a.ending]-ENDING_RANK[b.ending] || b.score-a.score);
+let myEntry=null;
+const NICK_OK=/^[\p{L}\p{N}_-]{2,12}$/u;
+
+function showNick(on){
+  $('#vBtns').hidden=on; $('#nickForm').hidden=!on;
+  if (on) $('#nick').focus(); else $('#vRegister').focus();
+}
+$('#vRegister').addEventListener('click', ()=> myEntry ? showBoard() : showNick(true));
+$('#nickBack').addEventListener('click', ()=>showNick(false));
+$('#nick').addEventListener('input', ()=>{ $('#nick').removeAttribute('aria-invalid'); $('#nickMsg').textContent=''; $('#nickMsg').className=''; });
+$('#nickForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const nick=$('#nick').value.trim(), msg=$('#nickMsg');
+  const fail = t => { msg.textContent=t; msg.className='err'; $('#nick').setAttribute('aria-invalid','true'); $('#nick').focus(); };
+  if (!NICK_OK.test(nick)) return fail('use 2–12 letters, numbers, _ or -.');
+  if (BOARD.some(r=>r.nick.toLowerCase()===nick.toLowerCase())) return fail('that name is taken. try another.');
+  $('#nick').disabled=$('#nickSubmit').disabled=true; msg.className=''; msg.textContent='registering…';
+  setTimeout(()=>{   // stands in for the network round trip
+    myEntry={nick, ending:S.verdict.ending, score:S.verdict.score, me:true};
+    BOARD.push(myEntry);
+    $('#vRegister').textContent='leaderboard ▶';
+    showNick(false);
+    showBoard();
+  }, reduced?0:500);
+});
+function showBoard(){
+  $('#verdict').close();
+  const rows=rankBoard(BOARD), ol=$('#bRows'); ol.innerHTML='';
+  rows.forEach((r,i)=>ol.append(h('li',{class:r.me?'me':''},
+    h('span',{class:'rk',text:'#'+(i+1)}),
+    h('span',{class:'nm',text:r.nick+(r.me?'  (you)':'')}),
+    h('span',{class:'end '+(r.ending==='WRONG'?'no':r.ending==='SOLVED'?'ok':''),text:ENDING_LABEL[r.ending]}),
+    h('span',{class:'sc',text:r.score+' pts'}))));
+  const rank=rows.indexOf(myEntry)+1;
+  $('#bMe').textContent=`registered. ${myEntry.nick}, you placed #${rank} of ${rows.length}.`;
+  document.documentElement.dataset.screen='board';
+  scrollTo(0,0);
+  ol.querySelector('.me')?.scrollIntoView({block:'nearest'});
+  $('#bBack').focus();
+}
+$('#bBack').addEventListener('click', ()=>{ document.documentElement.dataset.screen='map'; renderMap(false); });
+$('#bAgain').addEventListener('click', ()=>location.reload());
 
 /* ---------- TITLE: tune to 11.23 MHz, answer, then the map opens ---------- */
 const TARGET=11.23, LOCK=0.04, FMIN=9, FMAX=13;
