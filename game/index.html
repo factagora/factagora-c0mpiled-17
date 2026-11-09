@@ -244,10 +244,18 @@ html[data-screen="board"] #hud,html[data-screen="board"] #s-map{display:none}
   #s-map .pol{min-width:0}
   #s-map .pol>span:not(.new):not(.mark){max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #s-map .pol .ph{--sz:clamp(48px,min(100cqh - 110px,100cqw / 6 - 16px),160px);width:var(--sz);height:var(--sz)}
+  /* compact people row when a tall chat squeezes the map: drop the NEW badge and role line, fit face + name in the height left */
+  @container (max-height:170px){
+    #s-map .pol{padding-top:0;gap:0}
+    #s-map .pol .new{display:none}
+    #s-map .cell.slot .note{display:none}
+    #s-map .cell.slot{padding-block:2px}
+    #s-map .pol .ph{--sz:clamp(24px,min(100cqh - 30px,100cqw / 6 - 16px),160px)}
+  }
   #s-map .pol .new,#s-map .pol .mark{font-size:13px}
   #s-map .chat{margin-top:0;min-height:0}
   #s-map .memo textarea{min-height:0}
-  #s-map .wrap{--topMin:250px;grid-template-rows:minmax(var(--topMin),1fr) min(var(--chatH,clamp(160px,26vh,260px)),max(120px,calc(100% - var(--topMin) - 40px)));row-gap:40px}
+  #s-map .wrap{--topMin:280px;grid-template-rows:minmax(var(--topMin),1fr) min(var(--chatH,clamp(160px,26vh,260px)),max(120px,calc(100% - var(--topMin) - 40px)));row-gap:40px}
   #s-map .mapgrid>.win.memo{overflow-y:auto}   /* evidence + memo scroll inside the window instead of spilling out */
   /* drag the chat's top edge to change its height; the tab label stays above the grip */
   #s-map .chatgrip{display:block;position:absolute;left:0;right:0;top:-30px;height:34px;cursor:row-resize;touch-action:none;z-index:1}
@@ -993,7 +1001,7 @@ function renderChat(){
 {
   const grip=$('#chatGrip'), chat=grip.parentElement, wrap=chat.parentElement;
   const setH=px=>{
-    const max=wrap.clientHeight-250-40;   // keep the map/memo row at its minimum (--topMin) plus the row gap
+    const max=wrap.clientHeight-280-40;   // keep the map/memo row at its minimum (--topMin) plus the row gap
     const v=Math.round(Math.max(120, Math.min(max, px)));
     wrap.style.setProperty('--chatH', v+'px'); grip.setAttribute('aria-valuenow', v);
   };
