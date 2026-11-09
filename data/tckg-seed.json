@@ -1,0 +1,1799 @@
+{
+  "tenant": "hackathon-c0mpiled",
+  "case_id": "moonlight",
+  "query_rule": "Agent <char>.<T> = public (learned_at <= T) + char.<char> where learned_at <= T (knowledge) or said_at == T (claims). Never query truth for agents.",
+  "spaces": [
+    {
+      "name": "moonlight.truth",
+      "factblocks": [
+        {
+          "id": "F12",
+          "type": "fact",
+          "event_time": "always",
+          "text": "Minjae wore a gray hoodie every day."
+        },
+        {
+          "id": "F05",
+          "type": "fact",
+          "event_time": "always",
+          "text": "Only Jisoo, Dohyun and Minjae hold the deploy-bot key."
+        },
+        {
+          "id": "F44",
+          "type": "fact",
+          "event_time": "always",
+          "text": "The shared server-room admin card is kept in Minjae's desk drawer. Only Minjae has the drawer key."
+        },
+        {
+          "id": "F30",
+          "type": "fact",
+          "event_time": "2014-11",
+          "text": "Jisoo and Dohyun, friends from a university startup club, co-founded Moonlight Labs."
+        },
+        {
+          "id": "F31",
+          "type": "fact",
+          "event_time": "2014-12",
+          "text": "Minjae, Jisoo's university classmate, joined as the first engineer."
+        },
+        {
+          "id": "F32",
+          "type": "fact",
+          "event_time": "2015-01",
+          "text": "Moonlight moved into the Pangyo building where Mr. Kim worked as a guard."
+        },
+        {
+          "id": "F47",
+          "type": "fact",
+          "event_time": "2015-01",
+          "text": "At move-in, a developer in a gray hoodie signed out the shared server-room admin card."
+        },
+        {
+          "id": "F01",
+          "type": "fact",
+          "event_time": "2015-03",
+          "text": "Minjae built the first prototype; Jisoo rewrote it into the product."
+        },
+        {
+          "id": "F54",
+          "type": "fact",
+          "event_time": "2015-03",
+          "text": "Minjae built deploy-bot, the shared deploy account."
+        },
+        {
+          "id": "F43",
+          "type": "fact",
+          "event_time": "2015-12",
+          "text": "Moonlight raised its seed round."
+        },
+        {
+          "id": "F28",
+          "type": "fact",
+          "event_time": "2016-01",
+          "text": "Minjae's father was hospitalized; Minjae was buried in medical debt."
+        },
+        {
+          "id": "F33",
+          "type": "fact",
+          "event_time": "2016-01",
+          "text": "Hana joined Moonlight as a design intern."
+        },
+        {
+          "id": "F02",
+          "type": "fact",
+          "event_time": "2016-02-02",
+          "text": "A tech magazine profiled Jisoo as the 'genius CTO'. Minjae was not mentioned."
+        },
+        {
+          "id": "F07",
+          "type": "fact",
+          "event_time": "2016-03-01",
+          "text": "Dohyun inflated the user numbers in the investor deck (about 3x real users)."
+        },
+        {
+          "id": "F22",
+          "type": "fact",
+          "event_time": "2016-03-01",
+          "text": "Minjae promised to get Hana an internship interview at Nova AI."
+        },
+        {
+          "id": "F06",
+          "type": "fact",
+          "event_time": "2016-03-01",
+          "text": "Investment terms set for the Mar 16 signing: options vest from signing; a confidentiality breach voids them and triggers a lawsuit."
+        },
+        {
+          "id": "F21",
+          "type": "fact",
+          "event_time": "2016-03-08",
+          "text": "Jisoo noticed odd repo access and asked Grace who can see the code escrow. Grace sensed trouble but kept the signing date."
+        },
+        {
+          "id": "F03",
+          "type": "fact",
+          "event_time": "2016-03-10",
+          "text": "Minjae signed a secret consulting contract with Nova AI.",
+          "caused_by": [
+            "F28"
+          ],
+          "hidden": true
+        },
+        {
+          "id": "F29",
+          "type": "fact",
+          "event_time": "2016-03-10",
+          "text": "Nova paid Minjae 80 million won upfront, almost exactly his medical debt.",
+          "caused_by": [
+            "F28"
+          ],
+          "hidden": true
+        },
+        {
+          "id": "F04",
+          "type": "fact",
+          "event_time": "2016-03-14",
+          "text": "Jisoo found company code pushed to an outside repo from the shared deploy-bot account.",
+          "caused_by": [
+            "F54",
+            "F52"
+          ]
+        },
+        {
+          "id": "F19",
+          "type": "fact",
+          "event_time": "2016-03-15T15:00",
+          "text": "The server-room CCTV light was on that afternoon (it was working)."
+        },
+        {
+          "id": "F52",
+          "type": "fact",
+          "event_time": "2016-03-15T19:00",
+          "text": "Messenger: Jisoo asked Minjae about the deploy-bot push records. Minjae said he didn't know."
+        },
+        {
+          "id": "F08",
+          "type": "fact",
+          "event_time": "2016-03-15T21:00",
+          "text": "Dohyun and Jisoo argued loudly about the user numbers. Jisoo said she'd tell Grace herself. Hana heard it through the glass wall."
+        },
+        {
+          "id": "F09",
+          "type": "fact",
+          "event_time": "2016-03-15T21:10",
+          "text": "Dohyun's car left the parking lot."
+        },
+        {
+          "id": "F10",
+          "type": "fact",
+          "event_time": "2016-03-15T22:30",
+          "text": "Minjae asked the guard to switch off the server-room CCTV for 'maintenance'. (He meant to delete the push logs before Jisoo checked them.)",
+          "caused_by": [
+            "F14"
+          ],
+          "key": true
+        },
+        {
+          "id": "F56",
+          "type": "fact",
+          "event_time": "2016-03-15T22:30",
+          "text": "A developer in a gray hoodie asked Mr. Kim to switch off the server-room CCTV for 'maintenance'. Kim didn't know his name.",
+          "caused_by": [
+            "F14",
+            "F52"
+          ]
+        },
+        {
+          "id": "F24",
+          "type": "fact",
+          "event_time": "2016-03-15T22:32",
+          "text": "Minjae handed Mr. Kim an envelope with 500,000 won 'for the trouble'.",
+          "caused_by": [
+            "F10"
+          ]
+        },
+        {
+          "id": "F26",
+          "type": "fact",
+          "event_time": "2016-03-15T22:40",
+          "text": "Server-room door opened with the shared admin card kept in the dev-team drawer."
+        },
+        {
+          "id": "F11",
+          "type": "fact",
+          "event_time": "2016-03-15T22:45",
+          "text": "Hana saw someone in a gray hoodie in the server-room hallway. No face."
+        },
+        {
+          "id": "F13",
+          "type": "fact",
+          "event_time": "2016-03-15T23:00",
+          "text": "Jisoo emailed Grace: 'We need to talk before signing tomorrow. It's about one of our team.'",
+          "caused_by": [
+            "F04"
+          ],
+          "key": true
+        },
+        {
+          "id": "F49",
+          "type": "fact",
+          "event_time": "2016-03-15T23:04",
+          "text": "Hana left by the front entrance at 23:04."
+        },
+        {
+          "id": "F57",
+          "type": "fact",
+          "event_time": "2016-03-15T23:06",
+          "text": "Taxi app: Hana was picked up outside the front entrance at 23:06."
+        },
+        {
+          "id": "F14",
+          "type": "fact",
+          "event_time": "2016-03-15T23:20",
+          "text": "Jisoo went to the server room to check the logs.",
+          "caused_by": [
+            "F04"
+          ]
+        },
+        {
+          "id": "F15",
+          "type": "fact",
+          "event_time": "2016-03-15T23:23",
+          "text": "Jisoo was found dead in the server room. Ruled an accidental electrocution."
+        },
+        {
+          "id": "F20",
+          "type": "fact",
+          "event_time": "2016-03-15T23:23",
+          "text": "Jisoo walked in on Minjae pulling the log-server disk. They struggled, and he shoved her into the open live rack. Not planned.",
+          "caused_by": [
+            "F14",
+            "F06"
+          ],
+          "truth_only": true
+        },
+        {
+          "id": "F45",
+          "type": "fact",
+          "event_time": "2016-03-15T23:30",
+          "text": "The gray-hoodie developer left by the back door carrying a heavy bag.",
+          "caused_by": [
+            "F20"
+          ],
+          "key": true
+        },
+        {
+          "id": "F16",
+          "type": "fact",
+          "event_time": "2016-03-16",
+          "text": "The investment was postponed indefinitely."
+        },
+        {
+          "id": "F25",
+          "type": "fact",
+          "event_time": "2016-03-16",
+          "text": "Incident report: server-rack cover found open, log-server disk missing, no witness statements filed.",
+          "caused_by": [
+            "F20"
+          ]
+        },
+        {
+          "id": "F48",
+          "type": "fact",
+          "event_time": "2016-03-16",
+          "text": "Parking barrier log: after Dohyun's car left at 21:10, it never came back in that night."
+        },
+        {
+          "id": "F34",
+          "type": "fact",
+          "event_time": "2016-04",
+          "text": "Dohyun quietly corrected the user numbers and closed a smaller bridge round.",
+          "caused_by": [
+            "F08"
+          ],
+          "hidden": true
+        },
+        {
+          "id": "F35",
+          "type": "fact",
+          "event_time": "2016-04",
+          "text": "Hana passed the Nova interview but never joined."
+        },
+        {
+          "id": "F51",
+          "type": "fact",
+          "event_time": "2016-04",
+          "text": "Internal audit: at the time of the leak push, only Minjae was on the company VPN. Dohyun buried the result to save the company.",
+          "caused_by": [
+            "F04"
+          ],
+          "hidden": true,
+          "key": true
+        },
+        {
+          "id": "F17",
+          "type": "fact",
+          "event_time": "2016-09",
+          "text": "Nova AI launched a near-identical product. Minjae joined Nova as CTO."
+        },
+        {
+          "id": "F36",
+          "type": "fact",
+          "event_time": "2017-01",
+          "text": "Minjae's father died."
+        },
+        {
+          "id": "F37",
+          "type": "fact",
+          "event_time": "2017-03",
+          "text": "Mr. Kim quit his job as a security guard."
+        },
+        {
+          "id": "F55",
+          "type": "fact",
+          "event_time": "2017-03-15",
+          "text": "First memorial for Jisoo. Mr. Kim's last shift as guard."
+        },
+        {
+          "id": "F38",
+          "type": "fact",
+          "event_time": "2018-02",
+          "text": "Hana became a tech journalist."
+        },
+        {
+          "id": "F50",
+          "type": "fact",
+          "event_time": "2018-03",
+          "text": "Hana's first article: people heard loud shouting that night, and investigation records show the server room was opened at 22:40 with the shared admin card.",
+          "caused_by": [
+            "F25"
+          ]
+        },
+        {
+          "id": "F53",
+          "type": "fact",
+          "event_time": "2019-02",
+          "text": "During a server migration, the 2016 company messenger backup was found."
+        },
+        {
+          "id": "F39",
+          "type": "fact",
+          "event_time": "2019-06",
+          "text": "Moonlight raised its Series B. Dohyun started the 'Jisoo Han Fellowship'."
+        },
+        {
+          "id": "F40",
+          "type": "fact",
+          "event_time": "2022-08",
+          "text": "Moonlight became a unicorn."
+        },
+        {
+          "id": "F18",
+          "type": "fact",
+          "event_time": "2023-03",
+          "text": "Minjae became CEO of Nova AI."
+        },
+        {
+          "id": "F46",
+          "type": "fact",
+          "event_time": "2023-03",
+          "text": "Mr. Kim saw Nova's new CEO on TV and recognized the gray-hoodie developer's face.",
+          "caused_by": [
+            "F18"
+          ]
+        },
+        {
+          "id": "F41",
+          "type": "fact",
+          "event_time": "2024-05",
+          "text": "Hana found Minjae's Nova contract and advance in early filings, but Nova's lawyers killed the story."
+        },
+        {
+          "id": "F42",
+          "type": "fact",
+          "event_time": "2026-10",
+          "text": "Detective Seojin joined the cold case unit and opened the Moonlight evidence box."
+        },
+        {
+          "id": "L02",
+          "type": "claim",
+          "said_by": "minjae",
+          "said_at": [
+            "2016-03-15T22:50"
+          ],
+          "text": "I'm at home, working on tomorrow's demo.",
+          "truth": false
+        },
+        {
+          "id": "L03",
+          "type": "claim",
+          "said_by": "minjae",
+          "said_at": [
+            "2017-03-15T22:50",
+            "2018-03-15T22:50"
+          ],
+          "text": "I left at nine and was home all night.",
+          "truth": false
+        },
+        {
+          "id": "L04",
+          "type": "claim",
+          "said_by": "dohyun",
+          "said_at": [
+            "2017-03-15T22:50",
+            "2026-11-09T10:00"
+          ],
+          "text": "Jisoo and I never argued that night.",
+          "truth": false
+        },
+        {
+          "id": "L05",
+          "type": "claim",
+          "said_by": "minjae",
+          "said_at": [
+            "2019-03-15T22:50",
+            "2026-11-09T10:00"
+          ],
+          "text": "I came back around 10:30 for my laptop. Just for a minute.",
+          "truth": "partial"
+        },
+        {
+          "id": "L06",
+          "type": "claim",
+          "said_by": "grace",
+          "said_at": [
+            "2026-11-09T10:00"
+          ],
+          "text": "I had no idea anything was wrong at Moonlight.",
+          "truth": false
+        },
+        {
+          "id": "L07",
+          "type": "claim",
+          "said_by": "hana",
+          "said_at": [
+            "2026-11-09T10:00"
+          ],
+          "text": "I told the police everything I saw back then.",
+          "truth": false
+        },
+        {
+          "id": "L08",
+          "type": "claim",
+          "said_by": "hana",
+          "said_at": [
+            "2017-03-15T22:50"
+          ],
+          "text": "I didn't see anything that night.",
+          "truth": false
+        },
+        {
+          "id": "L09",
+          "type": "claim",
+          "said_by": "dohyun",
+          "said_at": [
+            "2017-03-15T22:50"
+          ],
+          "text": "There was no leak. Nothing ever left the company.",
+          "truth": false
+        },
+        {
+          "id": "L10",
+          "type": "claim",
+          "said_by": "dohyun",
+          "said_at": [
+            "2019-03-15T22:50"
+          ],
+          "text": "It was just a difference of opinion.",
+          "truth": "partial"
+        },
+        {
+          "id": "L11",
+          "type": "claim",
+          "said_by": "minjae",
+          "said_at": [
+            "2019-03-15T22:50"
+          ],
+          "text": "I first talked to Nova that summer, after everything.",
+          "truth": false
+        },
+        {
+          "id": "L12",
+          "type": "claim",
+          "said_by": "minjae",
+          "said_at": [
+            "2019-03-15T22:50"
+          ],
+          "text": "That card? Anyone could use it.",
+          "truth": false
+        },
+        {
+          "id": "L13",
+          "type": "claim",
+          "said_by": "minjae",
+          "said_at": [
+            "2025-03-15T22:50"
+          ],
+          "text": "It was a consulting gig. Everyone had side gigs.",
+          "truth": "partial"
+        },
+        {
+          "id": "L14",
+          "type": "claim",
+          "said_by": "minjae",
+          "said_at": [
+            "2017-03-15T22:50"
+          ],
+          "text": "Jisoo never told me anything about a leak.",
+          "truth": false
+        },
+        {
+          "id": "C1",
+          "type": "contradiction",
+          "kind": "real",
+          "between": [
+            "L03",
+            "L05"
+          ],
+          "text": "2017: home all night after nine. 2019: came back at 10:30."
+        },
+        {
+          "id": "C2",
+          "type": "contradiction",
+          "kind": "real",
+          "between": [
+            "L02",
+            "L05"
+          ],
+          "text": "2016: 'I'm at home.' 2019: 'I came back at 10:30.'"
+        },
+        {
+          "id": "C3",
+          "type": "contradiction",
+          "kind": "real",
+          "between": [
+            "L05",
+            "F45"
+          ],
+          "text": "'Just a minute for my laptop' vs leaving by the back door at 23:30 with a bag."
+        },
+        {
+          "id": "C4",
+          "type": "contradiction",
+          "kind": "real",
+          "between": [
+            "L11",
+            "F03"
+          ],
+          "text": "'First talked to Nova that summer' vs a Nova contract on March 10."
+        },
+        {
+          "id": "C5",
+          "type": "contradiction",
+          "kind": "real",
+          "between": [
+            "L12",
+            "F44"
+          ],
+          "text": "'Anyone could use the card' vs the card in his locked drawer."
+        },
+        {
+          "id": "C6",
+          "type": "contradiction",
+          "kind": "real",
+          "between": [
+            "L12",
+            "F47"
+          ],
+          "text": "'Anyone could use the card' vs the gray-hoodie developer who signed it out."
+        },
+        {
+          "id": "C7",
+          "type": "contradiction",
+          "kind": "real",
+          "between": [
+            "L14",
+            "F52"
+          ],
+          "text": "'Jisoo never told me about a leak' vs her messenger question that evening."
+        },
+        {
+          "id": "X1",
+          "type": "contradiction",
+          "kind": "trap",
+          "between": [
+            "L04",
+            "F08"
+          ],
+          "text": "Dohyun denies the fight. (Trap: he's hiding the inflated numbers.)"
+        },
+        {
+          "id": "X2",
+          "type": "contradiction",
+          "kind": "trap",
+          "between": [
+            "L06",
+            "F21"
+          ],
+          "text": "Grace says she had no idea. (Trap: she pushed the deal for her fund.)"
+        },
+        {
+          "id": "X3",
+          "type": "contradiction",
+          "kind": "trap",
+          "between": [
+            "L07",
+            "F25"
+          ],
+          "text": "Hana says she told the police everything, but no witness statement was filed. (Trap: the Nova interview.)"
+        },
+        {
+          "id": "X4",
+          "type": "contradiction",
+          "kind": "trap",
+          "between": [
+            "L08",
+            "F11"
+          ],
+          "text": "2017 Hana saw nothing; 2016 Hana saw the hoodie. (Trap: the Nova interview.)"
+        },
+        {
+          "id": "X5",
+          "type": "contradiction",
+          "kind": "trap",
+          "between": [
+            "L09",
+            "F04"
+          ],
+          "text": "Dohyun denies any leak. (Trap: he buried the audit to save the company. Follow it.)"
+        },
+        {
+          "id": "rec.report",
+          "type": "record",
+          "refs": [
+            "F25"
+          ],
+          "available_from": "start",
+          "text": "Server-rack cover found open. Log-server disk missing. No witness statements filed."
+        },
+        {
+          "id": "rec.parking",
+          "type": "record",
+          "refs": [
+            "F09",
+            "F48"
+          ],
+          "available_from": "T2017",
+          "text": "Mar 15, 21:10: Dohyun Kang's car exits. No re-entry that night."
+        },
+        {
+          "id": "rec.door",
+          "type": "record",
+          "refs": [
+            "F26"
+          ],
+          "available_from": "T2018",
+          "text": "Mar 15, 22:40: opened with the shared admin card."
+        },
+        {
+          "id": "rec.taxi",
+          "type": "record",
+          "refs": [
+            "F57"
+          ],
+          "available_from": "T2018",
+          "text": "Mar 15, 23:06: Hana Yoo picked up at the front entrance."
+        },
+        {
+          "id": "rec.messenger",
+          "type": "record",
+          "refs": [
+            "F52"
+          ],
+          "available_from": "T2019",
+          "text": "Mar 15, 19:02 Jisoo: 'Was the deploy-bot push on the 13th you?' 19:05 Minjae: 'No idea.'"
+        }
+      ]
+    },
+    {
+      "name": "moonlight.public",
+      "factblocks": [
+        {
+          "id": "public.F15",
+          "type": "knowledge",
+          "ref": "F15",
+          "learned_at": "2016-03-15T23:23",
+          "text": "Jisoo was found dead in the server room. Ruled an accidental electrocution."
+        },
+        {
+          "id": "public.F25",
+          "type": "knowledge",
+          "ref": "F25",
+          "learned_at": "2016-03-16",
+          "text": "Incident report: server-rack cover found open, log-server disk missing, no witness statements filed."
+        },
+        {
+          "id": "public.F30",
+          "type": "knowledge",
+          "ref": "F30",
+          "learned_at": "2014-11",
+          "text": "Jisoo and Dohyun, friends from a university startup club, co-founded Moonlight Labs."
+        },
+        {
+          "id": "public.F31",
+          "type": "knowledge",
+          "ref": "F31",
+          "learned_at": "2014-12",
+          "text": "Minjae, Jisoo's university classmate, joined as the first engineer."
+        },
+        {
+          "id": "public.F32",
+          "type": "knowledge",
+          "ref": "F32",
+          "learned_at": "2015-01",
+          "text": "Moonlight moved into the Pangyo building where Mr. Kim worked as a guard."
+        },
+        {
+          "id": "public.F33",
+          "type": "knowledge",
+          "ref": "F33",
+          "learned_at": "2016-01",
+          "text": "Hana joined Moonlight as a design intern."
+        },
+        {
+          "id": "public.F39",
+          "type": "knowledge",
+          "ref": "F39",
+          "learned_at": "2019-06",
+          "text": "Moonlight raised its Series B. Dohyun started the 'Jisoo Han Fellowship'."
+        },
+        {
+          "id": "public.F40",
+          "type": "knowledge",
+          "ref": "F40",
+          "learned_at": "2022-08",
+          "text": "Moonlight became a unicorn."
+        },
+        {
+          "id": "public.F42",
+          "type": "knowledge",
+          "ref": "F42",
+          "learned_at": "2026-10",
+          "text": "Detective Seojin joined the cold case unit and opened the Moonlight evidence box."
+        },
+        {
+          "id": "public.F43",
+          "type": "knowledge",
+          "ref": "F43",
+          "learned_at": "2015-12",
+          "text": "Moonlight raised its seed round."
+        },
+        {
+          "id": "public.F50",
+          "type": "knowledge",
+          "ref": "F50",
+          "learned_at": "2018-03",
+          "text": "Hana's first article: people heard loud shouting that night, and investigation records show the server room was opened at 22:40 with the shared admin card."
+        }
+      ]
+    },
+    {
+      "name": "moonlight.char.jisoo",
+      "factblocks": [
+        {
+          "id": "jisoo.knows.F30",
+          "type": "knowledge",
+          "ref": "F30",
+          "learned_at": "2014-11",
+          "text": "Jisoo and Dohyun, friends from a university startup club, co-founded Moonlight Labs."
+        },
+        {
+          "id": "jisoo.knows.F31",
+          "type": "knowledge",
+          "ref": "F31",
+          "learned_at": "2014-12",
+          "text": "Minjae, Jisoo's university classmate, joined as the first engineer."
+        },
+        {
+          "id": "jisoo.knows.F32",
+          "type": "knowledge",
+          "ref": "F32",
+          "learned_at": "2015-01",
+          "text": "Moonlight moved into the Pangyo building where Mr. Kim worked as a guard."
+        },
+        {
+          "id": "jisoo.knows.F01",
+          "type": "knowledge",
+          "ref": "F01",
+          "learned_at": "2015-03",
+          "text": "Minjae built the first prototype; Jisoo rewrote it into the product."
+        },
+        {
+          "id": "jisoo.knows.F54",
+          "type": "knowledge",
+          "ref": "F54",
+          "learned_at": "2015-03",
+          "text": "Minjae built deploy-bot, the shared deploy account."
+        },
+        {
+          "id": "jisoo.knows.F05",
+          "type": "knowledge",
+          "ref": "F05",
+          "learned_at": "2015-03",
+          "text": "Only Jisoo, Dohyun and Minjae hold the deploy-bot key."
+        },
+        {
+          "id": "jisoo.knows.F33",
+          "type": "knowledge",
+          "ref": "F33",
+          "learned_at": "2016-01",
+          "text": "Hana joined Moonlight as a design intern."
+        },
+        {
+          "id": "jisoo.knows.F28",
+          "type": "knowledge",
+          "ref": "F28",
+          "learned_at": "2016-01",
+          "text": "Minjae's father was hospitalized; Minjae was buried in medical debt."
+        },
+        {
+          "id": "jisoo.knows.F02",
+          "type": "knowledge",
+          "ref": "F02",
+          "learned_at": "2016-02-02",
+          "text": "A tech magazine profiled Jisoo as the 'genius CTO'. Minjae was not mentioned."
+        },
+        {
+          "id": "jisoo.knows.F06",
+          "type": "knowledge",
+          "ref": "F06",
+          "learned_at": "2016-03-01",
+          "text": "Investment terms set for the Mar 16 signing: options vest from signing; a confidentiality breach voids them and triggers a lawsuit."
+        },
+        {
+          "id": "jisoo.knows.F07",
+          "type": "knowledge",
+          "ref": "F07",
+          "learned_at": "2016-03-01",
+          "text": "Dohyun inflated the user numbers in the investor deck (about 3x real users)."
+        },
+        {
+          "id": "jisoo.knows.F21",
+          "type": "knowledge",
+          "ref": "F21",
+          "learned_at": "2016-03-08",
+          "text": "Jisoo noticed odd repo access and asked Grace who can see the code escrow. Grace sensed trouble but kept the signing date."
+        },
+        {
+          "id": "jisoo.knows.F04",
+          "type": "knowledge",
+          "ref": "F04",
+          "learned_at": "2016-03-14",
+          "text": "Jisoo found company code pushed to an outside repo from the shared deploy-bot account."
+        },
+        {
+          "id": "jisoo.knows.F52",
+          "type": "knowledge",
+          "ref": "F52",
+          "learned_at": "2016-03-15T19:00",
+          "text": "Messenger: Jisoo asked Minjae about the deploy-bot push records. Minjae said he didn't know."
+        },
+        {
+          "id": "jisoo.knows.F08",
+          "type": "knowledge",
+          "ref": "F08",
+          "learned_at": "2016-03-15T21:00",
+          "text": "Dohyun and Jisoo argued loudly about the user numbers. Jisoo said she'd tell Grace herself. Hana heard it through the glass wall."
+        },
+        {
+          "id": "jisoo.knows.F13",
+          "type": "knowledge",
+          "ref": "F13",
+          "learned_at": "2016-03-15T22:40",
+          "text": "Jisoo emailed Grace: 'We need to talk before signing tomorrow. It's about one of our team.'"
+        },
+        {
+          "id": "jisoo.knows.F14",
+          "type": "knowledge",
+          "ref": "F14",
+          "learned_at": "2016-03-15T22:40",
+          "text": "Jisoo went to the server room to check the logs."
+        }
+      ]
+    },
+    {
+      "name": "moonlight.char.dohyun",
+      "factblocks": [
+        {
+          "id": "dohyun.knows.F30",
+          "type": "knowledge",
+          "ref": "F30",
+          "learned_at": "2014-11",
+          "text": "Jisoo and Dohyun, friends from a university startup club, co-founded Moonlight Labs."
+        },
+        {
+          "id": "dohyun.knows.F31",
+          "type": "knowledge",
+          "ref": "F31",
+          "learned_at": "2014-12",
+          "text": "Minjae, Jisoo's university classmate, joined as the first engineer."
+        },
+        {
+          "id": "dohyun.knows.F32",
+          "type": "knowledge",
+          "ref": "F32",
+          "learned_at": "2015-01",
+          "text": "Moonlight moved into the Pangyo building where Mr. Kim worked as a guard."
+        },
+        {
+          "id": "dohyun.knows.F01",
+          "type": "knowledge",
+          "ref": "F01",
+          "learned_at": "2015-03",
+          "text": "Minjae built the first prototype; Jisoo rewrote it into the product."
+        },
+        {
+          "id": "dohyun.knows.F05",
+          "type": "knowledge",
+          "ref": "F05",
+          "learned_at": "2015-03",
+          "text": "Only Jisoo, Dohyun and Minjae hold the deploy-bot key."
+        },
+        {
+          "id": "dohyun.knows.F43",
+          "type": "knowledge",
+          "ref": "F43",
+          "learned_at": "2015-12",
+          "text": "Moonlight raised its seed round."
+        },
+        {
+          "id": "dohyun.knows.F28",
+          "type": "knowledge",
+          "ref": "F28",
+          "learned_at": "2016-01",
+          "text": "Minjae's father was hospitalized; Minjae was buried in medical debt."
+        },
+        {
+          "id": "dohyun.knows.F02",
+          "type": "knowledge",
+          "ref": "F02",
+          "learned_at": "2016-02-02",
+          "text": "A tech magazine profiled Jisoo as the 'genius CTO'. Minjae was not mentioned."
+        },
+        {
+          "id": "dohyun.knows.F06",
+          "type": "knowledge",
+          "ref": "F06",
+          "learned_at": "2016-03-01",
+          "text": "Investment terms set for the Mar 16 signing: options vest from signing; a confidentiality breach voids them and triggers a lawsuit."
+        },
+        {
+          "id": "dohyun.knows.F07",
+          "type": "knowledge",
+          "ref": "F07",
+          "learned_at": "2016-03-01",
+          "text": "Dohyun inflated the user numbers in the investor deck (about 3x real users)."
+        },
+        {
+          "id": "dohyun.knows.F08",
+          "type": "knowledge",
+          "ref": "F08",
+          "learned_at": "2016-03-15T21:00",
+          "text": "Dohyun and Jisoo argued loudly about the user numbers. Jisoo said she'd tell Grace herself. Hana heard it through the glass wall."
+        },
+        {
+          "id": "dohyun.knows.F09",
+          "type": "knowledge",
+          "ref": "F09",
+          "learned_at": "2016-03-15T21:10",
+          "text": "Dohyun's car left the parking lot."
+        },
+        {
+          "id": "dohyun.knows.F12",
+          "type": "knowledge",
+          "ref": "F12",
+          "learned_at": "2015-01",
+          "text": "Minjae wore a gray hoodie every day."
+        },
+        {
+          "id": "dohyun.knows.F15",
+          "type": "knowledge",
+          "ref": "F15",
+          "learned_at": "2016-03-16",
+          "text": "Jisoo was found dead in the server room. Ruled an accidental electrocution."
+        },
+        {
+          "id": "dohyun.knows.F16",
+          "type": "knowledge",
+          "ref": "F16",
+          "learned_at": "2016-03-16",
+          "text": "The investment was postponed indefinitely."
+        },
+        {
+          "id": "dohyun.knows.F25",
+          "type": "knowledge",
+          "ref": "F25",
+          "learned_at": "2016-03-16",
+          "text": "Incident report: server-rack cover found open, log-server disk missing, no witness statements filed."
+        },
+        {
+          "id": "dohyun.knows.F34",
+          "type": "knowledge",
+          "ref": "F34",
+          "learned_at": "2016-04",
+          "text": "Dohyun quietly corrected the user numbers and closed a smaller bridge round."
+        },
+        {
+          "id": "dohyun.knows.F51",
+          "type": "knowledge",
+          "ref": "F51",
+          "learned_at": "2016-04",
+          "text": "Internal audit: at the time of the leak push, only Minjae was on the company VPN. Dohyun buried the result to save the company."
+        },
+        {
+          "id": "dohyun.knows.F04",
+          "type": "knowledge",
+          "ref": "F04",
+          "learned_at": "2016-04",
+          "text": "Jisoo found company code pushed to an outside repo from the shared deploy-bot account."
+        },
+        {
+          "id": "dohyun.knows.F17",
+          "type": "knowledge",
+          "ref": "F17",
+          "learned_at": "2016-09",
+          "text": "Nova AI launched a near-identical product. Minjae joined Nova as CTO."
+        },
+        {
+          "id": "dohyun.knows.F36",
+          "type": "knowledge",
+          "ref": "F36",
+          "learned_at": "2017-01",
+          "text": "Minjae's father died."
+        },
+        {
+          "id": "dohyun.knows.F55",
+          "type": "knowledge",
+          "ref": "F55",
+          "learned_at": "2017-03-15",
+          "text": "First memorial for Jisoo. Mr. Kim's last shift as guard."
+        },
+        {
+          "id": "dohyun.knows.F50",
+          "type": "knowledge",
+          "ref": "F50",
+          "learned_at": "2018-03",
+          "text": "Hana's first article: people heard loud shouting that night, and investigation records show the server room was opened at 22:40 with the shared admin card."
+        },
+        {
+          "id": "dohyun.knows.F53",
+          "type": "knowledge",
+          "ref": "F53",
+          "learned_at": "2019-02",
+          "text": "During a server migration, the 2016 company messenger backup was found."
+        },
+        {
+          "id": "dohyun.knows.F52",
+          "type": "knowledge",
+          "ref": "F52",
+          "learned_at": "2019-02",
+          "text": "Messenger: Jisoo asked Minjae about the deploy-bot push records. Minjae said he didn't know."
+        },
+        {
+          "id": "dohyun.knows.F39",
+          "type": "knowledge",
+          "ref": "F39",
+          "learned_at": "2019-01",
+          "text": "Moonlight raised its Series B. Dohyun started the 'Jisoo Han Fellowship'."
+        },
+        {
+          "id": "dohyun.knows.F40",
+          "type": "knowledge",
+          "ref": "F40",
+          "learned_at": "2022-08",
+          "text": "Moonlight became a unicorn."
+        },
+        {
+          "id": "dohyun.knows.F18",
+          "type": "knowledge",
+          "ref": "F18",
+          "learned_at": "2023-03",
+          "text": "Minjae became CEO of Nova AI."
+        },
+        {
+          "id": "dohyun.knows.F41",
+          "type": "knowledge",
+          "ref": "F41",
+          "learned_at": "2024-05",
+          "text": "Hana found Minjae's Nova contract and advance in early filings, but Nova's lawyers killed the story."
+        },
+        {
+          "id": "dohyun.knows.F03",
+          "type": "knowledge",
+          "ref": "F03",
+          "learned_at": "2025-03-01",
+          "text": "Minjae signed a secret consulting contract with Nova AI."
+        },
+        {
+          "id": "dohyun.says.L04.T2017",
+          "type": "claim",
+          "ref": "L04",
+          "said_at": "2017-03-15T22:50",
+          "text": "Jisoo and I never argued that night.",
+          "truth": false
+        },
+        {
+          "id": "dohyun.says.L04.T2026",
+          "type": "claim",
+          "ref": "L04",
+          "said_at": "2026-11-09T10:00",
+          "text": "Jisoo and I never argued that night.",
+          "truth": false
+        },
+        {
+          "id": "dohyun.says.L09.T2017",
+          "type": "claim",
+          "ref": "L09",
+          "said_at": "2017-03-15T22:50",
+          "text": "There was no leak. Nothing ever left the company.",
+          "truth": false
+        },
+        {
+          "id": "dohyun.says.L10.T2019",
+          "type": "claim",
+          "ref": "L10",
+          "said_at": "2019-03-15T22:50",
+          "text": "It was just a difference of opinion.",
+          "truth": "partial"
+        }
+      ]
+    },
+    {
+      "name": "moonlight.char.minjae",
+      "factblocks": [
+        {
+          "id": "minjae.knows.F30",
+          "type": "knowledge",
+          "ref": "F30",
+          "learned_at": "2014-12",
+          "text": "Jisoo and Dohyun, friends from a university startup club, co-founded Moonlight Labs."
+        },
+        {
+          "id": "minjae.knows.F31",
+          "type": "knowledge",
+          "ref": "F31",
+          "learned_at": "2014-12",
+          "text": "Minjae, Jisoo's university classmate, joined as the first engineer."
+        },
+        {
+          "id": "minjae.knows.F32",
+          "type": "knowledge",
+          "ref": "F32",
+          "learned_at": "2015-01",
+          "text": "Moonlight moved into the Pangyo building where Mr. Kim worked as a guard."
+        },
+        {
+          "id": "minjae.knows.F01",
+          "type": "knowledge",
+          "ref": "F01",
+          "learned_at": "2015-03",
+          "text": "Minjae built the first prototype; Jisoo rewrote it into the product."
+        },
+        {
+          "id": "minjae.knows.F54",
+          "type": "knowledge",
+          "ref": "F54",
+          "learned_at": "2015-03",
+          "text": "Minjae built deploy-bot, the shared deploy account."
+        },
+        {
+          "id": "minjae.knows.F05",
+          "type": "knowledge",
+          "ref": "F05",
+          "learned_at": "2015-03",
+          "text": "Only Jisoo, Dohyun and Minjae hold the deploy-bot key."
+        },
+        {
+          "id": "minjae.knows.F12",
+          "type": "knowledge",
+          "ref": "F12",
+          "learned_at": "2015-01",
+          "text": "Minjae wore a gray hoodie every day."
+        },
+        {
+          "id": "minjae.knows.F43",
+          "type": "knowledge",
+          "ref": "F43",
+          "learned_at": "2015-12",
+          "text": "Moonlight raised its seed round."
+        },
+        {
+          "id": "minjae.knows.F28",
+          "type": "knowledge",
+          "ref": "F28",
+          "learned_at": "2016-01",
+          "text": "Minjae's father was hospitalized; Minjae was buried in medical debt."
+        },
+        {
+          "id": "minjae.knows.F02",
+          "type": "knowledge",
+          "ref": "F02",
+          "learned_at": "2016-02-02",
+          "text": "A tech magazine profiled Jisoo as the 'genius CTO'. Minjae was not mentioned."
+        },
+        {
+          "id": "minjae.knows.F22",
+          "type": "knowledge",
+          "ref": "F22",
+          "learned_at": "2016-03-01",
+          "text": "Minjae promised to get Hana an internship interview at Nova AI."
+        },
+        {
+          "id": "minjae.knows.F06",
+          "type": "knowledge",
+          "ref": "F06",
+          "learned_at": "2016-03-01",
+          "text": "Investment terms set for the Mar 16 signing: options vest from signing; a confidentiality breach voids them and triggers a lawsuit."
+        },
+        {
+          "id": "minjae.knows.F03",
+          "type": "knowledge",
+          "ref": "F03",
+          "learned_at": "2016-03-10",
+          "text": "Minjae signed a secret consulting contract with Nova AI."
+        },
+        {
+          "id": "minjae.knows.F29",
+          "type": "knowledge",
+          "ref": "F29",
+          "learned_at": "2016-03-10",
+          "text": "Nova paid Minjae 80 million won upfront, almost exactly his medical debt."
+        },
+        {
+          "id": "minjae.knows.F52",
+          "type": "knowledge",
+          "ref": "F52",
+          "learned_at": "2016-03-15T19:00",
+          "text": "Messenger: Jisoo asked Minjae about the deploy-bot push records. Minjae said he didn't know."
+        },
+        {
+          "id": "minjae.knows.F04",
+          "type": "knowledge",
+          "ref": "F04",
+          "learned_at": "2016-03-15T19:00",
+          "text": "Jisoo found company code pushed to an outside repo from the shared deploy-bot account."
+        },
+        {
+          "id": "minjae.knows.F10",
+          "type": "knowledge",
+          "ref": "F10",
+          "learned_at": "2016-03-15T22:30",
+          "text": "Minjae asked the guard to switch off the server-room CCTV for 'maintenance'. (He meant to delete the push logs before Jisoo checked them.)"
+        },
+        {
+          "id": "minjae.knows.F56",
+          "type": "knowledge",
+          "ref": "F56",
+          "learned_at": "2016-03-15T22:30",
+          "text": "A developer in a gray hoodie asked Mr. Kim to switch off the server-room CCTV for 'maintenance'. Kim didn't know his name."
+        },
+        {
+          "id": "minjae.knows.F24",
+          "type": "knowledge",
+          "ref": "F24",
+          "learned_at": "2016-03-15T22:32",
+          "text": "Minjae handed Mr. Kim an envelope with 500,000 won 'for the trouble'."
+        },
+        {
+          "id": "minjae.knows.F26",
+          "type": "knowledge",
+          "ref": "F26",
+          "learned_at": "2016-03-15T22:40",
+          "text": "Server-room door opened with the shared admin card kept in the dev-team drawer."
+        },
+        {
+          "id": "minjae.knows.F45",
+          "type": "knowledge",
+          "ref": "F45",
+          "learned_at": "2016-03-15T23:30",
+          "text": "The gray-hoodie developer left by the back door carrying a heavy bag."
+        },
+        {
+          "id": "minjae.knows.F15",
+          "type": "knowledge",
+          "ref": "F15",
+          "learned_at": "2016-03-16",
+          "text": "Jisoo was found dead in the server room. Ruled an accidental electrocution."
+        },
+        {
+          "id": "minjae.knows.F25",
+          "type": "knowledge",
+          "ref": "F25",
+          "learned_at": "2016-03-16",
+          "text": "Incident report: server-rack cover found open, log-server disk missing, no witness statements filed."
+        },
+        {
+          "id": "minjae.knows.F17",
+          "type": "knowledge",
+          "ref": "F17",
+          "learned_at": "2016-09",
+          "text": "Nova AI launched a near-identical product. Minjae joined Nova as CTO."
+        },
+        {
+          "id": "minjae.knows.F36",
+          "type": "knowledge",
+          "ref": "F36",
+          "learned_at": "2017-01",
+          "text": "Minjae's father died."
+        },
+        {
+          "id": "minjae.knows.F55",
+          "type": "knowledge",
+          "ref": "F55",
+          "learned_at": "2017-03-15",
+          "text": "First memorial for Jisoo. Mr. Kim's last shift as guard."
+        },
+        {
+          "id": "minjae.knows.F50",
+          "type": "knowledge",
+          "ref": "F50",
+          "learned_at": "2018-03",
+          "text": "Hana's first article: people heard loud shouting that night, and investigation records show the server room was opened at 22:40 with the shared admin card."
+        },
+        {
+          "id": "minjae.knows.F39",
+          "type": "knowledge",
+          "ref": "F39",
+          "learned_at": "2019-01",
+          "text": "Moonlight raised its Series B. Dohyun started the 'Jisoo Han Fellowship'."
+        },
+        {
+          "id": "minjae.knows.F18",
+          "type": "knowledge",
+          "ref": "F18",
+          "learned_at": "2023-03",
+          "text": "Minjae became CEO of Nova AI."
+        },
+        {
+          "id": "minjae.knows.F41",
+          "type": "knowledge",
+          "ref": "F41",
+          "learned_at": "2024-05",
+          "text": "Hana found Minjae's Nova contract and advance in early filings, but Nova's lawyers killed the story."
+        },
+        {
+          "id": "minjae.says.L02.T2016",
+          "type": "claim",
+          "ref": "L02",
+          "said_at": "2016-03-15T22:50",
+          "text": "I'm at home, working on tomorrow's demo.",
+          "truth": false
+        },
+        {
+          "id": "minjae.says.L03.T2017",
+          "type": "claim",
+          "ref": "L03",
+          "said_at": "2017-03-15T22:50",
+          "text": "I left at nine and was home all night.",
+          "truth": false
+        },
+        {
+          "id": "minjae.says.L03.T2018",
+          "type": "claim",
+          "ref": "L03",
+          "said_at": "2018-03-15T22:50",
+          "text": "I left at nine and was home all night.",
+          "truth": false
+        },
+        {
+          "id": "minjae.says.L05.T2019",
+          "type": "claim",
+          "ref": "L05",
+          "said_at": "2019-03-15T22:50",
+          "text": "I came back around 10:30 for my laptop. Just for a minute.",
+          "truth": "partial"
+        },
+        {
+          "id": "minjae.says.L05.T2026",
+          "type": "claim",
+          "ref": "L05",
+          "said_at": "2026-11-09T10:00",
+          "text": "I came back around 10:30 for my laptop. Just for a minute.",
+          "truth": "partial"
+        },
+        {
+          "id": "minjae.says.L11.T2019",
+          "type": "claim",
+          "ref": "L11",
+          "said_at": "2019-03-15T22:50",
+          "text": "I first talked to Nova that summer, after everything.",
+          "truth": false
+        },
+        {
+          "id": "minjae.says.L12.T2019",
+          "type": "claim",
+          "ref": "L12",
+          "said_at": "2019-03-15T22:50",
+          "text": "That card? Anyone could use it.",
+          "truth": false
+        },
+        {
+          "id": "minjae.says.L13.T2025",
+          "type": "claim",
+          "ref": "L13",
+          "said_at": "2025-03-15T22:50",
+          "text": "It was a consulting gig. Everyone had side gigs.",
+          "truth": "partial"
+        },
+        {
+          "id": "minjae.says.L14.T2017",
+          "type": "claim",
+          "ref": "L14",
+          "said_at": "2017-03-15T22:50",
+          "text": "Jisoo never told me anything about a leak.",
+          "truth": false
+        }
+      ]
+    },
+    {
+      "name": "moonlight.char.hana",
+      "factblocks": [
+        {
+          "id": "hana.knows.F33",
+          "type": "knowledge",
+          "ref": "F33",
+          "learned_at": "2016-01",
+          "text": "Hana joined Moonlight as a design intern."
+        },
+        {
+          "id": "hana.knows.F12",
+          "type": "knowledge",
+          "ref": "F12",
+          "learned_at": "2016-01",
+          "text": "Minjae wore a gray hoodie every day."
+        },
+        {
+          "id": "hana.knows.F44",
+          "type": "knowledge",
+          "ref": "F44",
+          "learned_at": "2016-02",
+          "text": "The shared server-room admin card is kept in Minjae's desk drawer. Only Minjae has the drawer key."
+        },
+        {
+          "id": "hana.knows.F02",
+          "type": "knowledge",
+          "ref": "F02",
+          "learned_at": "2016-02-02",
+          "text": "A tech magazine profiled Jisoo as the 'genius CTO'. Minjae was not mentioned."
+        },
+        {
+          "id": "hana.knows.F22",
+          "type": "knowledge",
+          "ref": "F22",
+          "learned_at": "2016-03-01",
+          "text": "Minjae promised to get Hana an internship interview at Nova AI."
+        },
+        {
+          "id": "hana.knows.F19",
+          "type": "knowledge",
+          "ref": "F19",
+          "learned_at": "2016-03-15T15:00",
+          "text": "The server-room CCTV light was on that afternoon (it was working)."
+        },
+        {
+          "id": "hana.knows.F08",
+          "type": "knowledge",
+          "ref": "F08",
+          "learned_at": "2016-03-15T21:00",
+          "text": "Dohyun and Jisoo argued loudly about the user numbers. Jisoo said she'd tell Grace herself. Hana heard it through the glass wall."
+        },
+        {
+          "id": "hana.knows.F24",
+          "type": "knowledge",
+          "ref": "F24",
+          "learned_at": "2016-03-15T22:32",
+          "text": "Minjae handed Mr. Kim an envelope with 500,000 won 'for the trouble'."
+        },
+        {
+          "id": "hana.knows.F11",
+          "type": "knowledge",
+          "ref": "F11",
+          "learned_at": "2016-03-15T22:45",
+          "text": "Hana saw someone in a gray hoodie in the server-room hallway. No face."
+        },
+        {
+          "id": "hana.knows.F49",
+          "type": "knowledge",
+          "ref": "F49",
+          "learned_at": "2016-03-15T23:04",
+          "text": "Hana left by the front entrance at 23:04."
+        },
+        {
+          "id": "hana.knows.F57",
+          "type": "knowledge",
+          "ref": "F57",
+          "learned_at": "2016-03-15T23:06",
+          "text": "Taxi app: Hana was picked up outside the front entrance at 23:06."
+        },
+        {
+          "id": "hana.knows.F15",
+          "type": "knowledge",
+          "ref": "F15",
+          "learned_at": "2016-03-16",
+          "text": "Jisoo was found dead in the server room. Ruled an accidental electrocution."
+        },
+        {
+          "id": "hana.knows.F35",
+          "type": "knowledge",
+          "ref": "F35",
+          "learned_at": "2016-04",
+          "text": "Hana passed the Nova interview but never joined."
+        },
+        {
+          "id": "hana.knows.F17",
+          "type": "knowledge",
+          "ref": "F17",
+          "learned_at": "2016-09",
+          "text": "Nova AI launched a near-identical product. Minjae joined Nova as CTO."
+        },
+        {
+          "id": "hana.knows.F55",
+          "type": "knowledge",
+          "ref": "F55",
+          "learned_at": "2017-03-15",
+          "text": "First memorial for Jisoo. Mr. Kim's last shift as guard."
+        },
+        {
+          "id": "hana.knows.F25",
+          "type": "knowledge",
+          "ref": "F25",
+          "learned_at": "2018-02",
+          "text": "Incident report: server-rack cover found open, log-server disk missing, no witness statements filed."
+        },
+        {
+          "id": "hana.knows.F26",
+          "type": "knowledge",
+          "ref": "F26",
+          "learned_at": "2018-02",
+          "text": "Server-room door opened with the shared admin card kept in the dev-team drawer."
+        },
+        {
+          "id": "hana.knows.F38",
+          "type": "knowledge",
+          "ref": "F38",
+          "learned_at": "2018-02",
+          "text": "Hana became a tech journalist."
+        },
+        {
+          "id": "hana.knows.F50",
+          "type": "knowledge",
+          "ref": "F50",
+          "learned_at": "2018-03",
+          "text": "Hana's first article: people heard loud shouting that night, and investigation records show the server room was opened at 22:40 with the shared admin card."
+        },
+        {
+          "id": "hana.knows.F39",
+          "type": "knowledge",
+          "ref": "F39",
+          "learned_at": "2019-01",
+          "text": "Moonlight raised its Series B. Dohyun started the 'Jisoo Han Fellowship'."
+        },
+        {
+          "id": "hana.knows.F40",
+          "type": "knowledge",
+          "ref": "F40",
+          "learned_at": "2022-08",
+          "text": "Moonlight became a unicorn."
+        },
+        {
+          "id": "hana.knows.F18",
+          "type": "knowledge",
+          "ref": "F18",
+          "learned_at": "2023-03",
+          "text": "Minjae became CEO of Nova AI."
+        },
+        {
+          "id": "hana.knows.F03",
+          "type": "knowledge",
+          "ref": "F03",
+          "learned_at": "2024-05",
+          "text": "Minjae signed a secret consulting contract with Nova AI."
+        },
+        {
+          "id": "hana.knows.F29",
+          "type": "knowledge",
+          "ref": "F29",
+          "learned_at": "2024-05",
+          "text": "Nova paid Minjae 80 million won upfront, almost exactly his medical debt."
+        },
+        {
+          "id": "hana.knows.F41",
+          "type": "knowledge",
+          "ref": "F41",
+          "learned_at": "2024-05",
+          "text": "Hana found Minjae's Nova contract and advance in early filings, but Nova's lawyers killed the story."
+        },
+        {
+          "id": "hana.says.L07.T2026",
+          "type": "claim",
+          "ref": "L07",
+          "said_at": "2026-11-09T10:00",
+          "text": "I told the police everything I saw back then.",
+          "truth": false
+        },
+        {
+          "id": "hana.says.L08.T2017",
+          "type": "claim",
+          "ref": "L08",
+          "said_at": "2017-03-15T22:50",
+          "text": "I didn't see anything that night.",
+          "truth": false
+        }
+      ]
+    },
+    {
+      "name": "moonlight.char.kim",
+      "factblocks": [
+        {
+          "id": "kim.knows.F32",
+          "type": "knowledge",
+          "ref": "F32",
+          "learned_at": "2015-01",
+          "text": "Moonlight moved into the Pangyo building where Mr. Kim worked as a guard."
+        },
+        {
+          "id": "kim.knows.F47",
+          "type": "knowledge",
+          "ref": "F47",
+          "learned_at": "2015-01",
+          "text": "At move-in, a developer in a gray hoodie signed out the shared server-room admin card."
+        },
+        {
+          "id": "kim.knows.F19",
+          "type": "knowledge",
+          "ref": "F19",
+          "learned_at": "2016-03-15T15:00",
+          "text": "The server-room CCTV light was on that afternoon (it was working)."
+        },
+        {
+          "id": "kim.knows.F09",
+          "type": "knowledge",
+          "ref": "F09",
+          "learned_at": "2016-03-15T21:10",
+          "text": "Dohyun's car left the parking lot."
+        },
+        {
+          "id": "kim.knows.F56",
+          "type": "knowledge",
+          "ref": "F56",
+          "learned_at": "2016-03-15T22:30",
+          "text": "A developer in a gray hoodie asked Mr. Kim to switch off the server-room CCTV for 'maintenance'. Kim didn't know his name."
+        },
+        {
+          "id": "kim.knows.F24",
+          "type": "knowledge",
+          "ref": "F24",
+          "learned_at": "2016-03-15T22:32",
+          "text": "Minjae handed Mr. Kim an envelope with 500,000 won 'for the trouble'."
+        },
+        {
+          "id": "kim.knows.F49",
+          "type": "knowledge",
+          "ref": "F49",
+          "learned_at": "2016-03-15T23:04",
+          "text": "Hana left by the front entrance at 23:04."
+        },
+        {
+          "id": "kim.knows.F45",
+          "type": "knowledge",
+          "ref": "F45",
+          "learned_at": "2016-03-15T23:30",
+          "text": "The gray-hoodie developer left by the back door carrying a heavy bag."
+        },
+        {
+          "id": "kim.knows.F15",
+          "type": "knowledge",
+          "ref": "F15",
+          "learned_at": "2016-03-16",
+          "text": "Jisoo was found dead in the server room. Ruled an accidental electrocution."
+        },
+        {
+          "id": "kim.knows.F48",
+          "type": "knowledge",
+          "ref": "F48",
+          "learned_at": "2016-03-16",
+          "text": "Parking barrier log: after Dohyun's car left at 21:10, it never came back in that night."
+        },
+        {
+          "id": "kim.knows.F37",
+          "type": "knowledge",
+          "ref": "F37",
+          "learned_at": "2017-03",
+          "text": "Mr. Kim quit his job as a security guard."
+        },
+        {
+          "id": "kim.knows.F55",
+          "type": "knowledge",
+          "ref": "F55",
+          "learned_at": "2017-03-15",
+          "text": "First memorial for Jisoo. Mr. Kim's last shift as guard."
+        },
+        {
+          "id": "kim.knows.F46",
+          "type": "knowledge",
+          "ref": "F46",
+          "learned_at": "2023-03",
+          "text": "Mr. Kim saw Nova's new CEO on TV and recognized the gray-hoodie developer's face."
+        },
+        {
+          "id": "kim.knows.F10",
+          "type": "knowledge",
+          "ref": "F10",
+          "learned_at": "2023-03",
+          "text": "Minjae asked the guard to switch off the server-room CCTV for 'maintenance'. (He meant to delete the push logs before Jisoo checked them.)"
+        }
+      ]
+    },
+    {
+      "name": "moonlight.char.grace",
+      "factblocks": [
+        {
+          "id": "grace.knows.F06",
+          "type": "knowledge",
+          "ref": "F06",
+          "learned_at": "2016-03-01",
+          "text": "Investment terms set for the Mar 16 signing: options vest from signing; a confidentiality breach voids them and triggers a lawsuit."
+        },
+        {
+          "id": "grace.knows.F21",
+          "type": "knowledge",
+          "ref": "F21",
+          "learned_at": "2016-03-08",
+          "text": "Jisoo noticed odd repo access and asked Grace who can see the code escrow. Grace sensed trouble but kept the signing date."
+        },
+        {
+          "id": "grace.knows.F13",
+          "type": "knowledge",
+          "ref": "F13",
+          "learned_at": "2016-03-15T23:00",
+          "text": "Jisoo emailed Grace: 'We need to talk before signing tomorrow. It's about one of our team.'"
+        },
+        {
+          "id": "grace.knows.F15",
+          "type": "knowledge",
+          "ref": "F15",
+          "learned_at": "2016-03-16",
+          "text": "Jisoo was found dead in the server room. Ruled an accidental electrocution."
+        },
+        {
+          "id": "grace.knows.F16",
+          "type": "knowledge",
+          "ref": "F16",
+          "learned_at": "2016-03-16",
+          "text": "The investment was postponed indefinitely."
+        },
+        {
+          "id": "grace.knows.F39",
+          "type": "knowledge",
+          "ref": "F39",
+          "learned_at": "2019-06",
+          "text": "Moonlight raised its Series B. Dohyun started the 'Jisoo Han Fellowship'."
+        },
+        {
+          "id": "grace.knows.F40",
+          "type": "knowledge",
+          "ref": "F40",
+          "learned_at": "2022-08",
+          "text": "Moonlight became a unicorn."
+        },
+        {
+          "id": "grace.says.L06.T2026",
+          "type": "claim",
+          "ref": "L06",
+          "said_at": "2026-11-09T10:00",
+          "text": "I had no idea anything was wrong at Moonlight.",
+          "truth": false
+        }
+      ]
+    }
+  ]
+}

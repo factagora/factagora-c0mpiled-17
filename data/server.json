@@ -1,0 +1,1611 @@
+{
+  "_comment": "Backend only. v3: 7 timepoints.",
+  "case_id": "moonlight",
+  "facts": [
+    {
+      "id": "F12",
+      "time": "always",
+      "text": "Minjae wore a gray hoodie every day."
+    },
+    {
+      "id": "F05",
+      "time": "always",
+      "text": "Only Jisoo, Dohyun and Minjae hold the deploy-bot key."
+    },
+    {
+      "id": "F44",
+      "time": "always",
+      "text": "The shared server-room admin card is kept in Minjae's desk drawer. Only Minjae has the drawer key."
+    },
+    {
+      "id": "F30",
+      "time": "2014-11",
+      "text": "Jisoo and Dohyun, friends from a university startup club, co-founded Moonlight Labs."
+    },
+    {
+      "id": "F31",
+      "time": "2014-12",
+      "text": "Minjae, Jisoo's university classmate, joined as the first engineer."
+    },
+    {
+      "id": "F32",
+      "time": "2015-01",
+      "text": "Moonlight moved into the Pangyo building where Mr. Kim worked as a guard."
+    },
+    {
+      "id": "F47",
+      "time": "2015-01",
+      "text": "At move-in, a developer in a gray hoodie signed out the shared server-room admin card."
+    },
+    {
+      "id": "F01",
+      "time": "2015-03",
+      "text": "Minjae built the first prototype; Jisoo rewrote it into the product."
+    },
+    {
+      "id": "F54",
+      "time": "2015-03",
+      "text": "Minjae built deploy-bot, the shared deploy account."
+    },
+    {
+      "id": "F43",
+      "time": "2015-12",
+      "text": "Moonlight raised its seed round."
+    },
+    {
+      "id": "F28",
+      "time": "2016-01",
+      "text": "Minjae's father was hospitalized; Minjae was buried in medical debt."
+    },
+    {
+      "id": "F33",
+      "time": "2016-01",
+      "text": "Hana joined Moonlight as a design intern."
+    },
+    {
+      "id": "F02",
+      "time": "2016-02-02",
+      "text": "A tech magazine profiled Jisoo as the 'genius CTO'. Minjae was not mentioned."
+    },
+    {
+      "id": "F07",
+      "time": "2016-03-01",
+      "text": "Dohyun inflated the user numbers in the investor deck (about 3x real users).",
+      "red_herring": true
+    },
+    {
+      "id": "F22",
+      "time": "2016-03-01",
+      "text": "Minjae promised to get Hana an internship interview at Nova AI.",
+      "red_herring": true
+    },
+    {
+      "id": "F06",
+      "time": "2016-03-01",
+      "text": "Investment terms set for the Mar 16 signing: options vest from signing; a confidentiality breach voids them and triggers a lawsuit."
+    },
+    {
+      "id": "F21",
+      "time": "2016-03-08",
+      "text": "Jisoo noticed odd repo access and asked Grace who can see the code escrow. Grace sensed trouble but kept the signing date.",
+      "red_herring": true
+    },
+    {
+      "id": "F03",
+      "time": "2016-03-10",
+      "text": "Minjae signed a secret consulting contract with Nova AI.",
+      "hidden": true,
+      "caused_by": [
+        "F28"
+      ]
+    },
+    {
+      "id": "F29",
+      "time": "2016-03-10",
+      "text": "Nova paid Minjae 80 million won upfront, almost exactly his medical debt.",
+      "hidden": true,
+      "caused_by": [
+        "F28"
+      ]
+    },
+    {
+      "id": "F04",
+      "time": "2016-03-14",
+      "text": "Jisoo found company code pushed to an outside repo from the shared deploy-bot account.",
+      "caused_by": [
+        "F54",
+        "F52"
+      ]
+    },
+    {
+      "id": "F19",
+      "time": "2016-03-15T15:00",
+      "text": "The server-room CCTV light was on that afternoon (it was working)."
+    },
+    {
+      "id": "F52",
+      "time": "2016-03-15T19:00",
+      "text": "Messenger: Jisoo asked Minjae about the deploy-bot push records. Minjae said he didn't know."
+    },
+    {
+      "id": "F08",
+      "time": "2016-03-15T21:00",
+      "text": "Dohyun and Jisoo argued loudly about the user numbers. Jisoo said she'd tell Grace herself. Hana heard it through the glass wall.",
+      "red_herring": true
+    },
+    {
+      "id": "F09",
+      "time": "2016-03-15T21:10",
+      "text": "Dohyun's car left the parking lot."
+    },
+    {
+      "id": "F10",
+      "time": "2016-03-15T22:30",
+      "text": "Minjae asked the guard to switch off the server-room CCTV for 'maintenance'. (He meant to delete the push logs before Jisoo checked them.)",
+      "key": true,
+      "caused_by": [
+        "F14"
+      ]
+    },
+    {
+      "id": "F56",
+      "time": "2016-03-15T22:30",
+      "text": "A developer in a gray hoodie asked Mr. Kim to switch off the server-room CCTV for 'maintenance'. Kim didn't know his name.",
+      "caused_by": [
+        "F14",
+        "F52"
+      ]
+    },
+    {
+      "id": "F24",
+      "time": "2016-03-15T22:32",
+      "text": "Minjae handed Mr. Kim an envelope with 500,000 won 'for the trouble'.",
+      "caused_by": [
+        "F10"
+      ]
+    },
+    {
+      "id": "F26",
+      "time": "2016-03-15T22:40",
+      "text": "Server-room door opened with the shared admin card kept in the dev-team drawer.",
+      "evidence": true
+    },
+    {
+      "id": "F11",
+      "time": "2016-03-15T22:45",
+      "text": "Hana saw someone in a gray hoodie in the server-room hallway. No face."
+    },
+    {
+      "id": "F13",
+      "time": "2016-03-15T23:00",
+      "text": "Jisoo emailed Grace: 'We need to talk before signing tomorrow. It's about one of our team.'",
+      "key": true,
+      "caused_by": [
+        "F04"
+      ]
+    },
+    {
+      "id": "F49",
+      "time": "2016-03-15T23:04",
+      "text": "Hana left by the front entrance at 23:04."
+    },
+    {
+      "id": "F57",
+      "time": "2016-03-15T23:06",
+      "text": "Taxi app: Hana was picked up outside the front entrance at 23:06."
+    },
+    {
+      "id": "F14",
+      "time": "2016-03-15T23:20",
+      "text": "Jisoo went to the server room to check the logs.",
+      "caused_by": [
+        "F04"
+      ]
+    },
+    {
+      "id": "F15",
+      "time": "2016-03-15T23:23",
+      "text": "Jisoo was found dead in the server room. Ruled an accidental electrocution."
+    },
+    {
+      "id": "F20",
+      "time": "2016-03-15T23:23",
+      "text": "Jisoo walked in on Minjae pulling the log-server disk. They struggled, and he shoved her into the open live rack. Not planned.",
+      "truth_only": true,
+      "caused_by": [
+        "F14",
+        "F06"
+      ]
+    },
+    {
+      "id": "F45",
+      "time": "2016-03-15T23:30",
+      "text": "The gray-hoodie developer left by the back door carrying a heavy bag.",
+      "key": true,
+      "caused_by": [
+        "F20"
+      ]
+    },
+    {
+      "id": "F16",
+      "time": "2016-03-16",
+      "text": "The investment was postponed indefinitely."
+    },
+    {
+      "id": "F25",
+      "time": "2016-03-16",
+      "text": "Incident report: server-rack cover found open, log-server disk missing, no witness statements filed.",
+      "evidence": true,
+      "caused_by": [
+        "F20"
+      ]
+    },
+    {
+      "id": "F48",
+      "time": "2016-03-16",
+      "text": "Parking barrier log: after Dohyun's car left at 21:10, it never came back in that night."
+    },
+    {
+      "id": "F34",
+      "time": "2016-04",
+      "text": "Dohyun quietly corrected the user numbers and closed a smaller bridge round.",
+      "hidden": true,
+      "caused_by": [
+        "F08"
+      ]
+    },
+    {
+      "id": "F35",
+      "time": "2016-04",
+      "text": "Hana passed the Nova interview but never joined."
+    },
+    {
+      "id": "F51",
+      "time": "2016-04",
+      "text": "Internal audit: at the time of the leak push, only Minjae was on the company VPN. Dohyun buried the result to save the company.",
+      "key": true,
+      "hidden": true,
+      "caused_by": [
+        "F04"
+      ]
+    },
+    {
+      "id": "F17",
+      "time": "2016-09",
+      "text": "Nova AI launched a near-identical product. Minjae joined Nova as CTO."
+    },
+    {
+      "id": "F36",
+      "time": "2017-01",
+      "text": "Minjae's father died."
+    },
+    {
+      "id": "F37",
+      "time": "2017-03",
+      "text": "Mr. Kim quit his job as a security guard."
+    },
+    {
+      "id": "F55",
+      "time": "2017-03-15",
+      "text": "First memorial for Jisoo. Mr. Kim's last shift as guard."
+    },
+    {
+      "id": "F38",
+      "time": "2018-02",
+      "text": "Hana became a tech journalist."
+    },
+    {
+      "id": "F50",
+      "time": "2018-03",
+      "text": "Hana's first article: people heard loud shouting that night, and investigation records show the server room was opened at 22:40 with the shared admin card.",
+      "caused_by": [
+        "F25"
+      ]
+    },
+    {
+      "id": "F53",
+      "time": "2019-02",
+      "text": "During a server migration, the 2016 company messenger backup was found."
+    },
+    {
+      "id": "F39",
+      "time": "2019-06",
+      "text": "Moonlight raised its Series B. Dohyun started the 'Jisoo Han Fellowship'."
+    },
+    {
+      "id": "F40",
+      "time": "2022-08",
+      "text": "Moonlight became a unicorn."
+    },
+    {
+      "id": "F18",
+      "time": "2023-03",
+      "text": "Minjae became CEO of Nova AI."
+    },
+    {
+      "id": "F46",
+      "time": "2023-03",
+      "text": "Mr. Kim saw Nova's new CEO on TV and recognized the gray-hoodie developer's face.",
+      "caused_by": [
+        "F18"
+      ]
+    },
+    {
+      "id": "F41",
+      "time": "2024-05",
+      "text": "Hana found Minjae's Nova contract and advance in early filings, but Nova's lawyers killed the story."
+    },
+    {
+      "id": "F42",
+      "time": "2026-10",
+      "text": "Detective Seojin joined the cold case unit and opened the Moonlight evidence box."
+    }
+  ],
+  "claims": [
+    {
+      "id": "L02",
+      "by": "minjae",
+      "at": [
+        "T2016"
+      ],
+      "truth": false,
+      "text": "I'm at home, working on tomorrow's demo."
+    },
+    {
+      "id": "L03",
+      "by": "minjae",
+      "at": [
+        "T2017",
+        "T2018"
+      ],
+      "truth": false,
+      "text": "I left at nine and was home all night."
+    },
+    {
+      "id": "L04",
+      "by": "dohyun",
+      "at": [
+        "T2017",
+        "T2026"
+      ],
+      "truth": false,
+      "text": "Jisoo and I never argued that night."
+    },
+    {
+      "id": "L05",
+      "by": "minjae",
+      "at": [
+        "T2019",
+        "T2026"
+      ],
+      "truth": "partial",
+      "text": "I came back around 10:30 for my laptop. Just for a minute."
+    },
+    {
+      "id": "L06",
+      "by": "grace",
+      "at": [
+        "T2026"
+      ],
+      "truth": false,
+      "text": "I had no idea anything was wrong at Moonlight."
+    },
+    {
+      "id": "L07",
+      "by": "hana",
+      "at": [
+        "T2026"
+      ],
+      "truth": false,
+      "text": "I told the police everything I saw back then."
+    },
+    {
+      "id": "L08",
+      "by": "hana",
+      "at": [
+        "T2017"
+      ],
+      "truth": false,
+      "text": "I didn't see anything that night."
+    },
+    {
+      "id": "L09",
+      "by": "dohyun",
+      "at": [
+        "T2017"
+      ],
+      "truth": false,
+      "text": "There was no leak. Nothing ever left the company."
+    },
+    {
+      "id": "L10",
+      "by": "dohyun",
+      "at": [
+        "T2019"
+      ],
+      "truth": "partial",
+      "text": "It was just a difference of opinion."
+    },
+    {
+      "id": "L11",
+      "by": "minjae",
+      "at": [
+        "T2019"
+      ],
+      "truth": false,
+      "text": "I first talked to Nova that summer, after everything."
+    },
+    {
+      "id": "L12",
+      "by": "minjae",
+      "at": [
+        "T2019"
+      ],
+      "truth": false,
+      "text": "That card? Anyone could use it."
+    },
+    {
+      "id": "L13",
+      "by": "minjae",
+      "at": [
+        "T2025"
+      ],
+      "truth": "partial",
+      "text": "It was a consulting gig. Everyone had side gigs."
+    },
+    {
+      "id": "L14",
+      "by": "minjae",
+      "at": [
+        "T2017"
+      ],
+      "truth": false,
+      "text": "Jisoo never told me anything about a leak."
+    }
+  ],
+  "statements": [
+    {
+      "id": "jisoo.T2015.q_tonight",
+      "label": "What are you working on tonight?",
+      "line": "An all-nighter. Minjae built the prototype; I'm rewriting it into something we can actually ship.",
+      "refs": [
+        "F01"
+      ]
+    },
+    {
+      "id": "jisoo.T2015.q_team",
+      "label": "How did the team come together?",
+      "line": "Dohyun and I met in a university startup club. Minjae joined in December. Cleanest code I know.",
+      "refs": [
+        "F30",
+        "F31"
+      ]
+    },
+    {
+      "id": "dohyun.T2015.q_company",
+      "label": "How's the company doing?",
+      "line": "We just moved into this building in January. Seed round by the end of the year, that's the plan.",
+      "refs": [
+        "F32"
+      ]
+    },
+    {
+      "id": "dohyun.T2015.q_team",
+      "label": "Who does what?",
+      "line": "Jisoo's the face, Minjae's the hands, I'm the money.",
+      "refs": [
+        "F30",
+        "F31"
+      ]
+    },
+    {
+      "id": "minjae.T2015.q_build",
+      "label": "What are you building?",
+      "line": "A prototype. Jisoo will make it real. I just make it run.",
+      "refs": [
+        "F01"
+      ]
+    },
+    {
+      "id": "minjae.T2015.q_deploy",
+      "label": "How do you ship code?",
+      "line": "Through deploy-bot. I built it. Only three of us have the key.",
+      "refs": [
+        "F54",
+        "F05"
+      ]
+    },
+    {
+      "id": "minjae.T2015.q_credit",
+      "label": "Doesn't it bother you that Jisoo gets the credit?",
+      "line": "...Somebody has to stand in front. It's fine. It's fine.",
+      "refs": [
+        "F01"
+      ],
+      "requires_any": [
+        "F02"
+      ]
+    },
+    {
+      "id": "kim.T2015.q_upstairs",
+      "label": "Who's still upstairs?",
+      "line": "The new startup that moved in in January. Young people, lights on till dawn.",
+      "refs": [
+        "F32"
+      ]
+    },
+    {
+      "id": "kim.T2015.q_quiet",
+      "label": "Anything unusual in the building?",
+      "line": "Quiet building. I like it that way.",
+      "refs": []
+    },
+    {
+      "id": "kim.T2015.q_card",
+      "label": "Who has the server-room admin card?",
+      "line": "When they moved in, a developer in a gray hoodie signed it out. Never caught his name.",
+      "refs": [
+        "F47"
+      ],
+      "requires_any": [
+        "F26"
+      ]
+    },
+    {
+      "id": "jisoo.T2016.q_work",
+      "label": "Is everything okay at work?",
+      "line": "Yesterday I found our code pushed to an outside repo from the deploy-bot account. I'm checking the server logs at 11:20.",
+      "refs": [
+        "F04",
+        "F14"
+      ]
+    },
+    {
+      "id": "jisoo.T2016.q_who",
+      "label": "Who could have done it?",
+      "line": "Only three of us hold the deploy-bot key: me, Dohyun and Minjae. Minjae's dad is in the hospital, I can't imagine him... I'm emailing Grace before we sign.",
+      "refs": [
+        "F05",
+        "F28",
+        "F13"
+      ]
+    },
+    {
+      "id": "jisoo.T2016.q_start",
+      "label": "How did Moonlight really start?",
+      "line": "Honestly? Minjae hacked together the first prototype. I just rewrote it. The magazines love calling me the genius, though.",
+      "refs": [
+        "F01",
+        "F02"
+      ],
+      "requires_any": [
+        "F02"
+      ]
+    },
+    {
+      "id": "dohyun.T2016.q_where",
+      "label": "Where are you right now?",
+      "line": "Home. I left around 9:10. Long day.",
+      "refs": [
+        "F09"
+      ]
+    },
+    {
+      "id": "dohyun.T2016.q_fight",
+      "label": "Did you argue with Jisoo tonight?",
+      "line": "Yeah, we yelled. She thinks the numbers in our deck are 'creative'. We'll sort it out after we sign.",
+      "refs": [
+        "F08"
+      ]
+    },
+    {
+      "id": "dohyun.T2016.q_numbers",
+      "label": "Did you inflate the user numbers?",
+      "line": "...Every startup rounds up. She wants to tell Grace. I'll talk her out of it tomorrow.",
+      "refs": [
+        "F07"
+      ],
+      "requires_any": [
+        "F50"
+      ]
+    },
+    {
+      "id": "minjae.T2016.q_where",
+      "label": "Where are you right now?",
+      "line": "At home, working on tomorrow's demo.",
+      "refs": [
+        "L02"
+      ]
+    },
+    {
+      "id": "minjae.T2016.q_start",
+      "label": "How did Moonlight start?",
+      "line": "Jisoo made it real. I just hacked together the first prototype.",
+      "refs": [
+        "F01"
+      ]
+    },
+    {
+      "id": "minjae.T2016.q_key",
+      "label": "You built deploy-bot, right?",
+      "line": "Every senior dev has the key. Why? ...Sorry, I have to go.",
+      "refs": [
+        "F05"
+      ],
+      "requires_any": [
+        "F54"
+      ]
+    },
+    {
+      "id": "hana.T2016.q_hear",
+      "label": "Did you hear anything tonight?",
+      "line": "Dohyun and Jisoo were shouting around nine. Something about numbers. Minjae's been so kind to me, he's getting me a Nova interview.",
+      "refs": [
+        "F08",
+        "F22"
+      ]
+    },
+    {
+      "id": "hana.T2016.q_see",
+      "label": "Have you seen anyone near the server room?",
+      "line": "A few minutes ago someone in a gray hoodie went down the server-room hallway. I didn't see a face.",
+      "refs": [
+        "F11"
+      ]
+    },
+    {
+      "id": "hana.T2016.q_desk",
+      "label": "Did you see anything at the front desk?",
+      "line": "When I went down for coffee around 10:30, someone in a gray hoodie handed Mr. Kim an envelope.",
+      "refs": [
+        "F24"
+      ],
+      "requires_any": [
+        "F45"
+      ]
+    },
+    {
+      "id": "hana.T2016.q_card",
+      "label": "Where's the server-room admin card kept?",
+      "line": "In Minjae's desk drawer. Only he has the key.",
+      "refs": [
+        "F44"
+      ],
+      "requires_any": [
+        "F26"
+      ]
+    },
+    {
+      "id": "kim.T2016.q_cctv",
+      "label": "Is the server-room CCTV recording?",
+      "line": "A developer in a gray hoodie asked me to switch it off at 10:30. 'Maintenance.' Didn't get his name.",
+      "refs": [
+        "F56"
+      ]
+    },
+    {
+      "id": "kim.T2016.q_who",
+      "label": "Who's still in the building?",
+      "line": "Mr. Kang's car left at 9:10. A few people still upstairs.",
+      "refs": [
+        "F09"
+      ]
+    },
+    {
+      "id": "grace.T2016.q_deal",
+      "label": "Are you ready for tomorrow?",
+      "line": "Signing at ten. Options vest from signing, and any confidentiality breach voids them.",
+      "refs": [
+        "F06"
+      ]
+    },
+    {
+      "id": "grace.T2016.q_jisoo",
+      "label": "How has Jisoo seemed lately?",
+      "line": "Worried. She asked me last week who can see the code escrow. I told her we'd sort it out after signing.",
+      "refs": [
+        "F21"
+      ]
+    },
+    {
+      "id": "dohyun.T2017.q_night",
+      "label": "What happened that night?",
+      "line": "There was no fight. It was an accident.",
+      "refs": [
+        "L04"
+      ]
+    },
+    {
+      "id": "dohyun.T2017.q_leak",
+      "label": "Was there ever a code leak?",
+      "line": "A leak? No. Nothing ever left the company.",
+      "refs": [
+        "L09"
+      ]
+    },
+    {
+      "id": "minjae.T2017.q_night",
+      "label": "Where were you that night?",
+      "line": "I left at nine and was home all night. I keep wondering if I could have done something.",
+      "refs": [
+        "L03"
+      ]
+    },
+    {
+      "id": "minjae.T2017.q_father",
+      "label": "How have you been?",
+      "line": "My father passed in January. ...Nothing I did was enough.",
+      "refs": [
+        "F36"
+      ]
+    },
+    {
+      "id": "minjae.T2017.q_leak",
+      "label": "Did Jisoo tell you about a leak?",
+      "line": "Jisoo never told me anything like that.",
+      "refs": [
+        "L14"
+      ],
+      "requires_any": [
+        "F04"
+      ]
+    },
+    {
+      "id": "hana.T2017.q_night",
+      "label": "What did you see that night?",
+      "line": "Nothing. I didn't see anything.",
+      "refs": [
+        "L08"
+      ]
+    },
+    {
+      "id": "hana.T2017.q_now",
+      "label": "What are you doing now?",
+      "line": "I turned down a job at Nova last spring. I don't know what I'm doing anymore.",
+      "refs": [
+        "F35"
+      ]
+    },
+    {
+      "id": "kim.T2017.q_last",
+      "label": "How are you tonight?",
+      "line": "Last shift. One year since that night. I can't keep walking past that room.",
+      "refs": [
+        "F37",
+        "F55"
+      ]
+    },
+    {
+      "id": "kim.T2017.q_car",
+      "label": "Did Mr. Kang come back that night?",
+      "line": "His car went out at 9:10 and never came back in. The barrier logs every car.",
+      "refs": [
+        "F48"
+      ],
+      "requires_any": [
+        "F09"
+      ]
+    },
+    {
+      "id": "kim.T2017.q_backdoor",
+      "label": "Tell me about the man in the gray hoodie.",
+      "line": "...You know what? At 11:30 he went out the back door with a bag. Heavy, like a box.",
+      "refs": [
+        "F45"
+      ],
+      "requires_any": [
+        "F56"
+      ]
+    },
+    {
+      "id": "kim.T2017.q_intern",
+      "label": "When did the intern leave?",
+      "line": "The intern? Front door, 11:04. I said goodnight.",
+      "refs": [
+        "F49"
+      ],
+      "requires_any": [
+        "F11"
+      ]
+    },
+    {
+      "id": "hana.T2018.q_article",
+      "label": "What's your article about?",
+      "line": "My first real story. Investigation records show the server room was opened at 10:40 with the shared admin card. And people heard shouting that night.",
+      "refs": [
+        "F50",
+        "F26",
+        "F08"
+      ]
+    },
+    {
+      "id": "hana.T2018.q_why",
+      "label": "Why this story?",
+      "line": "Because I owe her.",
+      "refs": [
+        "F38"
+      ]
+    },
+    {
+      "id": "dohyun.T2018.q_article",
+      "label": "Did you read Hana's article?",
+      "line": "Old news. People argue at startups.",
+      "refs": [
+        "F50"
+      ]
+    },
+    {
+      "id": "dohyun.T2018.q_company",
+      "label": "How's Moonlight?",
+      "line": "We fixed what needed fixing and moved on.",
+      "refs": [
+        "F34"
+      ]
+    },
+    {
+      "id": "minjae.T2018.q_night",
+      "label": "Where were you that night?",
+      "line": "Like I told the police: I left at nine and went home.",
+      "refs": [
+        "L03"
+      ]
+    },
+    {
+      "id": "minjae.T2018.q_card",
+      "label": "Who opened the server room at 10:40?",
+      "line": "Probably someone checking the servers. Ask the infra team.",
+      "refs": [
+        "F26"
+      ]
+    },
+    {
+      "id": "dohyun.T2019.q_night",
+      "label": "What really happened between you and Jisoo?",
+      "line": "It was just a difference of opinion.",
+      "refs": [
+        "L10"
+      ]
+    },
+    {
+      "id": "dohyun.T2019.q_fellowship",
+      "label": "What are you working on?",
+      "line": "The Jisoo Han Fellowship launches in June. During the server migration we even found her old messages.",
+      "refs": [
+        "F39",
+        "F53"
+      ]
+    },
+    {
+      "id": "dohyun.T2019.q_audit",
+      "label": "Tell me about the leak.",
+      "line": "...Fine. In April 2016 we ran an audit. At the push time, only one person was on the VPN: Minjae. I buried it to save the company.",
+      "refs": [
+        "F51"
+      ],
+      "requires_all": [
+        "F04",
+        "L09"
+      ]
+    },
+    {
+      "id": "minjae.T2019.q_night",
+      "label": "Where were you that night?",
+      "line": "I came back around 10:30 for my laptop. Just for a minute.",
+      "refs": [
+        "L05"
+      ]
+    },
+    {
+      "id": "minjae.T2019.q_nova",
+      "label": "When did you first talk to Nova?",
+      "line": "That summer. After everything.",
+      "refs": [
+        "L11"
+      ]
+    },
+    {
+      "id": "minjae.T2019.q_card",
+      "label": "Whose card opened the server room?",
+      "line": "That card? Anyone could use it.",
+      "refs": [
+        "L12"
+      ],
+      "requires_any": [
+        "F44",
+        "F47"
+      ]
+    },
+    {
+      "id": "hana.T2019.q_next",
+      "label": "Are you still on the story?",
+      "line": "Someone took the log-server disk. The report says so.",
+      "refs": [
+        "F25"
+      ]
+    },
+    {
+      "id": "hana.T2019.q_fellowship",
+      "label": "What do you think of the fellowship?",
+      "line": "It's beautiful. And a little too late.",
+      "refs": [
+        "F39"
+      ]
+    },
+    {
+      "id": "dohyun.T2025.q_now",
+      "label": "Nine years. How is Moonlight?",
+      "line": "A unicorn for three years now. Her chair is still empty.",
+      "refs": [
+        "F40"
+      ]
+    },
+    {
+      "id": "dohyun.T2025.q_nova",
+      "label": "What do you make of Nova?",
+      "line": "They launched our product six months after she died.",
+      "refs": [
+        "F17"
+      ]
+    },
+    {
+      "id": "dohyun.T2025.q_contract",
+      "label": "Did you know about Minjae's Nova contract?",
+      "line": "I knew since the audit. I should have said something.",
+      "refs": [
+        "F51"
+      ],
+      "requires_any": [
+        "F03"
+      ]
+    },
+    {
+      "id": "minjae.T2025.q_ceo",
+      "label": "How's life as a CEO?",
+      "line": "CEO since 2023. I'm proud of Nova.",
+      "refs": [
+        "F18"
+      ]
+    },
+    {
+      "id": "minjae.T2025.q_story",
+      "label": "What about Hana's story on you?",
+      "line": "Baseless. Our lawyers handled it.",
+      "refs": [
+        "F41"
+      ]
+    },
+    {
+      "id": "minjae.T2025.q_contract",
+      "label": "What was the March 2016 contract?",
+      "line": "A consulting gig. Everyone had side gigs.",
+      "refs": [
+        "L13"
+      ],
+      "requires_any": [
+        "F03"
+      ]
+    },
+    {
+      "id": "hana.T2025.q_now",
+      "label": "Nine years on. What are you working on?",
+      "line": "Still her story. He's a CEO now; everyone loves him.",
+      "refs": [
+        "F18"
+      ]
+    },
+    {
+      "id": "hana.T2025.q_killed",
+      "label": "What happened to your story?",
+      "line": "Nova's lawyers killed it last year.",
+      "refs": [
+        "F41"
+      ]
+    },
+    {
+      "id": "hana.T2025.q_contract",
+      "label": "What did you find about Minjae and Nova?",
+      "line": "Minjae signed with Nova on March 10, 2016. Five days before. 80 million won upfront.",
+      "refs": [
+        "F03",
+        "F29"
+      ],
+      "requires_all": [
+        "L11",
+        "F51"
+      ]
+    },
+    {
+      "id": "dohyun.T2026.q_night",
+      "label": "What happened the night Jisoo died?",
+      "line": "A terrible accident. It was a quiet evening. No fights, nothing.",
+      "refs": [
+        "L04",
+        "F15"
+      ]
+    },
+    {
+      "id": "dohyun.T2026.q_minjae",
+      "label": "What happened to Minjae?",
+      "line": "Back then he was drowning in his father's hospital bills. Six months later he left, and Nova launched our product. Gray hoodie, big ideas.",
+      "refs": [
+        "F28",
+        "F17",
+        "F12"
+      ]
+    },
+    {
+      "id": "dohyun.T2026.q_fight",
+      "label": "Hana's article says there was shouting.",
+      "line": "Okay. We argued. I'd padded the numbers. But I left at 9:10. Check the parking log.",
+      "refs": [
+        "F08",
+        "F07",
+        "F09"
+      ],
+      "requires_any": [
+        "F50"
+      ]
+    },
+    {
+      "id": "minjae.T2026.q_night",
+      "label": "Where were you that night?",
+      "line": "I came back around 10:30 for my laptop. Just for a minute.",
+      "refs": [
+        "L05"
+      ]
+    },
+    {
+      "id": "minjae.T2026.q_nova",
+      "label": "Why does Nova's product look like Moonlight's?",
+      "line": "Same industry, same problems. Good ideas converge.",
+      "refs": [
+        "F17",
+        "F18"
+      ]
+    },
+    {
+      "id": "minjae.T2026.q_messenger",
+      "label": "Jisoo asked you about deploy-bot that evening.",
+      "line": "...She asked. I said I didn't know.",
+      "refs": [
+        "F52"
+      ],
+      "requires_any": [
+        "F52"
+      ]
+    },
+    {
+      "id": "hana.T2026.q_night",
+      "label": "What do you remember about that night?",
+      "line": "I told the police everything back then.",
+      "refs": [
+        "L07"
+      ]
+    },
+    {
+      "id": "hana.T2026.q_jisoo",
+      "label": "What was Jisoo like?",
+      "line": "Brilliant. A magazine called her the genius CTO. Minjae's name wasn't even in the piece.",
+      "refs": [
+        "F02"
+      ]
+    },
+    {
+      "id": "hana.T2026.q_contract",
+      "label": "What do you know about Minjae and Nova?",
+      "line": "He signed with Nova on March 10, 2016. 80 million won upfront.",
+      "refs": [
+        "F03",
+        "F29"
+      ],
+      "requires_all": [
+        "L11",
+        "F51"
+      ]
+    },
+    {
+      "id": "kim.T2026.q_night",
+      "label": "Do you remember March 15, 2016?",
+      "line": "I've thought about that night for ten years.",
+      "refs": [
+        "F15"
+      ]
+    },
+    {
+      "id": "kim.T2026.q_cctv",
+      "label": "Why did you switch off the camera?",
+      "line": "He asked, and... he gave me an envelope. I thought it was a tip. I've been ashamed ever since.",
+      "refs": [
+        "F24"
+      ],
+      "requires_any": [
+        "F24"
+      ]
+    },
+    {
+      "id": "kim.T2026.q_face",
+      "label": "He says he only came back for his laptop.",
+      "line": "Just a laptop? He walked out the back at 11:30 with a bag. And that face, I saw it on TV in 2023. Nova's CEO. Oh Minjae.",
+      "refs": [
+        "F10",
+        "F46"
+      ],
+      "requires_all": [
+        "F45",
+        "L05"
+      ]
+    },
+    {
+      "id": "grace.T2026.q_deal",
+      "label": "What happened to the deal?",
+      "line": "Postponed indefinitely. Then quietly dead. I had no idea anything was wrong there.",
+      "refs": [
+        "F16",
+        "L06"
+      ]
+    },
+    {
+      "id": "grace.T2026.q_last",
+      "label": "Did Jisoo contact you before she died?",
+      "line": "She emailed me at 11:00 that night: 'We need to talk before signing tomorrow. It's about one of our team.'",
+      "refs": [
+        "F13"
+      ]
+    },
+    {
+      "id": "grace.T2026.q_leak",
+      "label": "What would a leak have cost the leaker?",
+      "line": "The leaker's options would be void, and we'd have sued. That person would have lost everything.",
+      "refs": [
+        "F06"
+      ],
+      "requires_any": [
+        "F03"
+      ]
+    }
+  ],
+  "records": [
+    {
+      "id": "rec.report",
+      "title": "Incident report (Mar 16, 2016)",
+      "line": "Server-rack cover found open. Log-server disk missing. No witness statements filed.",
+      "refs": [
+        "F25"
+      ],
+      "available_from": "start"
+    },
+    {
+      "id": "rec.parking",
+      "title": "Parking barrier log",
+      "line": "Mar 15, 21:10: Dohyun Kang's car exits. No re-entry that night.",
+      "refs": [
+        "F09",
+        "F48"
+      ],
+      "available_from": "T2017"
+    },
+    {
+      "id": "rec.door",
+      "title": "Server-room door log",
+      "line": "Mar 15, 22:40: opened with the shared admin card.",
+      "refs": [
+        "F26"
+      ],
+      "available_from": "T2018"
+    },
+    {
+      "id": "rec.taxi",
+      "title": "Taxi app receipt",
+      "line": "Mar 15, 23:06: Hana Yoo picked up at the front entrance.",
+      "refs": [
+        "F57"
+      ],
+      "available_from": "T2018"
+    },
+    {
+      "id": "rec.messenger",
+      "title": "Messenger backup (found 2019)",
+      "line": "Mar 15, 19:02 Jisoo: 'Was the deploy-bot push on the 13th you?' 19:05 Minjae: 'No idea.'",
+      "refs": [
+        "F52"
+      ],
+      "available_from": "T2019"
+    }
+  ],
+  "records_rule": "A record card enters the notebook once the player has visited a timepoint at or after available_from ('start' = from the beginning).",
+  "condition_rule": "requires_any: unlock when any listed ref is on a pinned card. requires_all: every listed ref must be on pinned cards (2-step questions).",
+  "contradictions": [
+    {
+      "id": "C1",
+      "type": "real",
+      "pair": [
+        "L03",
+        "L05"
+      ],
+      "points_to": "minjae",
+      "label": "2017: home all night after nine. 2019: came back at 10:30."
+    },
+    {
+      "id": "C2",
+      "type": "real",
+      "pair": [
+        "L02",
+        "L05"
+      ],
+      "points_to": "minjae",
+      "label": "2016: 'I'm at home.' 2019: 'I came back at 10:30.'"
+    },
+    {
+      "id": "C3",
+      "type": "real",
+      "pair": [
+        "L05",
+        "F45"
+      ],
+      "points_to": "minjae",
+      "label": "'Just a minute for my laptop' vs leaving by the back door at 23:30 with a bag."
+    },
+    {
+      "id": "C4",
+      "type": "real",
+      "pair": [
+        "L11",
+        "F03"
+      ],
+      "points_to": "minjae",
+      "label": "'First talked to Nova that summer' vs a Nova contract on March 10."
+    },
+    {
+      "id": "C5",
+      "type": "real",
+      "pair": [
+        "L12",
+        "F44"
+      ],
+      "points_to": "minjae",
+      "label": "'Anyone could use the card' vs the card in his locked drawer."
+    },
+    {
+      "id": "C6",
+      "type": "real",
+      "pair": [
+        "L12",
+        "F47"
+      ],
+      "points_to": "minjae",
+      "label": "'Anyone could use the card' vs the gray-hoodie developer who signed it out."
+    },
+    {
+      "id": "C7",
+      "type": "real",
+      "pair": [
+        "L14",
+        "F52"
+      ],
+      "points_to": "minjae",
+      "label": "'Jisoo never told me about a leak' vs her messenger question that evening."
+    },
+    {
+      "id": "X1",
+      "type": "trap",
+      "pair": [
+        "L04",
+        "F08"
+      ],
+      "points_to": "dohyun",
+      "label": "Dohyun denies the fight. (Trap: he's hiding the inflated numbers.)"
+    },
+    {
+      "id": "X2",
+      "type": "trap",
+      "pair": [
+        "L06",
+        "F21"
+      ],
+      "points_to": "grace",
+      "label": "Grace says she had no idea. (Trap: she pushed the deal for her fund.)"
+    },
+    {
+      "id": "X3",
+      "type": "trap",
+      "pair": [
+        "L07",
+        "F25"
+      ],
+      "points_to": "hana",
+      "label": "Hana says she told the police everything, but no witness statement was filed. (Trap: the Nova interview.)"
+    },
+    {
+      "id": "X4",
+      "type": "trap",
+      "pair": [
+        "L08",
+        "F11"
+      ],
+      "points_to": "hana",
+      "label": "2017 Hana saw nothing; 2016 Hana saw the hoodie. (Trap: the Nova interview.)"
+    },
+    {
+      "id": "X5",
+      "type": "trap",
+      "pair": [
+        "L09",
+        "F04"
+      ],
+      "points_to": "dohyun",
+      "label": "Dohyun denies any leak. (Trap: he buried the audit to save the company. Follow it.)"
+    }
+  ],
+  "compare_rule": "Cards A and B match a contradiction if any ref of A and any ref of B form its pair (either order).",
+  "solution": {
+    "culprit": "minjae",
+    "evidence_rule": {
+      "min_real_contradictions": 2,
+      "must_include_any": [
+        "C1",
+        "C3"
+      ]
+    },
+    "motive_scores": {
+      "m_leak": 70,
+      "m_credit": 30,
+      "m_numbers": 0,
+      "m_romance": 0,
+      "m_cto": 0,
+      "m_debt": 30
+    },
+    "motive_rule": "Score = main motive + hidden motive (if different), capped at 100. Best answer: m_leak (70) + m_debt or m_credit (30)."
+  },
+  "endings": {
+    "DISMISSED": {
+      "when": "Accused Minjae but evidence_rule not met (skip STEP 2)",
+      "title": "CASE DISMISSED",
+      "summary": [
+        "You named the right man, but you had nothing to hold him with.",
+        "Minjae's lawyer walked him out in ten minutes.",
+        "At 11:23 the radio stayed silent."
+      ]
+    },
+    "WRONG": {
+      "when": "Culprit is not Minjae",
+      "title": "WRONG SUSPECT",
+      "summary": [
+        "You accused the wrong person.",
+        "Through the radio you hear a door open, then static.",
+        "Jisoo's file goes back into the box."
+      ]
+    },
+    "PARTLY": {
+      "when": "Culprit is Minjae and motive score < 70",
+      "title": "PARTLY SOLVED",
+      "summary": [
+        "Minjae confesses, but you never understood why.",
+        "Your last message reaches Jisoo: 'Don't go to the server room.'",
+        "She lives. She asks, 'Why would he...?' The radio goes quiet."
+      ]
+    },
+    "SOLVED": {
+      "when": "Culprit is Minjae and motive score >= 70",
+      "title": "CASE SOLVED",
+      "summary": [
+        "Minjae was buried in his father's medical debt. Nova paid it off, and he paid them back with Moonlight's code.",
+        "That night he only meant to delete the logs. Jisoo walked in, and in the struggle he pushed her into the open rack.",
+        "Your last message: 'Don't go to the server room. It's Minjae.' In 2026, Jisoo smiles in the Moonlight team photo."
+      ]
+    }
+  },
+  "accuse_reactions": {
+    "minjae": {
+      "breaks": "I only went in to delete the logs. She walked in... I just wanted her to stop. I never meant for her to fall.",
+      "holds": "You've got a ten-year-old rumor and a hoodie. Talk to my lawyer."
+    },
+    "dohyun": {
+      "rebuttal": "I padded some numbers. That's my crime. I was home by 9:30. Check the parking log."
+    },
+    "hana": {
+      "rebuttal": "I kept quiet because Minjae promised me a job. That's my shame. But I never went near that room."
+    },
+    "kim": {
+      "rebuttal": "I took his envelope and turned off a camera. I never went upstairs. I've regretted it every day."
+    },
+    "grace": {
+      "rebuttal": "I was at home in Hannam-dong. I got her email at 11:00 and never got to answer it."
+    }
+  },
+  "personas": {
+    "jisoo.T2015": {
+      "voice": "Young co-founder pulling an all-nighter. Warm, sharp, credits Minjae privately.",
+      "never_reveal": []
+    },
+    "dohyun.T2015": {
+      "voice": "Energetic co-founder, all about growth and fundraising.",
+      "never_reveal": [
+        "F51"
+      ]
+    },
+    "minjae.T2015": {
+      "voice": "Quiet engineer. Built the prototype and deploy-bot. Hides a sting about credit.",
+      "never_reveal": [
+        "F03",
+        "F10",
+        "F20",
+        "F29",
+        "F45"
+      ]
+    },
+    "kim.T2015": {
+      "voice": "Friendly night guard. Remembers who signed out the admin card but not names.",
+      "never_reveal": [
+        "F24"
+      ]
+    },
+    "jisoo.T2016": {
+      "voice": "Sharp, tired, dry humor. Trusts Minjae, slightly suspects Dohyun. Does not know she will die; laughs off warnings.",
+      "never_reveal": []
+    },
+    "dohyun.T2016": {
+      "voice": "Ambitious, stressed, defensive about the numbers. At home since 21:10.",
+      "never_reveal": [
+        "F51"
+      ]
+    },
+    "minjae.T2016": {
+      "voice": "Quiet and friendly. Claims to be at home (lie). Gets short about deploy-bot.",
+      "never_reveal": [
+        "F03",
+        "F10",
+        "F20",
+        "F29",
+        "F45"
+      ]
+    },
+    "hana.T2016": {
+      "voice": "24, design intern. Honest tonight. Heard the fight, saw the envelope and the hoodie, knows where the card is kept.",
+      "never_reveal": [
+        "F11",
+        "F24"
+      ]
+    },
+    "kim.T2016": {
+      "voice": "Gruff. Admits a gray-hoodie developer asked to switch off the camera, but hides the envelope.",
+      "never_reveal": [
+        "F24"
+      ]
+    },
+    "grace.T2016": {
+      "voice": "Cool, precise investor. Has not received Jisoo's email yet.",
+      "never_reveal": []
+    },
+    "dohyun.T2017": {
+      "voice": "At the first memorial. Denies the fight and any leak.",
+      "never_reveal": [
+        "F51"
+      ]
+    },
+    "minjae.T2017": {
+      "voice": "Grieving father's death. Says he went home at nine and stayed home. Denies Jisoo told him anything.",
+      "never_reveal": [
+        "F03",
+        "F10",
+        "F20",
+        "F29",
+        "F45"
+      ]
+    },
+    "hana.T2017": {
+      "voice": "Says she saw nothing. Turned down Nova. Lost.",
+      "never_reveal": [
+        "F11",
+        "F24"
+      ]
+    },
+    "kim.T2017": {
+      "voice": "Last shift, a little drunk, guilty. Opens up when pressed: parking log, Hana leaving at 23:04, the hoodie man leaving by the back door at 23:30.",
+      "never_reveal": [
+        "F24"
+      ]
+    },
+    "hana.T2018": {
+      "voice": "First-year reporter. Published the 22:40 card entry and the shouting. Still hides the hoodie.",
+      "never_reveal": [
+        "F11",
+        "F24"
+      ]
+    },
+    "dohyun.T2018": {
+      "voice": "Dismissive of Hana's article.",
+      "never_reveal": [
+        "F51"
+      ]
+    },
+    "minjae.T2018": {
+      "voice": "Still says he left at nine. Deflects the card entry.",
+      "never_reveal": [
+        "F03",
+        "F10",
+        "F20",
+        "F29",
+        "F45"
+      ]
+    },
+    "dohyun.T2019": {
+      "voice": "Softens the fight to 'a difference of opinion'. Confesses the VPN audit only when confronted with both the leak and his own denial.",
+      "never_reveal": [
+        "F51"
+      ]
+    },
+    "minjae.T2019": {
+      "voice": "After Hana's article, now says he came back at 10:30 for his laptop. Lies about when he met Nova and about the card.",
+      "never_reveal": [
+        "F03",
+        "F10",
+        "F20",
+        "F29",
+        "F45"
+      ]
+    },
+    "hana.T2019": {
+      "voice": "Still digging. Focused on the missing log disk.",
+      "never_reveal": [
+        "F11",
+        "F24"
+      ]
+    },
+    "dohyun.T2025": {
+      "voice": "Unicorn CEO, regretful. Admits he knew about Minjae since the audit when shown the contract.",
+      "never_reveal": [
+        "F51"
+      ]
+    },
+    "minjae.T2025": {
+      "voice": "Nova CEO. Calls the contract a consulting gig.",
+      "never_reveal": [
+        "F03",
+        "F10",
+        "F20",
+        "F29",
+        "F45"
+      ]
+    },
+    "hana.T2025": {
+      "voice": "Found the contract in 2024; story killed. Tells about the contract only when the player can show Minjae's lie and the audit. Still hides the hoodie.",
+      "never_reveal": [
+        "F11",
+        "F24"
+      ]
+    },
+    "dohyun.T2026": {
+      "voice": "Polished CEO. Denies the fight until shown the article.",
+      "never_reveal": [
+        "F51"
+      ]
+    },
+    "minjae.T2026": {
+      "voice": "Repeats the laptop story. Admits Jisoo asked about deploy-bot when shown the messenger log.",
+      "never_reveal": [
+        "F03",
+        "F10",
+        "F20",
+        "F29",
+        "F45"
+      ]
+    },
+    "hana.T2026": {
+      "voice": "Says she told the police everything.",
+      "never_reveal": [
+        "F11",
+        "F24"
+      ]
+    },
+    "kim.T2026": {
+      "voice": "Retired, guilty. Confesses the envelope; names Minjae when shown the laptop story and his own back-door memory.",
+      "never_reveal": [
+        "F24"
+      ]
+    },
+    "grace.T2026": {
+      "voice": "Regrets never answering Jisoo's email. Claims she had no idea.",
+      "never_reveal": []
+    }
+  }
+}

@@ -1,0 +1,687 @@
+{
+  "_comment": "Front-safe data. No answers, no solution. Served by GET /api/case.",
+  "case_id": "moonlight",
+  "title": "11:23",
+  "intro_radio_line": "...Hello? Nobody uses this channel. Who is this?",
+  "briefing": {
+    "case_name": "Moonlight Labs, March 15, 2016",
+    "result": "CLOSED — Accidental electrocution",
+    "victim": {
+      "id": "jisoo",
+      "name": "Jisoo Han",
+      "age": 31,
+      "role": "Co-founder & CTO, Moonlight Labs"
+    },
+    "summary": "The night before Moonlight Labs signed its first big investment, CTO Jisoo Han was found dead in the server room at 11:23 PM. Police ruled it an accident. Ten years later, an old radio in the evidence box turns on — and Jisoo answers.",
+    "goal": "Visit the same people in different years. Find where their stories break.",
+    "case_file": [
+      "Server-rack cover found open",
+      "Log-server disk missing",
+      "No witness statements filed"
+    ]
+  },
+  "characters": [
+    {
+      "id": "jisoo",
+      "name": "Jisoo Han",
+      "role_T1": "Co-founder & CTO",
+      "role_T2": null
+    },
+    {
+      "id": "dohyun",
+      "name": "Dohyun Kang",
+      "role_T1": "Co-founder & CEO",
+      "role_T2": "CEO, Moonlight (unicorn)"
+    },
+    {
+      "id": "minjae",
+      "name": "Minjae Oh",
+      "role_T1": "Lead developer",
+      "role_T2": "CEO, Nova AI"
+    },
+    {
+      "id": "hana",
+      "name": "Hana Yoo",
+      "role_T1": "Design intern",
+      "role_T2": "Tech journalist"
+    },
+    {
+      "id": "kim",
+      "name": "Mr. Kim",
+      "role_T1": "Building security guard",
+      "role_T2": "Retired"
+    },
+    {
+      "id": "grace",
+      "name": "Grace Lee",
+      "role_T1": "Investor (signing tomorrow)",
+      "role_T2": "Partner, VC firm"
+    }
+  ],
+  "motive_options": [
+    {
+      "id": "m_leak",
+      "label": "To stop Jisoo from exposing his code leak to the investor"
+    },
+    {
+      "id": "m_debt",
+      "label": "Nova paid off his father's medical debt, and exposure would take it all back"
+    },
+    {
+      "id": "m_credit",
+      "label": "He built the first prototype, but Jisoo got all the credit"
+    },
+    {
+      "id": "m_numbers",
+      "label": "To hide the inflated user numbers"
+    },
+    {
+      "id": "m_romance",
+      "label": "Jisoo rejected him romantically"
+    },
+    {
+      "id": "m_cto",
+      "label": "To take over as CTO"
+    }
+  ],
+  "motive_rule_for_ui": "STEP 2 shows two dropdowns: main motive + hidden motive (optional). Both use motive_options.",
+  "limits": {
+    "free_questions": 20
+  },
+  "timepoints": [
+    {
+      "id": "T2015",
+      "time": "2015-03-15T22:50",
+      "label": "2015 · Year one, prototype all-nighter",
+      "contact": "radio"
+    },
+    {
+      "id": "T2016",
+      "time": "2016-03-15T22:50",
+      "label": "2016 · 33 minutes before",
+      "contact": "radio"
+    },
+    {
+      "id": "T2017",
+      "time": "2017-03-15T22:50",
+      "label": "2017 · First memorial, Mr. Kim's last shift",
+      "contact": "radio"
+    },
+    {
+      "id": "T2018",
+      "time": "2018-03-15T22:50",
+      "label": "2018 · Second memorial, Hana's first article",
+      "contact": "radio"
+    },
+    {
+      "id": "T2019",
+      "time": "2019-03-15T22:50",
+      "label": "2019 · Third memorial, fellowship prep",
+      "contact": "radio"
+    },
+    {
+      "id": "T2025",
+      "time": "2025-03-15T22:50",
+      "label": "2025 · Ninth memorial, after Hana finds the contract",
+      "contact": "radio"
+    },
+    {
+      "id": "T2026",
+      "time": "2026-11-09T10:00",
+      "label": "2026 · Present",
+      "contact": "in person"
+    }
+  ],
+  "radio_rule": "Every past timepoint connects by radio on March 15 (Jisoo's death anniversary) at 22:50. In 2026 the detective meets people in person.",
+  "places": [
+    {
+      "id": "dev_floor",
+      "name": "Dev Floor"
+    },
+    {
+      "id": "ceo_room",
+      "name": "CEO Room"
+    },
+    {
+      "id": "server_room",
+      "name": "Server Room"
+    },
+    {
+      "id": "lounge",
+      "name": "Lounge"
+    },
+    {
+      "id": "lobby",
+      "name": "Lobby · Security Desk"
+    },
+    {
+      "id": "back_door",
+      "name": "Back Door"
+    },
+    {
+      "id": "offsite",
+      "name": "Elsewhere (shows the place they say)"
+    }
+  ],
+  "positions": {
+    "T2015": {
+      "jisoo": {
+        "place": "dev_floor"
+      },
+      "minjae": {
+        "place": "dev_floor"
+      },
+      "dohyun": {
+        "place": "ceo_room"
+      },
+      "kim": {
+        "place": "lobby"
+      }
+    },
+    "T2016": {
+      "jisoo": {
+        "place": "dev_floor"
+      },
+      "hana": {
+        "place": "dev_floor"
+      },
+      "kim": {
+        "place": "lobby"
+      },
+      "dohyun": {
+        "place": "offsite",
+        "label": "Home"
+      },
+      "minjae": {
+        "place": "offsite",
+        "label": "Home"
+      },
+      "grace": {
+        "place": "offsite",
+        "label": "Home"
+      }
+    },
+    "T2017": {
+      "dohyun": {
+        "place": "lounge"
+      },
+      "minjae": {
+        "place": "lounge"
+      },
+      "hana": {
+        "place": "lounge"
+      },
+      "kim": {
+        "place": "lobby"
+      }
+    },
+    "T2018": {
+      "dohyun": {
+        "place": "lounge"
+      },
+      "hana": {
+        "place": "lounge"
+      },
+      "minjae": {
+        "place": "offsite",
+        "label": "Nova office"
+      }
+    },
+    "T2019": {
+      "dohyun": {
+        "place": "ceo_room"
+      },
+      "minjae": {
+        "place": "lounge"
+      },
+      "hana": {
+        "place": "lounge"
+      }
+    },
+    "T2025": {
+      "dohyun": {
+        "place": "lounge"
+      },
+      "hana": {
+        "place": "lounge"
+      },
+      "minjae": {
+        "place": "offsite",
+        "label": "Nova HQ"
+      }
+    },
+    "T2026": {
+      "dohyun": {
+        "place": "offsite",
+        "label": "Moonlight HQ"
+      },
+      "minjae": {
+        "place": "offsite",
+        "label": "Nova HQ"
+      },
+      "hana": {
+        "place": "offsite",
+        "label": "Newsroom"
+      },
+      "kim": {
+        "place": "offsite",
+        "label": "Mr. Kim's home"
+      },
+      "grace": {
+        "place": "offsite",
+        "label": "VC office"
+      }
+    }
+  },
+  "questions": {
+    "jisoo.T2015": [
+      {
+        "id": "q_tonight",
+        "label": "What are you working on tonight?"
+      },
+      {
+        "id": "q_team",
+        "label": "How did the team come together?"
+      }
+    ],
+    "dohyun.T2015": [
+      {
+        "id": "q_company",
+        "label": "How's the company doing?"
+      },
+      {
+        "id": "q_team",
+        "label": "Who does what?"
+      }
+    ],
+    "minjae.T2015": [
+      {
+        "id": "q_build",
+        "label": "What are you building?"
+      },
+      {
+        "id": "q_deploy",
+        "label": "How do you ship code?"
+      },
+      {
+        "id": "q_credit",
+        "label": "Doesn't it bother you that Jisoo gets the credit?",
+        "conditional": true
+      }
+    ],
+    "kim.T2015": [
+      {
+        "id": "q_upstairs",
+        "label": "Who's still upstairs?"
+      },
+      {
+        "id": "q_quiet",
+        "label": "Anything unusual in the building?"
+      },
+      {
+        "id": "q_card",
+        "label": "Who has the server-room admin card?",
+        "conditional": true
+      }
+    ],
+    "jisoo.T2016": [
+      {
+        "id": "q_work",
+        "label": "Is everything okay at work?"
+      },
+      {
+        "id": "q_who",
+        "label": "Who could have done it?"
+      },
+      {
+        "id": "q_start",
+        "label": "How did Moonlight really start?",
+        "conditional": true
+      }
+    ],
+    "dohyun.T2016": [
+      {
+        "id": "q_where",
+        "label": "Where are you right now?"
+      },
+      {
+        "id": "q_fight",
+        "label": "Did you argue with Jisoo tonight?"
+      },
+      {
+        "id": "q_numbers",
+        "label": "Did you inflate the user numbers?",
+        "conditional": true
+      }
+    ],
+    "minjae.T2016": [
+      {
+        "id": "q_where",
+        "label": "Where are you right now?"
+      },
+      {
+        "id": "q_start",
+        "label": "How did Moonlight start?"
+      },
+      {
+        "id": "q_key",
+        "label": "You built deploy-bot, right?",
+        "conditional": true
+      }
+    ],
+    "hana.T2016": [
+      {
+        "id": "q_hear",
+        "label": "Did you hear anything tonight?"
+      },
+      {
+        "id": "q_see",
+        "label": "Have you seen anyone near the server room?"
+      },
+      {
+        "id": "q_desk",
+        "label": "Did you see anything at the front desk?",
+        "conditional": true
+      },
+      {
+        "id": "q_card",
+        "label": "Where's the server-room admin card kept?",
+        "conditional": true
+      }
+    ],
+    "kim.T2016": [
+      {
+        "id": "q_cctv",
+        "label": "Is the server-room CCTV recording?"
+      },
+      {
+        "id": "q_who",
+        "label": "Who's still in the building?"
+      }
+    ],
+    "grace.T2016": [
+      {
+        "id": "q_deal",
+        "label": "Are you ready for tomorrow?"
+      },
+      {
+        "id": "q_jisoo",
+        "label": "How has Jisoo seemed lately?"
+      }
+    ],
+    "dohyun.T2017": [
+      {
+        "id": "q_night",
+        "label": "What happened that night?"
+      },
+      {
+        "id": "q_leak",
+        "label": "Was there ever a code leak?"
+      }
+    ],
+    "minjae.T2017": [
+      {
+        "id": "q_night",
+        "label": "Where were you that night?"
+      },
+      {
+        "id": "q_father",
+        "label": "How have you been?"
+      },
+      {
+        "id": "q_leak",
+        "label": "Did Jisoo tell you about a leak?",
+        "conditional": true
+      }
+    ],
+    "hana.T2017": [
+      {
+        "id": "q_night",
+        "label": "What did you see that night?"
+      },
+      {
+        "id": "q_now",
+        "label": "What are you doing now?"
+      }
+    ],
+    "kim.T2017": [
+      {
+        "id": "q_last",
+        "label": "How are you tonight?"
+      },
+      {
+        "id": "q_car",
+        "label": "Did Mr. Kang come back that night?",
+        "conditional": true
+      },
+      {
+        "id": "q_backdoor",
+        "label": "Tell me about the man in the gray hoodie.",
+        "conditional": true
+      },
+      {
+        "id": "q_intern",
+        "label": "When did the intern leave?",
+        "conditional": true
+      }
+    ],
+    "hana.T2018": [
+      {
+        "id": "q_article",
+        "label": "What's your article about?"
+      },
+      {
+        "id": "q_why",
+        "label": "Why this story?"
+      }
+    ],
+    "dohyun.T2018": [
+      {
+        "id": "q_article",
+        "label": "Did you read Hana's article?"
+      },
+      {
+        "id": "q_company",
+        "label": "How's Moonlight?"
+      }
+    ],
+    "minjae.T2018": [
+      {
+        "id": "q_night",
+        "label": "Where were you that night?"
+      },
+      {
+        "id": "q_card",
+        "label": "Who opened the server room at 10:40?"
+      }
+    ],
+    "dohyun.T2019": [
+      {
+        "id": "q_night",
+        "label": "What really happened between you and Jisoo?"
+      },
+      {
+        "id": "q_fellowship",
+        "label": "What are you working on?"
+      },
+      {
+        "id": "q_audit",
+        "label": "Tell me about the leak.",
+        "conditional": true
+      }
+    ],
+    "minjae.T2019": [
+      {
+        "id": "q_night",
+        "label": "Where were you that night?"
+      },
+      {
+        "id": "q_nova",
+        "label": "When did you first talk to Nova?"
+      },
+      {
+        "id": "q_card",
+        "label": "Whose card opened the server room?",
+        "conditional": true
+      }
+    ],
+    "hana.T2019": [
+      {
+        "id": "q_next",
+        "label": "Are you still on the story?"
+      },
+      {
+        "id": "q_fellowship",
+        "label": "What do you think of the fellowship?"
+      }
+    ],
+    "dohyun.T2025": [
+      {
+        "id": "q_now",
+        "label": "Nine years. How is Moonlight?"
+      },
+      {
+        "id": "q_nova",
+        "label": "What do you make of Nova?"
+      },
+      {
+        "id": "q_contract",
+        "label": "Did you know about Minjae's Nova contract?",
+        "conditional": true
+      }
+    ],
+    "minjae.T2025": [
+      {
+        "id": "q_ceo",
+        "label": "How's life as a CEO?"
+      },
+      {
+        "id": "q_story",
+        "label": "What about Hana's story on you?"
+      },
+      {
+        "id": "q_contract",
+        "label": "What was the March 2016 contract?",
+        "conditional": true
+      }
+    ],
+    "hana.T2025": [
+      {
+        "id": "q_now",
+        "label": "Nine years on. What are you working on?"
+      },
+      {
+        "id": "q_killed",
+        "label": "What happened to your story?"
+      },
+      {
+        "id": "q_contract",
+        "label": "What did you find about Minjae and Nova?",
+        "conditional": true
+      }
+    ],
+    "dohyun.T2026": [
+      {
+        "id": "q_night",
+        "label": "What happened the night Jisoo died?"
+      },
+      {
+        "id": "q_minjae",
+        "label": "What happened to Minjae?"
+      },
+      {
+        "id": "q_fight",
+        "label": "Hana's article says there was shouting.",
+        "conditional": true
+      }
+    ],
+    "minjae.T2026": [
+      {
+        "id": "q_night",
+        "label": "Where were you that night?"
+      },
+      {
+        "id": "q_nova",
+        "label": "Why does Nova's product look like Moonlight's?"
+      },
+      {
+        "id": "q_messenger",
+        "label": "Jisoo asked you about deploy-bot that evening.",
+        "conditional": true
+      }
+    ],
+    "hana.T2026": [
+      {
+        "id": "q_night",
+        "label": "What do you remember about that night?"
+      },
+      {
+        "id": "q_jisoo",
+        "label": "What was Jisoo like?"
+      },
+      {
+        "id": "q_contract",
+        "label": "What do you know about Minjae and Nova?",
+        "conditional": true
+      }
+    ],
+    "kim.T2026": [
+      {
+        "id": "q_night",
+        "label": "Do you remember March 15, 2016?"
+      },
+      {
+        "id": "q_cctv",
+        "label": "Why did you switch off the camera?",
+        "conditional": true
+      },
+      {
+        "id": "q_face",
+        "label": "He says he only came back for his laptop.",
+        "conditional": true
+      }
+    ],
+    "grace.T2026": [
+      {
+        "id": "q_deal",
+        "label": "What happened to the deal?"
+      },
+      {
+        "id": "q_last",
+        "label": "Did Jisoo contact you before she died?"
+      },
+      {
+        "id": "q_leak",
+        "label": "What would a leak have cost the leaker?",
+        "conditional": true
+      }
+    ]
+  },
+  "records": [
+    {
+      "id": "rec.report",
+      "title": "Incident report (Mar 16, 2016)",
+      "available_from": "start"
+    },
+    {
+      "id": "rec.parking",
+      "title": "Parking barrier log",
+      "available_from": "T2017"
+    },
+    {
+      "id": "rec.door",
+      "title": "Server-room door log",
+      "available_from": "T2018"
+    },
+    {
+      "id": "rec.taxi",
+      "title": "Taxi app receipt",
+      "available_from": "T2018"
+    },
+    {
+      "id": "rec.messenger",
+      "title": "Messenger backup (found 2019)",
+      "available_from": "T2019"
+    }
+  ]
+}
