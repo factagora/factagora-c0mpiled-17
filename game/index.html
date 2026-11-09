@@ -157,6 +157,7 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .msg{max-width:72%;padding:6px 12px;border:2px solid var(--muted);font-size:clamp(15px,1.4vw,18px);line-height:1.45;align-self:flex-start}
 .msg b{display:block;font-weight:400;font-size:13px;color:var(--muted)}
 .msg.me{align-self:flex-end;border-color:var(--gold);color:var(--gold)}
+.chatgrip{display:none}
 .chatform{display:flex;gap:10px;margin-top:10px}
 .chatform input{flex:1;min-width:0;background:transparent;border:3px solid var(--muted);padding:8px 12px;font-size:16px}
 .chatform input:focus-visible{outline:none;border-color:var(--gold)}
@@ -200,7 +201,20 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
   #s-map .pol .new,#s-map .pol .mark{font-size:13px}
   #s-map .chat{margin-top:0;min-height:0}
   #s-map .memo textarea{min-height:0}
-  #s-map .wrap{grid-template-rows:minmax(0,1fr) clamp(160px,26vh,260px);row-gap:40px}
+  #s-map .wrap{grid-template-rows:minmax(0,1fr) var(--chatH,clamp(160px,26vh,260px));row-gap:40px}
+  /* drag the chat's top edge to change its height; the tab label stays above the grip */
+  #s-map .chatgrip{display:block;position:absolute;left:0;right:0;top:-34px;height:40px;cursor:row-resize;touch-action:none;z-index:1}
+  /* the whole top edge lights up on hover/drag, like an editor's panel divider */
+  #s-map .chatgrip::before{content:"";position:absolute;left:0;right:0;bottom:3px;height:3px;background:var(--gold);opacity:0;transition:opacity .15s}
+  #s-map .chatgrip:hover::before,#s-map .chatgrip:focus-visible::before,#s-map .chatgrip.drag::before{opacity:1}
+  #s-map .chatgrip:focus-visible{outline:none}
+  /* a visible tab in the middle of the edge: up/down arrows + label say "drag me up or down" */
+  #s-map .griptab{position:absolute;left:50%;top:2px;translate:-50% 0;display:flex;align-items:center;gap:12px;padding:3px 18px;background:var(--solid);border:3px solid var(--muted);color:var(--fg);font-size:16px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+  #s-map .griptab i{width:0;height:0;border:7px solid transparent}
+  #s-map .griptab i:first-child{border-bottom-color:var(--gold);margin-top:-7px}
+  #s-map .griptab i:last-child{border-top-color:var(--gold);margin-top:7px}
+  #s-map .chatgrip:hover .griptab,#s-map .chatgrip:focus-visible .griptab,#s-map .chatgrip.drag .griptab{border-color:var(--gold);color:var(--gold)}
+  #s-map .chat .tablabel{z-index:2}
   #s-map .mapgrid>.win.memo{padding-bottom:clamp(10px,1.6vh,18px)}
 }
 
@@ -363,6 +377,7 @@ html:not([data-screen="title"]) #s-title{display:none}
       </div>
     </div>
     <div class="win chat">
+      <div class="chatgrip" id="chatGrip" role="separator" aria-orientation="horizontal" aria-label="resize chat" title="drag up or down to resize · double-click to reset" tabindex="0"><span class="griptab" aria-hidden="true"><i></i>drag to resize<i></i></span></div>
       <span class="win tablabel" id="chatTab">CASE FILE</span>
       <div class="chatlog" id="chatlog" aria-live="polite"></div>
       <form class="chatform" id="chatform">
@@ -595,6 +610,28 @@ function renderChat(){
     h('div',{class:'msg'}, h('b',{text:p.short}), t.answer)));
   if (asking) log.append(h('div',{class:'msg me'}, h('b',{text:'you'}), asking), h('p',{class:'intro muted',text:`${p.short} is answering…`}));
   log.scrollTop=log.scrollHeight;
+}
+/* chat height: drag the grip or use arrow keys; kept only for this page load */
+{
+  const grip=$('#chatGrip'), chat=grip.parentElement, wrap=chat.parentElement;
+  const setH=px=>{
+    const max=wrap.clientHeight-240;   // leave room for the map and memo row
+    const v=Math.round(Math.max(120, Math.min(max, px)));
+    wrap.style.setProperty('--chatH', v+'px'); grip.setAttribute('aria-valuenow', v);
+  };
+  grip.addEventListener('pointerdown', e=>{
+    grip.setPointerCapture(e.pointerId);
+    const bottom=chat.getBoundingClientRect().bottom;
+    const move=ev=>setH(bottom-ev.clientY);
+    grip.addEventListener('pointermove', move);
+    grip.classList.add('drag');
+    grip.addEventListener('lostpointercapture', ()=>{ grip.removeEventListener('pointermove', move); grip.classList.remove('drag'); }, {once:true});
+  });
+  grip.addEventListener('dblclick', ()=>{ wrap.style.removeProperty('--chatH'); grip.removeAttribute('aria-valuenow'); });
+  grip.addEventListener('keydown', e=>{
+    const d={ArrowUp:20,ArrowDown:-20}[e.key]; if (!d) return;
+    e.preventDefault(); setH(chat.offsetHeight+d);
+  });
 }
 $('#chatform').addEventListener('submit', async e=>{
   e.preventDefault();
