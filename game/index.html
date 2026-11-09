@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-screen="map">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -32,14 +32,6 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .tablabel{position:absolute;top:-30px;left:36px;padding:4px 18px;font-size:clamp(17px,2vw,22px);color:var(--gold);letter-spacing:.08em}
 .tablabel.win{padding:6px 20px}
 .muted{color:var(--muted)}
-.hint{font-size:14px;color:var(--muted);margin:0}
-.btn{background:var(--panel);border:3px solid var(--fg);box-shadow:inset 0 0 0 3px var(--solid),inset 0 0 0 5px var(--fg);padding:12px 26px;min-height:52px;font-size:clamp(17px,2vw,20px);letter-spacing:.06em;text-transform:uppercase;transition:color .15s}
-.btn::before{content:"▶";display:inline-block;width:0;overflow:hidden;color:var(--gold);transition:width .15s}
-.btn:hover:not(:disabled),.btn:focus-visible{color:var(--gold)}
-.btn:hover:not(:disabled)::before{width:1.3em}
-.btn:disabled{opacity:.35;cursor:default}
-.ghostbtn{background:transparent;border:0;padding:8px 0;min-height:44px;color:var(--muted);font-size:16px}
-.ghostbtn:hover{color:var(--gold)}
 .diamonds{color:var(--muted);letter-spacing:.1em}
 .diamonds b{color:#c9b8ff;font-weight:400}
 
@@ -64,51 +56,6 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 /* screens */
 .screen{animation:enter .5s steps(6)}
 @keyframes enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
-
-/* TITLE */
-#s-title .wrap{min-height:calc(100vh - 20px);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;text-align:center}
-.eyebrow{font-size:14px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
-.bigtitle{font-size:clamp(84px,16vw,180px);line-height:1;color:var(--gold);text-shadow:0 0 0 var(--solid),6px 6px 0 #3a2a9a,0 0 28px rgba(245,196,81,.35)}
-.bigtitle.flicker{animation:flick 2.4s steps(1) infinite}
-@keyframes flick{0%,100%{opacity:1}7%{opacity:.35}8%{opacity:1}61%{opacity:.6}62%{opacity:1}}
-.radio{width:min(480px,100%);display:grid;grid-template-columns:96px 1fr;gap:16px;text-align:left;padding:20px}
-.speaker{width:96px;height:96px;background:repeating-linear-gradient(0deg,var(--fg) 0 3px,transparent 3px 7px);opacity:.35;align-self:center}
-.rcol{display:flex;flex-direction:column;gap:10px;min-width:0}
-.clock{border:2px solid var(--dim);padding:4px 10px;font-size:22px;letter-spacing:.12em;color:var(--muted);font-variant-numeric:tabular-nums;display:flex;justify-content:space-between;align-items:center}
-.clock .dot{width:12px;height:12px;background:#3a2a6a}
-.clock.on{color:var(--gold);border-color:var(--gold)}
-.clock.on .dot{background:var(--gold);box-shadow:0 0 10px var(--gold)}
-.tuner{position:relative;height:34px;border:2px solid var(--dim);overflow:hidden}
-.ticks{position:absolute;left:0;right:0;bottom:0;height:12px;background:repeating-linear-gradient(90deg,var(--muted) 0 2px,transparent 2px 10%)}
-.tlabels{position:absolute;left:4px;right:4px;top:0;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
-.needle{position:absolute;top:0;bottom:0;width:3px;background:var(--red);left:50%}
-.dialrow label{display:block;font-size:14px;color:var(--muted);margin-bottom:2px}
-input[type=range]{width:100%;accent-color:var(--gold);min-height:32px}
-.lede{font-size:clamp(18px,2.2vw,22px);max-width:34ch;margin:0}
-
-/* BRIEF */
-.brief{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);gap:28px;align-items:start;margin-top:40px}
-.folder{position:relative;perspective:1600px;min-height:520px}
-.sheet{min-height:520px;display:flex;flex-direction:column;gap:16px}
-.cover{position:absolute;inset:0;z-index:2;transform-origin:left center;transition:transform 1s steps(10);display:flex;flex-direction:column;justify-content:center;align-items:center;gap:20px;text-align:center;backface-visibility:hidden;background:var(--solid)}
-.cover h2{font-size:clamp(24px,3vw,34px);color:var(--gold);letter-spacing:.06em}
-.folder.open .cover{transform:rotateY(-170deg);pointer-events:none}
-.sheethead{display:flex;flex-wrap:wrap;justify-content:space-between;gap:10px}
-.stamp{color:var(--red);border:3px solid var(--red);padding:2px 12px;display:inline-block;letter-spacing:.08em;text-transform:uppercase}
-.slam{animation:slam .45s steps(5) both}
-@keyframes slam{from{transform:scale(2.6);opacity:0}to{transform:scale(1);opacity:1}}
-.case{display:flex;flex-wrap:wrap;gap:22px}
-.facts{display:flex;flex-direction:column;gap:4px;min-width:0;flex:1 1 220px}
-.facts h3{font-size:clamp(24px,3vw,32px);line-height:1.25;margin-bottom:6px}
-.facts b{color:var(--gold);font-weight:400}
-.typed{font-size:17px;line-height:1.8;margin:0;min-height:5.4em}
-.mission{margin-top:auto;border-top:2px dashed var(--dim);padding-top:14px;color:var(--gold);font-size:clamp(17px,2vw,20px)}
-.drop{animation:drop .7s .4s steps(7) both}
-@keyframes drop{from{transform:translateY(-60px);opacity:0}to{transform:none;opacity:1}}
-.people{display:flex;flex-direction:column}
-.prow{display:flex;gap:14px;align-items:center;padding:10px 0;border-bottom:2px solid rgba(236,234,255,.12)}
-.prow .ph{width:52px;height:52px;flex:none}
-.prow small{display:block;color:var(--muted);font-size:14px}
 
 /* portrait tile */
 .ph{--suit:#3b2f7a;position:relative;background:radial-gradient(circle at 50% 40%,var(--skin) 0 19%,transparent 20%),radial-gradient(circle at 50% 30%,var(--hair,#2a1d14) 0 23%,transparent 24%),radial-gradient(ellipse at 50% 108%,var(--suit) 0 46%,transparent 47%),var(--portrait);border:3px solid var(--fg);box-sizing:border-box;display:flex;align-items:flex-end;justify-content:flex-end;padding:2px 4px;font-size:12px;color:var(--fg);image-rendering:pixelated}
@@ -193,12 +140,10 @@ input[type=range]{width:100%;accent-color:var(--gold);min-height:32px}
 #toast.on{opacity:1}
 
 @media (max-width:900px){
-  .brief,.mapgrid{grid-template-columns:minmax(0,1fr)}
+  .mapgrid{grid-template-columns:minmax(0,1fr)}
   .plan,.plan.y26{grid-template-columns:repeat(2,minmax(0,1fr))}
   .cell.tall{grid-row:auto}
   .win{padding:18px 16px}
-  .radio{grid-template-columns:64px 1fr}
-  .speaker{width:64px;height:64px}
   .seg{margin-left:0}
   #hud{position:relative}
   #hud .wrap{gap:10px}
@@ -212,37 +157,13 @@ input[type=range]{width:100%;accent-color:var(--gold);min-height:32px}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
 }
 </style>
-
-<canvas id="sky" aria-hidden="true"></canvas>
-<canvas id="noise" width="160" height="90" aria-hidden="true"></canvas>
-<div id="vhs" aria-hidden="true"></div>
-
-<header id="hud" hidden>
-  <div class="wrap">
-    <div class="win timebox">
-      <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px"><span class="tt" id="hudTime">RADIO 3/14 23:23</span>
-        <div class="seg" id="eraSeg" role="group" aria-label="year">
-          <button class="y16" data-era="2016" aria-pressed="true">2016</button>
-          <button class="y26" data-era="2026" aria-pressed="false">2026</button>
-        </div>
-      </div>
-      <div class="bars" id="bars"></div>
-    </div>
-    <div class="win navbox">
-      <button data-go="map">map</button><span class="sep">|</span>
-      <button id="logBtn" data-go="board">case log <b id="logCount">0</b></button><span class="sep">|</span>
-      <button data-go="accuse">accuse</button>
-    </div>
-  </div>
-</header>
-</style>
 </head>
 <body>
 <canvas id="sky" aria-hidden="true"></canvas>
 <canvas id="noise" width="160" height="90" aria-hidden="true"></canvas>
 <div id="vhs" aria-hidden="true"></div>
 
-<header id="hud" hidden>
+<header id="hud">
   <div class="wrap">
     <div class="win timebox">
       <div style="display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px"><span class="tt" id="hudTime"></span>
@@ -262,71 +183,8 @@ input[type=range]{width:100%;accent-color:var(--gold);min-height:32px}
 </header>
 
 <main>
-<!-- TITLE -->
-<section id="s-title" class="screen">
-  <div class="wrap">
-    <p class="eyebrow">moonlight labs · cold case 2016-0315</p>
-    <h1 class="bigtitle" id="bigTitle">11:23</h1>
-    <div class="win radio">
-      <div class="speaker" aria-hidden="true"></div>
-      <div class="rcol">
-        <div class="clock" id="clock"><span id="clockT">23:22:41</span><i class="dot"></i></div>
-        <div class="tuner" aria-hidden="true">
-          <div class="tlabels"><span>9.0</span><span>10.0</span><span>11.0</span><span>12.0</span><span>13.0</span></div>
-          <div class="ticks"></div>
-          <div class="needle" id="needle"></div>
-        </div>
-        <div class="dialrow">
-          <label for="dial">tune the dial · <span id="freq">10.00 MHz</span></label>
-          <input type="range" id="dial" min="0" max="1000" value="250">
-        </div>
-      </div>
-    </div>
-    <p class="lede">Every night at 11:23, a dead radio picks up a woman who died ten years ago. She doesn’t know it yet.</p>
-    <p class="hint" id="tuneHint">drag the dial until the static clears</p>
-    <button class="btn" id="answerBtn" disabled>answer the radio</button>
-  </div>
-</section>
-
-<!-- BRIEF -->
-<section id="s-brief" class="screen" hidden>
-  <div class="wrap">
-    <div class="brief">
-      <div class="folder" id="folder">
-        <div class="win cover">
-          <p class="eyebrow" style="margin:0">seoul police · cold case unit</p>
-          <h2>HAN, JISU<br>CASE 2016-0315</h2>
-          <p class="muted" style="margin:0">the radio was found in this box.</p>
-          <button class="btn" id="openFile">open the file</button>
-        </div>
-        <div class="win sheet">
-          <span class="win tablabel">CASE FILE</span>
-          <div class="sheethead"><span class="muted">cold case unit</span><span class="stamp" id="closedStamp">closed · accident</span></div>
-          <div class="case">
-            <div class="pol drop" style="cursor:default;width:150px;padding-top:0"><div class="ph" id="briefPh" style="width:150px;height:150px">JH</div>Jisu Han, 31</div>
-            <div class="facts">
-              <h3>Moonlight Labs,<br>server room.</h3>
-              <span><b>date</b> march 15, 2016 · 23:23</span>
-              <span><b>cause</b> electrocution at a server rack</span>
-              <span><b>ruling</b> accident</span>
-              <span><b>note</b> cctv “out of order” that night</span>
-            </div>
-          </div>
-          <p class="typed" id="briefText"></p>
-          <div class="mission">ask the same people in 2016 and in 2026.<br>find where their stories break.</div>
-        </div>
-      </div>
-      <div class="win">
-        <p class="wtitle" style="margin:0 0 6px">people · 2016 → 2026</p>
-        <div class="people" id="peopleList"></div>
-        <div style="display:flex;justify-content:flex-end;margin-top:24px"><button class="btn" id="beginBtn" disabled>begin the night</button></div>
-      </div>
-    </div>
-  </div>
-</section>
-
 <!-- MAP (main screen) -->
-<section id="s-map" class="screen" hidden>
+<section id="s-map" class="screen">
   <div class="wrap">
     <div class="mapgrid">
       <div class="win">
@@ -393,7 +251,7 @@ const CELLS = {
     {lbl:'evidence storage', sub:'case 2016-0315, boxed since 2016',people:[], cls:'hot', room:true, empty:'(jisu · not reachable)'}
   ]
 };
-const S = {era:'2016', screen:'title', visited:new Set(), contradictions:0};
+const S = {era:'2016', visited:new Set(), contradictions:0};
 
 /* ---------- SKY (pixel stars, moon, horizon) ---------- */
 const sky=$('#sky'), sctx=sky.getContext('2d'); let stars=[], SW=0, SH=0, frame=0;
@@ -425,17 +283,6 @@ let typeTok=0;
 function typeInto(el, text, speed){ const tok=++typeTok; if (reduced){ el.textContent=text; return Promise.resolve(); } el.textContent=''; return new Promise(res=>{ let i=0; (function step(){ if (tok!==typeTok) return res(); el.textContent=text.slice(0, ++i); if (i<text.length) setTimeout(step, speed||22); else res(); })(); }); }
 function phEl(k, style){ const p=PEOPLE[k]; return h('div',{class:'ph',text:p.ini,style:`--hair:${p.hair};--suit:${p.suit};${style||''}`}); }
 
-/* ---------- NAV ---------- */
-const SCREENS=['title','brief','map'];
-function go(name){
-  S.screen=name; document.documentElement.dataset.screen=name;
-  SCREENS.forEach(n=>{ $('#s-'+n).hidden = n!==name; });
-  const sc=$('#s-'+name); sc.classList.remove('screen'); void sc.offsetWidth; sc.classList.add('screen');
-  $('#hud').hidden = name!=='map';
-  updateHud();
-  if (name==='map') renderMap(false);
-  scrollTo({top:0});
-}
 // shortcut: talk, room, case log and accuse screens are not built yet; their entry points show a toast
 const soon = () => toast('coming next: this screen is not built yet');
 document.addEventListener('click', e=>{ if (e.target.closest('[data-soon]')) soon(); });
@@ -458,30 +305,6 @@ function setEra(era){
   setTimeout(()=>vhs.classList.remove('run'), 720);
 }
 $('#eraSeg').addEventListener('click', e=>{ const b=e.target.closest('button'); if (b) setEra(b.dataset.era); });
-
-/* ---------- TITLE: tune to 11.23 MHz ---------- */
-const TARGET=11.23; let connected=false;
-const freqOf = v => 9 + v/1000*4;
-function onDial(){
-  const v=+$('#dial').value, f=freqOf(v), d=Math.abs(f-TARGET), ok=d<0.04;
-  $('#needle').style.left=(v/10)+'%';
-  $('#freq').textContent=f.toFixed(2)+' MHz';
-  setNoise(ok ? 0 : Math.min(.3, d/1.2*.3 + .04));
-  if (ok && !connected){ connected=true; $('#clock').classList.add('on'); $('#bigTitle').classList.add('flicker'); $('#tuneHint').textContent='…hello? nobody uses this channel. who is this?'; $('#answerBtn').disabled=false; $('#clockT').textContent='23:23:00'; }
-  if (!ok && connected){ connected=false; $('#clock').classList.remove('on'); $('#bigTitle').classList.remove('flicker'); $('#tuneHint').textContent='drag the dial until the static clears'; $('#answerBtn').disabled=true; }
-}
-$('#dial').addEventListener('input', onDial);
-let secs=41; setInterval(()=>{ if (connected) return; secs=(secs+1)%60; $('#clockT').textContent='23:22:'+String(secs).padStart(2,'0'); }, 1000);
-$('#answerBtn').addEventListener('click', ()=>{ burst(500); setTimeout(()=>go('brief'), reduced?0:350); });
-
-/* ---------- BRIEF ---------- */
-const bp=PEOPLE.jisu; $('#briefPh').style.cssText+=`;--hair:${bp.hair};--suit:${bp.suit}`;
-Object.keys(PEOPLE).forEach(k=>{ const p=PEOPLE[k]; $('#peopleList').append(h('div',{class:'prow'}, phEl(k), h('div',null, h('span',{text:p.name}), h('small',{text:p.r16+' → '+p.r26})))); });
-$('#openFile').addEventListener('click', ()=>{
-  $('#folder').classList.add('open');
-  setTimeout(()=>{ $('#closedStamp').classList.add('slam'); typeInto($('#briefText'),'Co-founder and CTO, found dead one day before the first big investment signing. Ten years later the company is a unicorn, and her evidence box still holds a radio that turns on at 11:23 every night.',18).then(()=>{ $('#beginBtn').disabled=false; }); }, reduced?0:800);
-});
-$('#beginBtn').addEventListener('click', ()=>go('map'));
 
 /* ---------- MAP (main screen) ---------- */
 const pols={};
@@ -527,6 +350,7 @@ function renderMap(animate){
     });
   }
 }
+updateHud(); renderMap(false);
 })();
 </script>
 </body>
