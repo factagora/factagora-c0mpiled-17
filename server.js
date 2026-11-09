@@ -2,9 +2,14 @@ const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
 const { TIMEPOINTS, NAMES, appearsAt, spacesOf, hiddenRefs, systemPrompt } = require("./characters");
-const { judge } = require("./accuse");
+const { judgeScored } = require("./scoring");
+const { createLeaderboard, createVerdictStore, parseNick } = require("./leaderboard");
+const { createLimiter, clientKey } = require("./ratelimit");
 
 const port = process.env.PORT || 3000;
+const board = createLeaderboard();
+const verdicts = createVerdictStore();
+const accuseAllowed = createLimiter({ max: 5, windowMs: 60 * 1000 });
 
 const GAME_FILE = path.join(__dirname, "game", "index.html");
 const STATIC = {
@@ -214,8 +219,52 @@ ${list(facts.filter((m) => m.type === "claim"), true)}`;
   sendJson(res, 200, { answer: answer.trim(), refs });
 }
 
+// Judges the accusation (right or wrong culprit, motive score 1-100). The response keeps the shape the game screen reads and adds
+// a verdictId to register the score later. With a nick it registers right away and there is no verdictId.
+async function handleAccuse(req, res) {
+  const started = Date.now();
+  if (!accuseAllowed(clientKey(req))) return sendJson(res, 429, { error: "Too many accusations. Wait a minute and try again." });
+  let body;
+  try {
+    body = await readJson(req);
+  } catch (e) {
+    return sendJson(res, 400, { error: e.message });
+  }
+  const { nick, error } = parseNick(body?.nick);
+  if (error) return sendJson(res, 400, { error });
+
+  const result = await judgeScored(body?.who, body?.motive, {
+    chat,
+    onFallback: (e) => console.error(JSON.stringify({ event: "scoring_fallback", error: e.message })),
+  });
+  if (!result) return sendJson(res, 400, { error: "Send a suspect id and a motive." });
+
+  const entry = nick ? board.add({ nick, ending: result.ending, score: result.score }) : null;
+  const verdictId = nick ? null : verdicts.save(result);
+  console.log(JSON.stringify({ event: "accuse", who: body.who, nick, ending: result.ending, score: result.score, total_score: result.total_score, source: result.source, rank: entry?.rank ?? null, ms: Date.now() - started }));
+  sendJson(res, 200, { ...result, verdictId, entry });
+}
+
+// Registers a judged verdict under a nick. The score comes from the stored verdict, so the browser cannot choose it.
+async function handleRegister(req, res) {
+  let body;
+  try {
+    body = await readJson(req);
+  } catch (e) {
+    return sendJson(res, 400, { error: e.message });
+  }
+  const { nick, error } = parseNick(body?.nick);
+  if (error || !nick) return sendJson(res, 400, { error: error ?? "Send a nick." });
+  const verdict = verdicts.claim(body?.verdictId);
+  if (!verdict) return sendJson(res, 404, { error: "Unknown, used or expired verdictId. Accuse again to get a new one." });
+
+  const entry = board.add({ nick, ending: verdict.ending, score: verdict.score });
+  console.log(JSON.stringify({ event: "score_registered", nick, ending: verdict.ending, score: verdict.score, rank: entry.rank }));
+  sendJson(res, 200, { entry, total: board.top(1).total });
+}
+
 function handle(req, res) {
-  const { pathname } = new URL(req.url, "http://localhost");
+  const { pathname, searchParams } = new URL(req.url, "http://localhost");
 
   if (pathname === "/api/characters") {
     const timepoints = Object.entries(TIMEPOINTS).map(([id, t]) => ({ id, label: t.label }));
@@ -231,13 +280,21 @@ function handle(req, res) {
   }
   if (pathname === "/api/accuse") {
     if (req.method !== "POST") return sendJson(res, 405, { error: "Use POST." });
-    return readJson(req).then(
-      (b) => {
-        const result = judge(b?.who, b?.motive);
-        sendJson(res, result ? 200 : 400, result || { error: "Send a suspect id and a motive." });
-      },
-      (e) => sendJson(res, 400, { error: e.message })
-    );
+    return handleAccuse(req, res).catch((e) => {
+      console.error(JSON.stringify({ event: "accuse_failed", error: e.message }));
+      if (!res.headersSent) sendJson(res, 500, { error: "Something went wrong." });
+    });
+  }
+  if (pathname === "/api/scores") {
+    if (req.method === "GET") {
+      const limit = Math.min(100, Math.max(1, Number.parseInt(searchParams.get("limit"), 10) || 100));
+      return sendJson(res, 200, board.top(limit));
+    }
+    if (req.method !== "POST") return sendJson(res, 405, { error: "Use GET or POST." });
+    return handleRegister(req, res).catch((e) => {
+      console.error(JSON.stringify({ event: "register_failed", error: e.message }));
+      if (!res.headersSent) sendJson(res, 500, { error: "Something went wrong." });
+    });
   }
   const prefix = Object.keys(STATIC).find((p) => pathname.startsWith(p));
   if (prefix) return serveStatic(prefix, pathname, res);
