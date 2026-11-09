@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-screen="map">
+<html lang="en" data-screen="title">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -143,7 +143,39 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
   #s-map .wrap{grid-template-rows:minmax(0,1fr) clamp(160px,26vh,260px);row-gap:40px}
   #s-map .mapgrid>.win.memo{padding-bottom:clamp(10px,1.6vh,18px)}
 }
-}
+
+/* TITLE — tune the radio to 11.23 MHz, then answer it; answering opens the map */
+html[data-screen="title"] #hud,html[data-screen="title"] #s-map{display:none}
+html:not([data-screen="title"]) #s-title{display:none}
+#s-title{min-height:100vh;min-height:100dvh;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+#s-title .wrap{display:flex;flex-direction:column;align-items:center;gap:clamp(10px,2vh,18px);text-align:center;width:100%}
+.t-eyebrow{margin:0;color:var(--muted);letter-spacing:.25em;text-transform:uppercase;font-size:clamp(13px,1.3vw,16px)}
+.t-logo{font-size:clamp(88px,14vw,184px);line-height:1;color:var(--gold);text-shadow:6px 6px 0 var(--solid)}
+.t-logo.live{animation:tflick 2.4s steps(1,end) infinite}
+@keyframes tflick{0%,100%{color:var(--gold)}7%{color:var(--cyan)}8%{color:var(--gold)}61%{color:var(--fg)}62%{color:var(--gold)}}
+.t-radio{display:grid;grid-template-columns:96px minmax(0,1fr);gap:20px;width:min(640px,100%);text-align:left;margin-block:8px}
+.t-speaker{align-self:center;width:96px;height:96px;background:repeating-linear-gradient(0deg,var(--dim) 0 3px,transparent 3px 9px)}
+.t-body{display:flex;flex-direction:column;gap:10px;min-width:0}
+.t-clock{display:flex;justify-content:space-between;align-items:center;padding:4px 12px;border:2px solid var(--dim);font-size:clamp(22px,2.6vw,30px);letter-spacing:.1em;color:var(--muted);font-variant-numeric:tabular-nums}
+.t-clock i{width:14px;height:14px;background:var(--dim)}
+.t-clock.live{border-color:var(--gold);color:var(--gold)}
+.t-clock.live i{background:var(--red)}
+.t-tuner{position:relative;height:44px;border:2px solid var(--dim);background:repeating-linear-gradient(90deg,var(--dim) 0 2px,transparent 2px 10%) bottom/100% 10px no-repeat}
+.t-ticks{position:absolute;inset:2px 8px auto;display:flex;justify-content:space-between;font-size:12px;color:var(--muted)}
+.t-needle{position:absolute;top:0;bottom:0;left:25%;width:4px;background:var(--red)}
+.t-label{color:var(--muted);font-variant-numeric:tabular-nums}
+.t-label span{color:var(--fg)}
+#dial{width:100%;margin:0;accent-color:var(--gold);min-height:28px}
+.t-lede{margin:0;font-size:clamp(17px,1.8vw,22px);max-width:40ch}
+.t-status{margin:0;min-height:1.6em;color:var(--muted)}
+.t-status.live{color:var(--gold)}
+.t-answer{background:transparent;border:3px solid var(--gold);color:var(--gold);padding:8px 26px;min-height:48px;text-transform:uppercase;letter-spacing:.08em;font-size:clamp(17px,1.8vw,22px)}
+.t-answer:hover:not(:disabled){background:var(--gold);color:var(--solid)}
+.t-answer:disabled{border-color:var(--dim);color:var(--dim);cursor:default}
+.t-answer:not(:disabled){animation:blinkb 1.4s steps(1) infinite}
+.t-keys{margin:0;font-size:13px;color:var(--dim)}
+@media (max-width:600px){.t-radio{grid-template-columns:minmax(0,1fr)}.t-speaker{display:none}}
+@media (prefers-reduced-motion:reduce){.t-logo.live{animation:none}}
 
 /* VHS */
 #vhs{position:fixed;inset:0;z-index:75;pointer-events:none;display:none;overflow:hidden}
@@ -196,6 +228,30 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 </header>
 
 <main>
+<!-- TITLE (first screen) -->
+<section id="s-title" class="screen" aria-labelledby="tLogo">
+  <div class="wrap">
+    <p class="t-eyebrow">Moonlight Labs · cold case 2016-0315</p>
+    <h1 class="t-logo" id="tLogo">11:23</h1>
+    <div class="win t-radio" role="group" aria-label="radio">
+      <div class="t-speaker" aria-hidden="true"></div>
+      <div class="t-body">
+        <div class="t-clock" id="tClock"><span id="tTime">22:49:41</span><i aria-hidden="true"></i></div>
+        <div class="t-tuner" aria-hidden="true">
+          <div class="t-ticks"><span>9.0</span><span>10.0</span><span>11.0</span><span>12.0</span><span>13.0</span></div>
+          <i class="t-needle" id="tNeedle"></i>
+        </div>
+        <label class="t-label" for="dial">frequency <span id="tFreq">10.00</span> MHz</label>
+        <input type="range" id="dial" min="0" max="1000" value="250">
+      </div>
+    </div>
+    <p class="t-lede">Every March 15, a dead radio on 11.23 MHz picks up a woman who died ten years ago.</p>
+    <p class="t-status" id="tStatus" role="status">turn the dial until the static clears.</p>
+    <button class="t-answer" id="tAnswer" disabled>answer the radio</button>
+    <p class="t-keys">←→ tune · enter answer</p>
+  </div>
+</section>
+
 <!-- MAP (main screen) -->
 <section id="s-map" class="screen">
   <div class="wrap">
@@ -385,6 +441,40 @@ $('#chatform').addEventListener('submit', e=>{
   (S.chats[chatKey()] ||= []).push(v);
   $('#chatInput').value=''; renderChat();
 });
+
+/* ---------- TITLE: tune to 11.23 MHz, answer, then the map opens ---------- */
+const TARGET=11.23, LOCK=0.04, FMIN=9, FMAX=13;
+const dial=$('#dial'); let tuned=false, answered=false, tSecs=41;
+const mhz = () => FMIN + dial.value/1000*(FMAX-FMIN);
+function tune(){
+  const f=mhz(), d=Math.abs(f-TARGET), ok=d<LOCK;
+  $('#tNeedle').style.left = dial.value/10+'%';
+  $('#tFreq').textContent = f.toFixed(2);
+  setNoise(ok ? 0 : Math.min(.35, .05 + d/2*.35));   // static fades as the dial nears 11.23
+  if (ok===tuned) return;
+  tuned=ok;
+  ['#tClock','#tLogo'].forEach(q=>$(q).classList.toggle('live', ok));
+  $('#tStatus').classList.toggle('live', ok);
+  $('#tStatus').textContent = ok ? '…something is on this channel.' : 'turn the dial until the static clears.';
+  $('#tAnswer').disabled = !ok;
+  if (ok) $('#tTime').textContent='22:50:00';
+}
+const tClock = setInterval(()=>{ if (tuned) return; tSecs=(tSecs+1)%60; $('#tTime').textContent=`22:49:${String(tSecs).padStart(2,'0')}`; }, 1000);
+function answer(){
+  if (!tuned || answered) return;
+  answered=true; dial.disabled=true; $('#tAnswer').disabled=true; clearInterval(tClock);
+  $('#tStatus').textContent='connecting…';
+  burst(reduced?0:420);
+  setTimeout(()=>{ document.documentElement.dataset.screen='map'; renderMap(false); $('#timeRange').focus(); }, reduced?0:420);
+}
+dial.addEventListener('input', tune);
+$('#tAnswer').addEventListener('click', answer);
+addEventListener('keydown', e=>{
+  if (document.documentElement.dataset.screen!=='title') return;
+  if (e.key==='Enter' && document.activeElement!==$('#tAnswer')) answer();
+  if (!dial.disabled && (e.key==='ArrowLeft'||e.key==='ArrowRight') && document.activeElement!==dial){ dial.value=+dial.value+(e.key==='ArrowRight'?5:-5); tune(); }
+});
+tune();
 
 $('#timeRange').value=S.t; updateHud(); renderMap(false); renderChat();
 })();
