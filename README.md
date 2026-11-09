@@ -59,27 +59,32 @@ Each character has its own TCKG space.
 ## Architecture
 
 ```
-Browser (game/index.html + client/game.js)
-   │  POST /api/ask {character, timepoint, question, history, evidence}
+Browser: React app (web/), game saved in localStorage
+   │  POST /api/ask {character, timepoint, question, history, evidence}   (web/src/api/client.ts)
    ▼
-server.js ──► TCKG  GET /memories?space=moonlight.public|moonlight.char.<id>&as_of=<timepoint>
-   │          (locked memories removed: characters.js hiddenRefs)
-   ├────────► Azure OpenAI  → {answer, used}
+server.js ──► lib/tckg.js  GET /memories?space=moonlight.public|moonlight.char.<id>&as_of=<timepoint>
+   │          (locked memories removed: lib/characters.js hiddenRefs)
+   ├────────► lib/llm.js  Azure OpenAI → {answer, used}
    ▼
 {answer, refs}  → browser: chat log · evidence slots · pinned cards
 
-POST /api/accuse {who, memo} → scoring.js (LLM extracts motives → rule-based score) → verdict stored
-POST /api/scores {nick, verdictId} → leaderboard.js
+POST /api/accuse {who, memo} → lib/scoring.js (LLM extracts motives → rule-based score) → verdict stored
+POST /api/scores {nick, verdictId} → lib/leaderboard.js
 ```
 
-| File | Role |
+| Path | Role |
 |---|---|
-| `server.js` | HTTP server, API, static files, TCKG reads |
-| `characters.js` | Personas, timepoints, spaces, lock rules (`hiddenRefs`) |
-| `scoring.js` / `accuse.js` | LLM motive judging + rule score / keyword judging (fallback) |
-| `leaderboard.js`, `ratelimit.js` | In-memory leaderboard and verdict store, rate limits |
-| `game/index.html`, `game/assets/` | Game screens; portraits (three looks across the timepoints), backgrounds, icons |
-| `client/game.js` | Saves chats, pins and memo; chat test page at `/client/` |
+| `server.js` | HTTP server: API, the built web app (`web/dist`) and game art (`/assets/`) |
+| `lib/characters.js` | Personas, timepoints, spaces, lock rules (`hiddenRefs`), screen names (`screenText`) |
+| `lib/tckg.js`, `lib/llm.js`, `lib/fetch-retry.js` | TCKG reads, Azure OpenAI calls, retries |
+| `lib/scoring.js` / `lib/accuse.js` | LLM motive judging + rule score / keyword judging (fallback) |
+| `lib/leaderboard.js`, `lib/ratelimit.js` | In-memory leaderboard and verdict store, rate limits |
+| `web/src/screens/` | Title, briefing, map, places, leaderboard (React + TypeScript) |
+| `web/src/components/` | Chat, people row, evidence slots, accuse panel, verdict dialog, time slider |
+| `web/src/store/` | Game save (Zustand, localStorage key `moonlight-game-v2`) and screen state |
+| `web/src/api/client.ts` | Calls to `/api/*` |
+| `web/public/assets/` | Portraits (three looks across the timepoints), backgrounds, item icons |
+| `test/` | All tests (`node --test`) |
 | `data/case.json` | Case data safe to send to the client (characters, timepoints, places, positions, questions, records) |
 | `data/server.json` | Server only (statements, unlock conditions, solution, endings) |
 | `data/tckg-seed.json` | TCKG seed (1 tenant, 8 spaces) |
@@ -95,11 +100,18 @@ POST /api/scores {nick, verdictId} → leaderboard.js
 
 ## Run
 
-Node 22 or newer. There are no dependencies to install.
+Node 22 or newer. The server itself needs no packages; the web app is built with Vite (dev dependencies).
 
 ```bash
+npm install
 cp .env.example .env      # fill in TCKG_TOKEN and AOAI_API_KEY
-npm start                 # http://localhost:3000  (set PORT to change)
+npm run dev               # server on :3000 + Vite on :5173 (proxies /api to the server)
+```
+
+```bash
+npm run build             # build the web app into web/dist
+npm start                 # serve the built game at http://localhost:3000  (set PORT to change)
+npm run typecheck         # TypeScript check of web/
 npm test
 ```
 
@@ -108,7 +120,7 @@ npm test
 | `TCKG_TOKEN`, `TCKG_COLLECTION_ID` | Personal TCKG token, the `11:23 Moonlight Labs` collection |
 | `AOAI_ENDPOINT`, `AOAI_API_KEY`, `AOAI_DEPLOYMENT` | Azure OpenAI for character answers and motive judging |
 
-A push to `main` deploys to Azure App Service through GitHub Actions.
+A push to `main` deploys to Azure App Service through GitHub Actions; CI runs `typecheck`, `test` and `build` before uploading.
 
 ## Team
 
