@@ -1,5 +1,5 @@
 // Chat with the person picked on the map. Each person and year keeps its own conversation; pinned cards go along.
-import { type FormEvent, type RefObject, useEffect, useRef, useState } from "react";
+import { type FormEvent, Fragment, type RefObject, useEffect, useRef, useState } from "react";
 import { askCharacter } from "../api/client";
 import { ERA_NOTE, PEOPLE, roleOf, timepointOf } from "../core/data";
 import { togglePin, turnCard, whenOf } from "../store/cards";
@@ -83,7 +83,7 @@ export function ChatPanel({ wrap }: { wrap: RefObject<HTMLDivElement> }) {
         {!p && <p className="intro">{introOf(era)}</p>}
         {p && !here.length && !asking && <p className="intro muted">{`${p.name} · ${roleOf(person!, +era)} · ${era}. Ask anything.`}</p>}
         {p && here.map((t) => (
-          <div key={t.at}>
+          <Fragment key={t.at}>
             <div className="msg me"><b>you</b>{t.question}</div>
             <div className="msg">
               <b>{p.short}</b>{t.answer}
@@ -94,7 +94,7 @@ export function ChatPanel({ wrap }: { wrap: RefObject<HTMLDivElement> }) {
                 </button>
               </div>
             </div>
-          </div>
+          </Fragment>
         ))}
         {p && pins.length > 0 && <p className="intro muted">{`you are showing ${pins.length} card${pins.length > 1 ? "s" : ""}: pinned answers and evidence.`}</p>}
         {p && asking && (<><div className="msg me"><b>you</b>{asking}</div><p className="intro muted">{`${p.short} is answering…`}</p></>)}
