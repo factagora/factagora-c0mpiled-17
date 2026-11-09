@@ -1,7 +1,8 @@
 // Dialogue window controller
 //   const d = createDialog(document.querySelector(".dialog-window"), lines);
-//   lines: [{ speaker: "Rosalind", text: "I was <del>asleep</del>." }, ...]
+//   lines: [{ speaker: "Minjae · 2026", text: "I left <del>at nine</del>." }, ...]
 //   Without a speaker the line is shown as narration (CASE FILE).
+//   d.say(lines) replaces the queue and shows its first line (e.g. a new answer).
 // Rules
 //   · First input (click, Enter, Space) completes the current line; the second shows the next line
 //   · Speed follows <html data-text-speed="slow|normal|instant">
@@ -59,7 +60,9 @@ export function createDialog(win, lines, { onEnd } = {}) {
     show(++i);                                  // second input: next line
   };
 
+  const say = (next) => { clearInterval(timer); timer = null; lines = next; i = -1; advance(); };
+
   win.addEventListener("click", advance);
   advance();
-  return { advance, get typing() { return !!timer; }, get index() { return i; } };
+  return { advance, say, get typing() { return !!timer; }, get index() { return i; } };
 }

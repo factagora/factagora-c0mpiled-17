@@ -1,5 +1,5 @@
 /* =========================================================
-   DECK SEVEN — Components v4
+   11:23 — Components v5
    Load order: tokens.css → components.css → stage.js, dialog.js
    Naming: BEM. Change state with an .is-* class and the matching ARIA attribute together.
      .is-selected  ↔ aria-selected="true"   (▶ cursor)
@@ -54,23 +54,26 @@
   font-size: var(--fs-ui);          /* so large-text mode is recomputed inside the stage */
   line-height: var(--lh-ui);
 }
-.stage--night { background-image: url("assets/night-deck-bg.png"); }
+/* shortcut: flat scene colours until the 2016 office / 2026 cold-case desk art exists */
+.stage--2016 { background-color: var(--c-scene-2016); }
+.stage--2026 { background-color: var(--c-scene-2026); }
 
-/* Main screen: HUD/menu → map/list → dialogue → key hints */
+/* Investigation screen (hub): left = HUD → people → questions → dialogue, right = menu → case log sidebar */
 .layout-main {
   display: grid;
-  grid-template-columns: var(--win-map-w) var(--win-side-w);
-  grid-template-rows: var(--win-hud-h) 40px var(--win-main-h) 56px var(--win-dialog-h) var(--hint-h);
+  grid-template-columns: var(--win-main-w) var(--win-side-w);
+  grid-template-rows: var(--win-hud-h) var(--sp-4) var(--win-people-h) var(--sp-4) var(--win-ask-h) 56px var(--win-dialog-h) var(--hint-h);
   column-gap: var(--sp-5);
   padding: var(--stage-top) var(--stage-gutter) 0;
   height: 100%;
 }
-.layout-main > .hud-window    { grid-area: 1 / 1; justify-self: start; }
+.layout-main > .hud-window    { grid-area: 1 / 1; }
 .layout-main > .menu-window   { grid-area: 1 / 2; justify-self: end; align-self: start; }
-.layout-main > .map-window    { grid-area: 3 / 1; }
-.layout-main > .side-window   { grid-area: 3 / 2; }
-.layout-main > .dialog-window { grid-area: 5 / 1 / 6 / 3; justify-self: center; }
-.layout-main > .keyhints      { grid-area: 6 / 1 / 7 / 3; justify-self: end; align-self: end; margin-right: 112px; }
+.layout-main > .people-window { grid-area: 3 / 1; }
+.layout-main > .ask-window    { grid-area: 5 / 1; }
+.layout-main > .dialog-window { grid-area: 7 / 1; }
+.layout-main > .log-window    { grid-area: 3 / 2 / 8 / 3; }
+.layout-main > .keyhints      { grid-area: 8 / 1 / 9 / 3; justify-self: end; align-self: end; }
 
 /* ---------------------------------------------------------
    WINDOW — double-bordered window
@@ -101,11 +104,12 @@
   color: var(--c-text-title);
 }
 
-.hud-window    { width: var(--win-hud-w);  height: var(--win-hud-h);  padding: var(--sp-3) var(--sp-4); }
+.hud-window    { width: var(--win-main-w); height: var(--win-hud-h);  padding: var(--sp-3) var(--sp-4); display: flex; justify-content: space-between; align-items: center; }
 .menu-window   { width: var(--win-menu-w); height: var(--win-menu-h); padding: var(--sp-3) var(--sp-4); }
-.map-window    { width: var(--win-map-w);  height: var(--win-main-h); padding-bottom: var(--sp-3); }
-.side-window   { width: var(--win-side-w); height: var(--win-main-h); display: flex; flex-direction: column; }
-.dialog-window { width: var(--win-dialog-w); height: var(--win-dialog-h); padding: 40px 48px; cursor: pointer; }
+.people-window { width: var(--win-main-w); height: var(--win-people-h); padding: var(--sp-3) var(--sp-4); }
+.ask-window    { width: var(--win-main-w); height: var(--win-ask-h); padding-bottom: var(--sp-3); display: flex; flex-direction: column; }
+.log-window    { width: var(--win-side-w); display: flex; flex-direction: column; min-height: 0; }
+.dialog-window { width: var(--win-main-w); height: var(--win-dialog-h); padding: 40px 48px; cursor: pointer; }
 
 /* ---------------------------------------------------------
    NAME TAB — who is speaking (XAG 104: speaker identification)
@@ -126,9 +130,11 @@
 .name-tab--narration { color: var(--c-text-info); }
 
 /* ---------------------------------------------------------
-   HUD — time + progress segments (progress shown as bars and text together)
+   HUD — date/time on the left, year switch (.stepper) on the right
+   .segments: progress bar, used by the verdict score
    --------------------------------------------------------- */
 .hud__time { color: var(--c-text-title); white-space: pre; }
+.hud__place { color: var(--c-text-info); }
 .segments { display: flex; gap: var(--seg-gap); margin-top: 16px; }
 .segments > i { width: var(--seg-w); height: var(--seg-h); background: var(--c-line-dim); }
 .segments > i.is-past    { background: var(--c-text-info); }
@@ -151,53 +157,38 @@
 .menubar__sep { color: var(--c-text-disabled); }
 
 /* ---------------------------------------------------------
-   DECK MAP
+   PEOPLE — who you can question in the current year
+   Each person: portrait + status mark (★ NEW / ✓ all asked) + name + role in that year
    --------------------------------------------------------- */
-.deck__rooms { display: flex; }
-.deck__hull { display: block; width: 1116px; height: var(--hull-h); }
-
-.cell {
+.people { display: flex; gap: var(--sp-3); list-style: none; margin: 0; padding: 0; }
+.person {
   position: relative;
-  flex: 0 0 var(--cell-w);
-  height: var(--cell-h);
-  margin-left: calc(var(--bw-inner) * -1);
-  padding-top: 56px;
-  display: flex; flex-direction: column; align-items: center;
-  background: var(--c-surface-cell);
-  border: var(--bw-inner) solid var(--c-line);
+  flex: 1 1 0;
+  display: grid; justify-items: center; align-content: start;
+  padding: var(--sp-2) 0;
+  border: var(--bw-inner) solid transparent;
   cursor: pointer;
 }
-.cell:first-child { margin-left: 0; }
-.cell--wide { flex-basis: var(--cell-w-wide); }
-.cell__label { position: absolute; top: 4px; left: 12px; text-transform: uppercase; }
-.cell__people { display: flex; gap: 16px; }
-.cell__person { display: flex; flex-direction: column; align-items: center; }
-.cell__status { height: 40px; display: flex; align-items: center; justify-content: center; }
-.cell__name { margin-top: 8px; white-space: nowrap; }
-
-.cell:not(.cell--empty):hover { background: var(--c-surface-hover); }
-.cell.is-selected { outline: var(--bw-outer) solid var(--c-accent); outline-offset: calc(var(--u) * -5); }
-.cell__person.is-visited .portrait { filter: var(--fx-visited); }
-.cell__person.is-visited .cell__name { color: var(--c-text-visited); }
-
-.cell--empty {
-  justify-content: center; padding-top: 0;
-  background: transparent;
-  border-style: dashed;
-  color: var(--c-text-info);
-  cursor: default;
-}
-.cell--empty::after { content: "(empty)"; }
+.person:hover, .person.is-selected { background: var(--c-surface-hover); }
+.person.is-selected { outline: var(--bw-outer) solid var(--c-accent); outline-offset: calc(var(--u) * -2); }
+.person__status { position: absolute; top: var(--sp-2); right: var(--sp-2); }   /* one mark only: ★ new · ✓ all asked · — unavailable */
+.person__name { margin-top: var(--sp-2); white-space: nowrap; }
+.person__role { color: var(--c-text-info); white-space: nowrap; text-transform: uppercase; }
+.person.is-visited .portrait { filter: var(--fx-visited); }
+.person.is-visited .person__name { color: var(--c-text-visited); }
+.person.is-disabled { border: var(--bw-inner) dashed var(--c-line-dim); cursor: default; }   /* Jisu in 2026 */
+.person.is-disabled:hover { background: transparent; }
+.person.is-disabled .person__name, .person.is-disabled .person__role { color: var(--c-text-disabled); }
 
 /* ---------------------------------------------------------
    PORTRAIT — slot for character art
    · Character designs are not final. The design system only defines the frame:
      sizes (120 / 96 / 360), 4px white border, states (visited, selected).
+   · Every person except Jisu has two portraits: 2016 (younger) and 2026 (older)
    · Default is a placeholder (checkerboard + initial):  <span class="portrait" data-initial="R"></span>
-   · Once art exists, put an <img> inside, or use .portrait--sheet + --sx/--sy for a sprite sheet
+   · Once art exists, put an <img> inside
    --------------------------------------------------------- */
 .portrait {
-  --sx: 0; --sy: 0;
   position: relative;
   display: grid; place-items: center;
   width: var(--portrait-md); aspect-ratio: 1;
@@ -212,11 +203,6 @@
 }
 .portrait::after { content: attr(data-initial); }
 .portrait > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.portrait--sheet {                                   /* temporary mock-up art (3×2 sheet) */
-  background-image: var(--portrait-sheet, url("assets/portraits.png"));
-  background-size: 333.333% 222.222%;
-  background-position: calc(2.38% + var(--sx) * 47.62%) calc(4.55% + var(--sy) * 90.9%);
-}
 .portrait--sm { width: var(--portrait-sm); font-size: var(--fs-ui); }
 .portrait--lg { width: 360px; font-size: var(--fs-display); }
 .portrait.is-visited { filter: var(--fx-visited); }
@@ -229,11 +215,9 @@
 .mark--star  { color: var(--c-accent); }
 .mark--check { color: var(--c-check); }
 .mark--dash  { color: var(--c-text-disabled); }
-.mark--cost  { color: var(--c-gem); }
 .mark--star::before  { content: "★"; }
 .mark--check::before { content: "✓"; }
 .mark--dash::before  { content: "—"; }
-.mark--cost::before  { content: "◆"; }             /* a choice that spends one question */
 
 .badge-new { color: var(--c-accent); white-space: nowrap; }
 .badge-new::before { content: "★"; margin-right: 0.25em; }
@@ -289,13 +273,6 @@
 .choice.is-disabled { color: var(--c-text-disabled); cursor: not-allowed; }
 .choice.is-disabled.is-selected { background: transparent; }
 
-/* Remaining questions ◆◆◇ 2/3 — icons + number */
-.gems { display: flex; align-items: center; gap: var(--sp-3); color: var(--c-text-info); white-space: nowrap; }
-.side-window > .gems { margin-top: auto; }
-.gems__row { display: inline-flex; gap: 6px; }
-.gems__row > i { width: 0.5em; height: 0.5em; background: var(--c-gem); transform: rotate(45deg); }
-.gems__row > i.is-empty { background: transparent; box-shadow: inset 0 0 0 var(--bw-inner) var(--c-gem-empty); }
-.gems.is-empty { color: var(--c-danger); }
 
 /* ---------------------------------------------------------
    DIALOG
@@ -375,10 +352,10 @@
 .modal__actions { display: flex; gap: var(--sp-4); justify-content: flex-end; }
 
 /* ---------------------------------------------------------
-   TOAST — short feedback (e.g. clue found). Disappears after 3s; the notebook count changes too
+   TOAST — short feedback (e.g. clue found). Disappears after 3s; the case log entry stays marked ★
    --------------------------------------------------------- */
 .toast {
-  position: absolute; top: 176px; left: 50%; z-index: var(--z-toast);
+  position: absolute; top: var(--sp-2); left: 50%; z-index: var(--z-toast);   /* over the top margin, so it never hides people or the log */
   transform: translateX(-50%);
   display: flex; gap: var(--sp-3); align-items: center;
   padding: var(--sp-3) var(--sp-5);
@@ -389,7 +366,7 @@
 .toast[hidden] { display: none; }
 
 /* ---------------------------------------------------------
-   CLUE CARD — notebook entry
+   CLUE CARD — larger statement card (graph view, verdict)
    --------------------------------------------------------- */
 .clue {
   display: grid; grid-template-columns: auto 1fr; gap: var(--sp-3);
@@ -402,6 +379,45 @@
 .clue__title { color: var(--c-text-title); }
 .clue.is-new { border-color: var(--c-accent); }
 .clue.is-contradiction { border-color: var(--c-danger); border-style: dashed; }
+
+.clue.is-picked { outline: var(--bw-outer) solid var(--c-accent); outline-offset: calc(var(--u) * -2); }
+
+/* ---------------------------------------------------------
+   ASK — free-text question under the preset choices
+   --------------------------------------------------------- */
+.ask { display: flex; gap: var(--sp-3); margin-top: auto; }
+.ask__input {
+  flex: 1; height: 64px; padding: 0 var(--sp-4);
+  font: inherit; color: var(--c-text);
+  background: var(--c-surface-cell);
+  border: var(--bw-inner) solid var(--c-line-dim);
+}
+.ask__input::placeholder { color: var(--c-text-disabled); }
+.ask__input:focus-visible { outline: var(--bw-inner) solid var(--c-focus); outline-offset: 0; border-color: var(--c-focus); }
+.ask__input:disabled { color: var(--c-text-disabled); }
+
+/* ---------------------------------------------------------
+   CASE LOG — sidebar. Statements sorted by the time they talk about.
+   Pick two (▶ + amber outline) and press Contradiction?
+   --------------------------------------------------------- */
+.log { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-2); overflow-y: auto; min-height: 0; flex: 1; align-content: start; }
+.log__entry {
+  display: grid; grid-template-columns: 8ch 1fr; column-gap: var(--sp-3);   /* 8ch fits "▶ 22:30" in both text sizes */
+  padding: var(--sp-2) var(--sp-3);
+  background: var(--c-surface-cell);
+  border: var(--bw-inner) solid var(--c-line-dim);
+  cursor: pointer;
+}
+.log__time { color: var(--c-text-title); }
+.log__who  { color: var(--c-text-info); }
+.log__text { grid-column: 2; }
+.log__entry.is-new { border-color: var(--c-accent); }
+.log__entry.is-picked { outline: var(--bw-outer) solid var(--c-accent); outline-offset: calc(var(--u) * -2); }
+.log__entry.is-picked .log__time::before { content: "▶ "; }
+.log__entry.is-contradiction { border: var(--bw-inner) dashed var(--c-danger); }
+.log__entry.is-contradiction .log__time { color: var(--c-danger); }
+.log__entry.is-contradiction .log__time::before { content: "! "; }
+.log__actions { white-space: nowrap; display: flex; gap: var(--sp-3); justify-content: space-between; align-items: center; margin-top: var(--sp-3); }
 
 /* ---------------------------------------------------------
    SETTINGS — stepped options (text speed, contrast, text size)

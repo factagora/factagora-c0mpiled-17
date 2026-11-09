@@ -1,4 +1,6 @@
-# Deck Seven — Readability, UX and Pixel Rules
+# 11:23 — Readability, UX and Pixel Rules
+
+Story: 「11:23」 (Moonlight Labs, 2016 ↔ 2026). The pixel style comes from the earlier Deck Seven concept; the cruise-ship content is gone.
 
 These rules are written so that a new screen can be built from this document alone. All numbers are in 1920×1080 stage pixels unless stated otherwise.
 A bracketed number at the end of a rule points to the sources at the bottom.
@@ -70,20 +72,18 @@ Contrast is measured **worst-case, with a white image behind the window**, becau
 | Not selectable | dark lilac | — |
 | New | amber | ★ NEW |
 | Contradiction | red | `!` prefix, dashed border |
-| Costs a question | lilac | ◆ |
 
 ## 4. Input
 
 | Rule | Implementation |
 |---|---|
-| One cursor | Mouse hover and ↑↓ move the same `.is-selected`. The list item and its map cell highlight together |
-| Everything works with the keyboard | ↑↓ select · Enter/Space confirm · Esc back/cancel · number keys 1–9 pick directly |
+| One cursor | Mouse hover and the arrow keys move the same `.is-selected`: ←→ person, ↑↓ question |
+| Everything works with the keyboard | ←→ person · ↑↓ question · Enter ask · Y switch year · Space next line · Esc back/cancel · 1–3 ask directly · Tab reaches the case log entries |
 | Focus is visible | `:focus-visible` is a 2px amber pixel outline; the browser's blue ring is not used `[8]` |
 | Show the keys that work right now | `.keyhints`, updated when the screen changes |
 | Minimum target size | 56 stage px or more (list row 56, button 64): 37px in a 1280px browser, above the WCAG 24px target `[8]` |
 | Confirm irreversible actions | ACCUSE → `.modal`. State the consequence in a sentence, default focus on **cancel**, Esc = cancel |
-| Show resources as icons and numbers | ◆◆◇ 2/3. Choices that spend a question show `◆`. Turns red at zero |
-| Feedback for every action | A found clue shows a 3-second `.toast` and turns the notebook count amber (`.is-new`) |
+| Feedback for every action | A found clue shows a 3-second `.toast` and appears in the case log with an amber border and ★ (`.is-new`) |
 
 ## 5. Dialogue
 
@@ -105,7 +105,7 @@ Contrast is measured **worst-case, with a white image behind the window**, becau
 
 ## 7. Characters
 
-Character designs are not final. The design system defines only the portrait **frame**: sizes (120 / 96 / 360), border, and states (visited, selected). Without art, a portrait shows a checkerboard placeholder with an initial (`data-initial`). The faces on the gallery's main screen are temporary mock-up art (`.portrait--sheet`).
+Character designs are not final. The design system defines only the portrait **frame**: sizes (120 / 96 / 360), border, and states (visited, selected). Without art, a portrait shows a checkerboard placeholder with an initial (`data-initial`). Everyone except Jisu needs two portraits: 2016 (younger) and 2026 (older).
 
 ## 8. New screen checklist
 

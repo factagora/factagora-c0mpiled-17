@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Deck Seven DS</title>
+<title>11:23 DS</title>
 <link rel="stylesheet" href="tokens.css">
 <link rel="stylesheet" href="components.css">
 <style>
@@ -32,82 +32,73 @@
 </head>
 <body class="ds">
 
-<!-- ================= 1. Main screen (interactive) ================= -->
+<!-- ================= 1. Investigation screen (interactive) ================= -->
 <div class="stage-viewport screen" id="main">
-  <div class="stage stage--night">
+  <div class="stage stage--2016" id="stage">
     <div class="layout-main">
 
       <div class="win hud-window">
-        <p class="hud__time">THE NIGHT  23:40</p>
-        <div class="segments" role="img" aria-label="Chapter 3 of 4"><i class="is-past"></i><i class="is-past"></i><i class="is-current"></i><i></i></div>
+        <div>
+          <p class="hud__time" id="hud-time">MAR 15, 2016  22:50</p>
+          <p class="hud__place" id="hud-place">Moonlight Labs · Radio</p>
+        </div>
+        <div class="stepper" id="year" role="group" aria-label="Year">
+          <button data-year="2016" aria-pressed="true">2016</button><button data-year="2026" aria-pressed="false">2026</button>
+        </div>
       </div>
 
       <nav class="win menu-window" aria-label="Menu">
         <div class="menubar">
-          <button class="menubar__item">Notebook<span class="menubar__count" id="nb-count">4</span></button>
+          <button class="menubar__item" id="graph-btn">Graph</button>
           <span class="menubar__sep">|</span>
           <button class="menubar__item" id="accuse-btn">Accuse</button>
         </div>
       </nav>
 
-      <section class="win map-window" aria-label="Deck 7 map">
-        <h2 class="win__title">Deck 7</h2>
-        <div class="deck">
-          <div class="deck__rooms">
-            <div class="cell cell--empty" data-room="stern"><span class="cell__label">Stern</span></div>
-            <div class="cell" data-room="701"><span class="cell__label">701</span>
-              <div class="cell__person is-visited"><div class="cell__status"><span class="mark mark--check"></span></div><span class="portrait portrait--sheet" style="--sx:0;--sy:0"></span><span class="cell__name">Gus</span></div></div>
-            <div class="cell" data-room="702"><span class="cell__label">702</span>
-              <div class="cell__person"><div class="cell__status"><span class="badge-new">NEW</span></div><span class="portrait portrait--sheet" style="--sx:1;--sy:0"></span><span class="cell__name">Rosalind</span></div></div>
-            <div class="cell" data-room="703"><span class="cell__label">703</span>
-              <div class="cell__person"><div class="cell__status"></div><span class="portrait portrait--sheet" style="--sx:2;--sy:0"></span><span class="cell__name">Martin</span></div></div>
-            <div class="cell" data-room="704"><span class="cell__label">704</span>
-              <div class="cell__person is-visited"><div class="cell__status"><span class="mark mark--check"></span></div><span class="portrait portrait--sheet" style="--sx:0;--sy:1"></span><span class="cell__name">Vivian</span></div></div>
-            <div class="cell cell--wide" data-room="lounge"><span class="cell__label">Lounge</span>
-              <div class="cell__people">
-                <div class="cell__person"><div class="cell__status"></div><span class="portrait portrait--sm portrait--sheet" style="--sx:1;--sy:1"></span><span class="cell__name">Theo</span></div>
-                <div class="cell__person"><div class="cell__status"><span class="badge-new">NEW</span></div><span class="portrait portrait--sm portrait--sheet" style="--sx:2;--sy:1"></span><span class="cell__name">Lawyer</span></div>
-              </div></div>
-          </div>
-          <img class="deck__hull" src="assets/ship-hull.svg" width="1116" height="90" alt="">
-        </div>
+      <section class="win people-window" aria-label="People">
+        <ul class="people" id="people"></ul>
       </section>
 
-      <section class="win side-window" aria-labelledby="where-title">
-        <h2 class="win__title" id="where-title">Where will you go?</h2>
-        <ul class="choices" id="where" role="listbox" aria-labelledby="where-title">
-          <li class="choice" role="option" data-room="702"><span class="choice__label"><span class="choice__key">1</span><span>702</span><span>Rosalind</span></span><span class="mark mark--star"></span></li>
-          <li class="choice" role="option" data-room="lounge"><span class="choice__label"><span class="choice__key">2</span><span>Lounge</span><span>Theo / Lawyer</span></span><span class="mark mark--star"></span></li>
-          <li class="choice" role="option" data-room="703"><span class="choice__label"><span class="choice__key">3</span><span>703</span><span>Martin</span></span><span class="mark mark--cost"></span></li>
-          <li class="choice is-visited" role="option" data-room="701"><span class="choice__label"><span class="choice__key">4</span><span>701</span><span>Gus</span></span><span class="mark mark--check"></span></li>
-          <li class="choice is-visited" role="option" data-room="704"><span class="choice__label"><span class="choice__key">5</span><span>704</span><span>Vivian</span></span><span class="mark mark--check"></span></li>
-          <li class="choice is-disabled" role="option" aria-disabled="true" data-room="stern"><span class="choice__label"><span class="choice__key">6</span><span>Stern deck</span></span><span class="mark mark--dash"></span></li>
-        </ul>
-        <div class="gems" id="gems">Free questions <span class="gems__row"><i></i><i></i><i></i></span> <span>3/3</span></div>
+      <section class="win ask-window" aria-label="Questions">
+        <ul class="choices" id="questions" role="listbox" aria-label="Questions"></ul>
+        <form class="ask" id="ask">
+          <input class="ask__input" id="ask-input" placeholder="Ask anything…" aria-label="Ask anything" autocomplete="off">
+          <button class="btn">Ask</button>
+        </form>
       </section>
 
-      <section class="win dialog-window" id="narration" aria-label="Dialogue">
+      <section class="win dialog-window" id="dialog" aria-label="Dialogue">
         <div class="win name-tab">Case File</div>
         <p class="dialog__text"></p>
         <span class="dialog__next" aria-hidden="true"></span>
       </section>
 
-      <div class="keyhints" id="hints">
-        <span><span class="key">↑↓</span>Select</span>
-        <span><span class="key">Enter</span>Go</span>
-        <span><span class="key">Space</span>Next line</span>
+      <section class="win log-window" aria-labelledby="log-title">
+        <h2 class="win__title" id="log-title">Case Log <span id="log-count">0</span></h2>
+        <ul class="log" id="log"></ul>
+        <div class="log__actions">
+          <span class="hud__place" id="pick-hint">Pick 2 statements</span>
+          <button class="btn btn--danger" id="contra-btn" disabled>Contradiction?</button>
+        </div>
+      </section>
+
+      <div class="keyhints">
+        <span><span class="key">←→</span>Person</span>
+        <span><span class="key">↑↓</span>Question</span>
+        <span><span class="key">Enter</span>Ask</span>
+        <span><span class="key">Y</span>Year</span>
         <span><span class="key">A</span>Accuse</span>
       </div>
     </div>
 
-    <div class="win toast" id="toast" hidden role="status"><span class="badge-new">NEW</span><span id="toast-text"></span></div>
+    <div class="win toast" id="toast" hidden role="status"><span id="toast-text"></span></div>
 
     <div class="modal-scrim" id="modal" hidden>
       <div class="win modal" role="alertdialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-body">
-        <h2 class="win__title" id="modal-title" style="margin:0">Accuse Rosalind?</h2>
+        <h2 class="win__title" id="modal-title" style="margin:0">Accuse Minjae?</h2>
         <div class="modal__suspect">
-          <span class="portrait portrait--sheet" style="--sx:1;--sy:0"></span>
-          <p class="modal__body" id="modal-body">You can't take this back.<br>If you're wrong, <b>the culprit walks free</b>.</p>
+          <span class="portrait" id="modal-portrait" data-initial="M"></span>
+          <p class="modal__body" id="modal-body">You can't take this back.<br>If you're wrong, <b>Jisu walks into the server room</b>.</p>
         </div>
         <div class="modal__actions">
           <button class="btn" id="modal-cancel">Not yet</button>
@@ -120,8 +111,8 @@
 
 <main class="doc">
   <header>
-    <h1>DECK SEVEN · DESIGN SYSTEM v4</h1>
-    <p class="lead">위 화면은 실제로 조작할 수 있다: ↑↓·숫자키로 고르기, Enter로 이동(단서 알림이 뜨고 수첩 숫자가 바뀜), Space나 클릭으로 대사 넘기기, A로 지목 확인창(Esc로 취소).
+    <h1>11:23 · DESIGN SYSTEM v5</h1>
+    <p class="lead">위 화면은 수사 화면(허브)이고 실제로 조작할 수 있다: ←→ 인물, ↑↓·숫자키 질문, Enter 질문하기(단서가 오른쪽 사건 기록에 시간순으로 쌓임), Y 2016/2026 전환, 사건 기록에서 진술 2개를 골라 Contradiction?, A 지목 확인창(Esc 취소). 데모 동선: 민재 2016 1번 → Y → 민재 2026 1번 → 김씨 2026 1번 → 두 진술 골라 Contradiction?
       규칙과 출처는 <a href="RULES.md" style="color:var(--p-lilac-200)">RULES.md</a>에 있다.</p>
   </header>
 
@@ -158,7 +149,7 @@
       <div class="rule"><b>크기 대신 색으로 위계</b>제목 = 호박 + 대문자. 굵게·기울임 금지.</div>
       <div class="rule"><b>투명한 글자 금지</b>흐리게 = 팔레트 다음 색. 반투명은 창 바탕에만.</div>
       <div class="rule"><b>최악 대비로 검사</b>창 뒤가 흰색일 때 본문 4.5 · 비활성 2.5 · 고대비 7 이상.</div>
-      <div class="rule"><b>색 + 기호</b>▶ 선택 · ✓ 본 것 · — 불가 · ★ 새것 · ! 모순 · ◆ 질문 소모.</div>
+      <div class="rule"><b>색 + 기호</b>▶ 선택 · ✓ 본 것 · — 불가 · ★ 새것 · ! 모순.</div>
       <div class="rule"><b>커서 하나</b>마우스와 키보드가 같은 선택을 움직인다. 숫자키로 바로 고르기.</div>
       <div class="rule"><b>대사 2단 입력</b>첫 입력 = 줄 완성, 다음 입력 = 다음 줄. 속도 3단계. 화자 항상 표시.</div>
       <div class="rule"><b>되돌릴 수 없으면 확인</b>결과를 문장으로 말하고, 기본 포커스는 취소, Esc = 취소.</div>
@@ -177,7 +168,7 @@
       <tr><td><span class="chip" style="background:var(--c-text-disabled)"></span><code>--c-text-disabled</code></td><td>#7a6fcc</td><td>고를 수 없음</td><td>3.5</td><td class="pass">2.5</td></tr>
       <tr><td><span class="chip" style="background:var(--c-danger)"></span><code>--c-danger</code></td><td>#ff6b6b</td><td>모순 · 위험</td><td>5.3</td><td class="pass">4.5</td></tr>
       <tr><td><span class="chip" style="background:var(--c-success)"></span><code>--c-success</code></td><td>#7ee0a4</td><td>알리바이 확인</td><td>9.2</td><td class="pass">4.5</td></tr>
-      <tr><td><span class="chip" style="background:var(--c-line-dim)"></span><code>--c-line-dim</code></td><td>#807c9c</td><td>남은 단계 · 빈 ◆</td><td>3.7</td><td class="pass">3 (그래픽)</td></tr>
+      <tr><td><span class="chip" style="background:var(--c-line-dim)"></span><code>--c-line-dim</code></td><td>#807c9c</td><td>남은 단계 · 점수 막대 빈칸</td><td>3.7</td><td class="pass">3 (그래픽)</td></tr>
       <tr><td><span class="chip" style="background:var(--c-surface-cell)"></span><code>--c-surface-cell</code></td><td>#1a1640</td><td>방 칸 · 카드 (불투명)</td><td>—</td><td></td></tr>
     </table>
   </section>
@@ -189,11 +180,11 @@
     <table>
       <tr><th>토큰</th><th>무대</th><th>1280</th><th>1440</th><th>1920</th><th>쓰는 곳</th><th>견본 (1440 기준)</th></tr>
       <tr><td><code>--fs-display</code></td><td>48</td><td>32</td><td>36</td><td>48</td><td>장 제목</td><td style="font-size:36px;color:var(--c-text-title)">CASE CLOSED</td></tr>
-      <tr><td><code>--fs-hero</code></td><td>32</td><td>21</td><td>24</td><td>32</td><td>대사</td><td style="font-size:24px;line-height:1.5">Someone on this deck is lying.</td></tr>
-      <tr><td><code>--fs-ui</code></td><td>24</td><td>16</td><td>18</td><td>24</td><td>메뉴 · 리스트 · 이름</td><td style="font-size:18px">703  Martin</td></tr>
-      <tr><td></td><td>24</td><td></td><td></td><td></td><td>제목 = 색 + 대문자</td><td style="font-size:18px;color:var(--c-text-title);letter-spacing:var(--ls-title)">WHERE WILL YOU GO?</td></tr>
+      <tr><td><code>--fs-hero</code></td><td>32</td><td>21</td><td>24</td><td>32</td><td>대사</td><td style="font-size:24px;line-height:1.5">She doesn't know she dies tonight.</td></tr>
+      <tr><td><code>--fs-ui</code></td><td>24</td><td>16</td><td>18</td><td>24</td><td>메뉴 · 리스트 · 이름</td><td style="font-size:18px">22:50  Minjae</td></tr>
+      <tr><td></td><td>24</td><td></td><td></td><td></td><td>제목 = 색 + 대문자</td><td style="font-size:18px;color:var(--c-text-title);letter-spacing:var(--ls-title)">WHO KILLED HAN JISU?</td></tr>
       <tr><td><code>--fs-deco</code></td><td>16</td><td>11</td><td>12</td><td>16</td><td>장식 전용</td><td style="font-size:12px;color:var(--c-text-disabled)">decoration only</td></tr>
-      <tr><td><code>.ds-ko</code></td><td>24</td><td>16</td><td>18</td><td>24</td><td>한국어판</td><td class="ds-ko" style="font-size:18px">갈무리11 — 누가 거짓말을 하고 있다</td></tr>
+      <tr><td><code>.ds-ko</code></td><td>24</td><td>16</td><td>18</td><td>24</td><td>한국어판</td><td class="ds-ko" style="font-size:18px">갈무리11 — 오늘 밤 자기가 죽는다는 걸 모른다</td></tr>
     </table>
     <p class="lead" style="margin-top:16px">큰 글자(설정 또는 화면 폭 1280px 미만이면 자동): 메뉴 32 · 대사 40.</p>
   </section>
@@ -203,47 +194,60 @@
     <h2>COMPONENTS</h2>
     <p class="lead">실제 크기의 50%.</p>
     <div class="specimen">
-      <h3>.choice — 선택 · 기본 · 질문 소모 · 본 것 · 불가</h3>
+      <h3>.choice — 선택 · 기본 · 본 것 · 불가</h3>
       <div class="win" style="width:616px">
         <ul class="choices">
-          <li class="choice is-selected"><span class="choice__label"><span class="choice__key">1</span><span>The door</span><span>23:15</span></span><span class="mark mark--star"></span></li>
-          <li class="choice"><span class="choice__label"><span class="choice__key">2</span><span>Sunglasses</span></span><span></span></li>
-          <li class="choice"><span class="choice__label"><span class="choice__key">3</span><span>Ask again</span></span><span class="mark mark--cost"></span></li>
-          <li class="choice is-visited"><span class="choice__label"><span class="choice__key">4</span><span>Where were you?</span></span><span class="mark mark--check"></span></li>
-          <li class="choice is-disabled"><span class="choice__label"><span class="choice__key">5</span><span>Show evidence</span></span><span class="mark mark--dash"></span></li>
+          <li class="choice is-selected"><span class="choice__label"><span class="choice__key">1</span><span>Where are you right now?</span></span><span class="mark mark--star"></span></li>
+          <li class="choice"><span class="choice__label"><span class="choice__key">2</span><span>Who has the deploy-bot key?</span></span><span></span></li>
+          <li class="choice is-visited"><span class="choice__label"><span class="choice__key">3</span><span>How is the team tonight?</span></span><span class="mark mark--check"></span></li>
+          <li class="choice is-disabled"><span class="choice__label"><span class="choice__key">4</span><span>Ask Jisu (deceased in 2026)</span></span><span class="mark mark--dash"></span></li>
         </ul>
       </div>
 
       <h3>.btn — 기본 · 선택 · primary · danger · disabled(— 붙음)</h3>
       <div class="row"><button class="btn">Ask</button><button class="btn is-selected">Selected</button><button class="btn btn--primary">Continue</button><button class="btn btn--danger">Accuse</button><button class="btn" disabled>Locked</button></div>
 
-      <h3>.tag · .mark · .gems — 색 + 기호</h3>
+      <h3>.tag · .mark — 색 + 기호</h3>
       <div class="row">
         <span class="tag tag--accent">Clue</span><span class="tag tag--info">Heard</span><span class="tag tag--danger">Contradiction</span><span class="tag tag--success">Alibi</span>
-        <span class="mark mark--star"></span><span class="mark mark--check"></span><span class="mark mark--dash"></span><span class="mark mark--cost"></span><span class="badge-new">NEW</span>
+        <span class="mark mark--star"></span><span class="mark mark--check"></span><span class="mark mark--dash"></span><span class="badge-new">NEW</span>
       </div>
-      <div class="row">
-        <span class="gems">Free questions <span class="gems__row"><i></i><i></i><i class="is-empty"></i></span> 2/3</span>
-        <span class="gems is-empty">Free questions <span class="gems__row"><i class="is-empty"></i><i class="is-empty"></i><i class="is-empty"></i></span> 0/3</span>
-      </div>
+      <h3>.ask — 자유 질문</h3>
+      <form class="ask" style="width:1100px" onsubmit="return false"><input class="ask__input" placeholder="Ask anything…" aria-label="Ask anything"><button class="btn">Ask</button></form>
+
+      <h3>.person — 기본 · 새것 · 선택 · 본 것 · 불가(2026의 지수)</h3>
+      <ul class="people" style="width:1100px">
+        <li class="person"><span class="person__status"><span class="mark mark--star"></span></span><span class="portrait portrait--sm" data-initial="J"></span><span class="person__name">Jisu</span><span class="person__role">CTO</span></li>
+        <li class="person is-selected"><span class="person__status"></span><span class="portrait portrait--sm" data-initial="M"></span><span class="person__name">Minjae</span><span class="person__role">Lead dev</span></li>
+        <li class="person is-visited"><span class="person__status"><span class="mark mark--check"></span></span><span class="portrait portrait--sm" data-initial="K"></span><span class="person__name">Kim</span><span class="person__role">Guard</span></li>
+        <li class="person is-disabled"><span class="person__status"><span class="mark mark--dash"></span></span><span class="portrait portrait--sm" data-initial="J"></span><span class="person__name">Jisu</span><span class="person__role">Deceased</span></li>
+      </ul>
+
+      <h3>.log__entry — 사건 기록: 기본 · 새것 · 고름 · 모순</h3>
+      <ul class="log" style="width:600px">
+        <li class="log__entry"><span class="log__time">21:00</span><span class="log__who">Minjae · 2026</span><span class="log__text">"I left at nine."</span></li>
+        <li class="log__entry is-new"><span class="log__time">22:30</span><span class="log__who">Kim · 2026 <span class="badge-new">NEW</span></span><span class="log__text">Minjae asked to cut the CCTV</span></li>
+        <li class="log__entry is-picked"><span class="log__time">22:50</span><span class="log__who">Minjae · 2016</span><span class="log__text">"I'm home."</span></li>
+        <li class="log__entry is-contradiction"><span class="log__time">22:30</span><span class="log__who">Kim · 2026</span><span class="log__text">Minjae asked to cut the CCTV</span></li>
+      </ul>
 
       <h3>.keyhints</h3>
       <div class="keyhints"><span><span class="key">↑↓</span>Select</span><span><span class="key">Enter</span>Confirm</span><span><span class="key">Esc</span>Back</span><span><span class="key">1</span>–<span class="key">9</span>Quick pick</span></div>
 
-      <h3>.portrait — 인물 미확정: 틀만 정의 (자리표시 · sm · 본 것 · 선택). 위 메인 화면의 얼굴은 임시 시안 그림</h3>
-      <div class="row"><span class="portrait" data-initial="M"></span><span class="portrait portrait--sm" data-initial="T"></span><span class="portrait is-visited" data-initial="G"></span><span class="portrait is-selected" data-initial="R"></span></div>
+      <h3>.portrait — 인물 미확정: 틀만 정의 (자리표시 · sm · 본 것 · 선택). 지수 외 모두 2016·2026 두 장</h3>
+      <div class="row"><span class="portrait" data-initial="M"></span><span class="portrait portrait--sm" data-initial="K"></span><span class="portrait is-visited" data-initial="G"></span><span class="portrait is-selected" data-initial="D"></span></div>
 
       <h3>.clue — 기본 · 새것 · 모순(빨강 + 점선 + !)</h3>
       <div class="row" style="align-items:stretch">
-        <div class="clue" style="width:600px"><span class="portrait portrait--sm" data-initial="M"></span><div class="clue__body"><span class="clue__title">Martin's alibi</span><span>"I heard 702's door at 23:15."</span><span><span class="tag tag--info">Heard</span></span></div></div>
-        <div class="clue is-new" style="width:600px"><span class="portrait portrait--sm" data-initial="R"></span><div class="clue__body"><span class="clue__title">Sunglasses</span><span>Worn indoors. At night.</span><span class="badge-new">NEW</span></div></div>
-        <div class="clue is-contradiction" style="width:600px"><span class="portrait portrait--sm" data-initial="V"></span><div class="clue__body"><span class="clue__title">Vivian, 23:20</span><span>"Asleep" — light was on.</span><span><span class="tag tag--danger">Contradiction</span></span></div></div>
+        <div class="clue" style="width:600px"><span class="portrait portrait--sm" data-initial="D"></span><div class="clue__body"><span class="clue__title">Dohyun's car, 21:10</span><span>Left the parking lot.</span><span><span class="tag tag--success">Alibi</span></span></div></div>
+        <div class="clue is-new" style="width:600px"><span class="portrait portrait--sm" data-initial="G"></span><div class="clue__body"><span class="clue__title">Last email, 23:00</span><span>"It's about a team member."</span><span class="badge-new">NEW</span></div></div>
+        <div class="clue is-contradiction" style="width:600px"><span class="portrait portrait--sm" data-initial="M"></span><div class="clue__body"><span class="clue__title">Minjae, 21:00</span><span>"Left at nine" — back at 22:30.</span><span><span class="tag tag--danger">Contradiction</span></span></div></div>
       </div>
 
       <h3>.dialog — 화자 탭 · 단서 &lt;em&gt; · 모순 &lt;del&gt;</h3>
       <div class="win dialog-window" style="margin-top:56px">
-        <div class="win name-tab">Rosalind</div>
-        <p class="dialog__text">I was <del>asleep by eleven</del>. Ask <em>Martin</em> if you don't believe me.</p>
+        <div class="win name-tab">Minjae · 2026</div>
+        <p class="dialog__text">I left <del>around nine</del>. Ask <em>Kim</em> if you don't believe me.</p>
         <span class="dialog__next"></span>
       </div>
     </div>
@@ -254,54 +258,155 @@
 <script type="module">
   import { createDialog } from "./dialog.js";
 
-  /* ---- Dialogue ---- */
-  const dialog = createDialog(document.getElementById("narration"), [
-    { text: "Deck 7 is quiet. Everyone says they were in their rooms." },
-    { text: "Someone on this deck is <em>lying</em>." },
-    { speaker: "Rosalind", text: "I was <del>asleep by eleven</del>. Ask <em>Martin</em> if you don't believe me." },
+  /* ---- Gallery demo data. Real replies come from the backend; log entries: [order, time label, text] ---- */
+  const PEOPLE = [
+    { id: "jisu",   name: "Jisu",   role: { 2016: "CTO" } },
+    { id: "dohyun", name: "Dohyun", role: { 2016: "CEO", 2026: "Unicorn CEO" } },
+    { id: "minjae", name: "Minjae", role: { 2016: "Lead dev", 2026: "Nova AI CEO" } },
+    { id: "hana",   name: "Hana",   role: { 2016: "Design intern", 2026: "IT reporter" } },
+    { id: "kim",    name: "Kim",    role: { 2016: "Guard", 2026: "Retired" } },
+    { id: "grace",  name: "Grace",  role: { 2016: "Investor", 2026: "Investor" } },
+  ];
+  const Q = (q, a, log) => ({ q, a, log });
+  const PRESETS = {
+    "jisu-2016":   [Q("Are you okay?", "Something's off. Someone pushed our code <em>outside</em>.", [3, "Mar 14", "Code pushed out via deploy-bot"]),
+                    Q("How did the company start?", "Funny thing. Minjae built the <em>first prototype</em>. I just rewrote it.", [0, "2015", "Minjae built the first prototype"]),
+                    Q("What's tomorrow?", "We sign with Grace. Big day.")],
+    "dohyun-2016": [Q("What was the fight about?", "<em>User numbers</em>. Drop it.", [5, "21:00", "Fought with Jisu over user numbers"]),
+                    Q("When are you leaving?", "Now. Ten past nine, I'm out.", [6, "21:10", "Dohyun leaves the lot"]),
+                    Q("Big day tomorrow?", "The biggest.")],
+    "dohyun-2026": [Q("Did you fight with Jisu?", "We <del>never fought</del>.", [5, "21:00", "\"We never fought.\""]),
+                    Q("What happened after?", "I went home. Ask the parking log."),
+                    Q("Do you miss her?", "Every day.")],
+    "minjae-2016": [Q("Where are you right now?", "I'm <em>home</em>. Getting the demo ready for tomorrow.", [10, "22:50", "\"I'm home.\""]),
+                    Q("Who has the deploy-bot key?", "Jisu, Dohyun and me. Why?", [2, "Mar", "deploy-bot key: Jisu, Dohyun, Minjae"]),
+                    Q("How's the team tonight?", "Tense. Jisu and Dohyun had a fight.")],
+    "minjae-2026": [Q("When did you leave that night?", "Around <em>nine</em>. I went straight home.", [4, "21:00", "\"I left at nine.\""]),
+                    Q("Did you come back later?", "…I stopped by at <em>10:30</em> for my laptop. A minute.", [7, "22:30", "\"Back for my laptop.\""]),
+                    Q("What's Nova AI to you?", "My company. We built it from nothing.")],
+    "hana-2016":   [Q("Did you see anyone?", "Someone in a <em>gray hoodie</em> by the server room. No face.", [8, "22:45", "Gray hoodie near the server room"]),
+                    Q("Why are you still here?", "Deadline. Interns don't go home."),
+                    Q("Heard anything tonight?", "Dohyun yelling at Jisu around nine.", [5, "21:00", "Heard Dohyun and Jisu fight"])],
+    "hana-2026":   [Q("Anything on Nova AI?", "I covered it in 2024. Minjae signed with <em>Nova</em> in March 2016.", [1, "Mar 10", "Minjae's secret Nova contract"]),
+                    Q("Who wears a gray hoodie?", "Minjae. Every single day."),
+                    Q("Why reporting now?", "Some stories don't let go.")],
+    "kim-2016":    [Q("Is the CCTV on?", "It's <em>broken</em> tonight. Nothing I can do.", [10, "22:50", "\"The CCTV is broken.\""]),
+                    Q("Anyone still here?", "A few. The intern, the CTO."),
+                    Q("Quiet night?", "Same as always.")],
+    "kim-2026":    [Q("Was the CCTV really broken?", "No. At <em>10:30</em> Minjae asked me to <em>turn off</em> the camera.", [7, "22:30", "Minjae asked to cut the CCTV"]),
+                    Q("Why stay quiet?", "He said it was server maintenance. I believed him."),
+                    Q("How have you been?", "Retired. I sleep badly.")],
+    "grace-2016":  [Q("Anything strange lately?", "Jisu asked who can see the <em>code escrow</em>. Last week.", [1, "Mar 8", "Jisu asked about code escrow"]),
+                    Q("Is the deal safe?", "We sign tomorrow. Nothing changes that."),
+                    Q("Heard from Jisu tonight?", "Not yet.")],
+    "grace-2026":  [Q("Did Jisu contact you?", "She emailed at <em>11:00</em>. It's about a team member.", [11, "23:00", "Jisu's last email to Grace"]),
+                    Q("Did you know of a problem?", "No. Nothing <del>seemed wrong</del>.", [1, "Mar 8", "\"Nothing seemed wrong.\""]),
+                    Q("Why push the signing?", "The fund had its own clock.")],
+  };
+  // Correct contradiction pairs, by "person-year-question index"
+  const PAIRS = [["minjae-2026-0", "kim-2026-0"], ["minjae-2016-0", "kim-2026-0"], ["dohyun-2026-0", "dohyun-2016-0"],
+                 ["dohyun-2026-0", "hana-2016-2"], ["grace-2026-1", "grace-2016-0"]];
+
+  const $ = (id) => document.getElementById(id);
+  let year = 2016, person = 2, q = 0;
+  const asked = new Set(), log = new Map(), picked = new Set();
+  const key = () => `${PEOPLE[person].id}-${year}`;
+  const available = (i) => PEOPLE[i].role[year];
+
+  const dialog = createDialog($("dialog"), [
+    { text: "2026. Cold Case Unit. A dead radio just turned on." },
+    { speaker: "Jisu · 2016", text: "…Hello? Nobody uses this channel. Who is this?" },
   ]);
 
-  /* ---- One cursor shared by keyboard and mouse ---- */
-  const list = [...document.querySelectorAll("#where .choice")];
-  const cells = document.querySelectorAll("#main .cell");
-  let idx = 0;
-  const select = (i) => {
-    list.forEach((li) => { li.classList.remove("is-selected"); li.setAttribute("aria-selected", "false"); });
-    idx = (i + list.length) % list.length;
-    list[idx].classList.add("is-selected"); list[idx].setAttribute("aria-selected", "true");
-    cells.forEach((c) => c.classList.toggle("is-selected", c.dataset.room === list[idx].dataset.room));
+  const renderPeople = () => {
+    $("people").innerHTML = PEOPLE.map((p, i) => {
+      const off = !available(i), all = !off && PRESETS[`${p.id}-${year}`].every((_, j) => asked.has(`${p.id}-${year}-${j}`));
+      const mark = off ? '<span class="mark mark--dash"></span>' : all ? '<span class="mark mark--check"></span>' : asked.has(`${p.id}-${year}-seen`) ? "" : '<span class="mark mark--star" aria-label="New"></span>';
+      return `<li class="person${i === person ? " is-selected" : ""}${off ? " is-disabled" : ""}${all ? " is-visited" : ""}" data-i="${i}" aria-disabled="${off}">
+        <span class="person__status">${mark}</span><span class="portrait portrait--sm" data-initial="${p.name[0]}"></span>
+        <span class="person__name">${p.name}</span><span class="person__role">${off ? "Deceased" : p.role[year]}</span></li>`;
+    }).join("");
   };
-  select(0);
-  list.forEach((li, i) => { li.addEventListener("mouseenter", () => select(i)); li.addEventListener("click", () => { select(i); confirmChoice(); }); });
-  cells.forEach((c) => c.addEventListener("mouseenter", () => { const i = list.findIndex((l) => l.dataset.room === c.dataset.room); if (i >= 0) select(i); }));
+  const renderQuestions = () => {
+    $("questions").innerHTML = PRESETS[key()].map((x, j) => {
+      const done = asked.has(`${key()}-${j}`);
+      return `<li class="choice${j === q ? " is-selected" : ""}${done ? " is-visited" : ""}" role="option" aria-selected="${j === q}" data-j="${j}">
+        <span class="choice__label"><span class="choice__key">${j + 1}</span><span>${x.q}</span></span><span class="mark${done ? " mark--check" : ""}"></span></li>`;
+    }).join("");
+  };
+  const renderLog = () => {
+    const rows = [...log.entries()].sort((a, b) => a[1].order - b[1].order);
+    $("log").innerHTML = rows.map(([id, e]) => `<li class="log__entry${e.isNew ? " is-new" : ""}${picked.has(id) ? " is-picked" : ""}${e.contra ? " is-contradiction" : ""}" data-id="${id}" tabindex="0">
+      <span class="log__time">${e.time}</span><span class="log__who">${e.who}</span><span class="log__text">${e.text}</span></li>`).join("");
+    $("log-count").textContent = log.size;
+    $("contra-btn").disabled = picked.size !== 2;
+    $("pick-hint").textContent = picked.size === 2 ? "Ready" : `Pick ${2 - picked.size} more`;
+  };
+  const render = () => { renderPeople(); renderQuestions(); renderLog(); };
 
-  /* ---- Confirm → feedback (toast + notebook count) ---- */
-  const toast = document.getElementById("toast");
-  const nb = document.getElementById("nb-count");
-  const showToast = (msg) => {
-    document.getElementById("toast-text").textContent = msg;
-    toast.hidden = true; void toast.offsetWidth; toast.hidden = false;   // restart the animation
+  const showToast = (msg) => { $("toast-text").innerHTML = msg; $("toast").hidden = true; void $("toast").offsetWidth; $("toast").hidden = false; };
+
+  const selectPerson = (i) => {
+    const n = PEOPLE.length; i = (i + n) % n;
+    if (!available(i)) i = (i + (i >= person ? 1 : -1) + n) % n;   // skip Jisu in 2026
+    person = i; q = 0; asked.add(`${key()}-seen`); render();
   };
-  const confirmChoice = () => {
-    const li = list[idx];
-    if (li.classList.contains("is-disabled")) return showToast("The stern deck is locked tonight.");
-    if (!li.classList.contains("is-visited")) {
-      li.classList.add("is-visited");
-      li.querySelector(".mark").className = "mark mark--check";
-      cells.forEach((c) => { if (c.dataset.room === li.dataset.room) c.querySelectorAll(".cell__person").forEach((p) => p.classList.add("is-visited")); });
-      nb.textContent = +nb.textContent + 1; nb.classList.add("is-new");
-      showToast(`Clue added to notebook (${nb.textContent})`);
-    } else showToast("Nothing new here.");
+  const setYear = (y) => {
+    year = y;
+    $("stage").className = `stage stage--${y}`;
+    $("hud-time").textContent = y === 2016 ? "MAR 15, 2016  22:50" : "NOV 9, 2026   23:23";
+    $("hud-place").textContent = y === 2016 ? "Moonlight Labs · Radio" : "Cold Case Unit · Seoul";
+    $("year").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", +b.dataset.year === y));
+    if (!available(person)) person = 1;
+    q = 0; asked.add(`${key()}-seen`); render();
   };
+  const ask = () => {
+    const x = PRESETS[key()][q], id = `${key()}-${q}`;
+    asked.add(id);
+    dialog.say([{ speaker: `${PEOPLE[person].name} · ${year}`, text: x.a }]);
+    if (x.log && !log.has(id)) {
+      log.forEach((e) => (e.isNew = false));
+      log.set(id, { order: x.log[0], time: x.log[1], text: x.log[2], who: `${PEOPLE[person].name} · ${year}`, isNew: true });
+      showToast(`<span class="badge-new">NEW</span> Case log: ${x.log[2]}`);
+    }
+    render();
+  };
+
+  $("people").addEventListener("click", (e) => { const li = e.target.closest(".person"); if (li && li.getAttribute("aria-disabled") !== "true") selectPerson(+li.dataset.i); });
+  $("questions").addEventListener("click", (e) => { const li = e.target.closest(".choice"); if (li) { q = +li.dataset.j; ask(); } });
+  $("questions").addEventListener("mouseover", (e) => { const li = e.target.closest(".choice"); if (li && +li.dataset.j !== q) { q = +li.dataset.j; renderQuestions(); } });
+  $("year").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) setYear(+b.dataset.year); });
+  $("ask").addEventListener("submit", (e) => {
+    e.preventDefault();
+    const input = $("ask-input"); if (!input.value.trim()) return;
+    input.disabled = true;
+    dialog.say([{ speaker: `${PEOPLE[person].name} · ${year}`, text: "…" }]);
+    setTimeout(() => { dialog.say([{ speaker: `${PEOPLE[person].name} · ${year}`, text: "(The AI agent answers here.)" }]); input.value = ""; input.disabled = false; input.focus(); }, 600);
+  });
+  const togglePick = (id) => { picked.has(id) ? picked.delete(id) : picked.size < 2 && picked.add(id); renderLog(); };
+  $("log").addEventListener("click", (e) => { const li = e.target.closest(".log__entry"); if (li) togglePick(li.dataset.id); });
+  $("log").addEventListener("keydown", (e) => { const li = e.target.closest(".log__entry"); if (li && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); e.stopPropagation(); togglePick(li.dataset.id); } });
+  $("contra-btn").addEventListener("click", () => {
+    const [a, b] = picked;
+    const hit = PAIRS.some(([x, y]) => (x === a && y === b) || (x === b && y === a));
+    if (hit) { log.get(a).contra = log.get(b).contra = true; showToast(`<span class="tag tag--danger">Contradiction</span> ${log.get(a).who} vs ${log.get(b).who}`); }
+    else showToast("No conflict.");
+    picked.clear(); renderLog();
+  });
+  $("graph-btn").addEventListener("click", () => showToast("The timeline graph opens here (next wireframe)."));
 
   /* ---- Accuse confirmation: default focus = cancel, Esc = cancel ---- */
-  const modal = document.getElementById("modal");
+  const modal = $("modal");
   let lastFocus;
-  const openModal = () => { lastFocus = document.activeElement; modal.hidden = false; document.getElementById("modal-cancel").focus(); };
+  const openModal = () => {
+    const p = PEOPLE[person];
+    $("modal-title").textContent = `Accuse ${p.name}?`; $("modal-portrait").dataset.initial = p.name[0];
+    lastFocus = document.activeElement; modal.hidden = false; $("modal-cancel").focus();
+  };
   const closeModal = () => { modal.hidden = true; lastFocus?.focus?.(); };
-  document.getElementById("accuse-btn").addEventListener("click", openModal);
-  document.getElementById("modal-cancel").addEventListener("click", closeModal);
-  document.getElementById("modal-ok").addEventListener("click", () => { closeModal(); showToast("Case closed. (demo)"); });
+  $("accuse-btn").addEventListener("click", openModal);
+  $("modal-cancel").addEventListener("click", closeModal);
+  $("modal-ok").addEventListener("click", () => { closeModal(); showToast("Next: pick the motive (next wireframe)."); });
 
   addEventListener("keydown", (e) => {
     if (!modal.hidden) {
@@ -312,23 +417,29 @@
       }
       return;                                    // block the screen behind while the modal is open
     }
-    if (e.target.closest(".doc")) return;
-    if (e.key === "ArrowDown") { e.preventDefault(); select(idx + 1); }
-    else if (e.key === "ArrowUp") { e.preventDefault(); select(idx - 1); }
-    else if (/^[1-9]$/.test(e.key) && list[+e.key - 1]) select(+e.key - 1);
-    else if (e.key === "Enter") confirmChoice();
+    if (e.target.closest(".doc") || e.target.matches("input")) return;
+    const n = PRESETS[key()].length;
+    if (e.key === "ArrowRight") { e.preventDefault(); selectPerson(person + 1); }
+    else if (e.key === "ArrowLeft") { e.preventDefault(); selectPerson(person - 1); }
+    else if (e.key === "ArrowDown") { e.preventDefault(); q = (q + 1) % n; renderQuestions(); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); q = (q - 1 + n) % n; renderQuestions(); }
+    else if (/^[1-9]$/.test(e.key) && +e.key <= n) { q = +e.key - 1; ask(); }
+    else if (e.key === "Enter" && !e.target.closest("button, .log__entry")) ask();
     else if (e.key === " ") { e.preventDefault(); dialog.advance(); }
+    else if (e.key.toLowerCase() === "y") setYear(year === 2016 ? 2026 : 2016);
     else if (e.key.toLowerCase() === "a") openModal();
   });
+
+  asked.add(`${key()}-seen`); render();
 
   /* ---- Settings: one attribute on <html> ---- */
   document.querySelectorAll(".stepper").forEach((st) => st.addEventListener("click", (e) => {
     const b = e.target.closest("button"); if (!b) return;
     st.querySelectorAll("button").forEach((x) => x.setAttribute("aria-pressed", x === b));
     const attr = st.dataset.attr;
-    if (attr === "scale") return window.DeckStage.setMode(b.dataset.v);
+    if (attr === "scale") return window.GameStage.setMode(b.dataset.v);
     if (b.dataset.v) document.documentElement.dataset[attr] = b.dataset.v; else delete document.documentElement.dataset[attr];
-    window.DeckStage.refit();
+    window.GameStage.refit();
   }));
 </script>
 </body>

@@ -1,6 +1,6 @@
 /* =========================================================
-   DECK SEVEN — Design Tokens v4
-   Visual source: Figma "Deck Seven 스타일 시안", node 26:67
+   11:23 — Design Tokens v5
+   Visual source: Figma "Deck Seven 스타일 시안", node 26:67 (pixel style kept; story changed to 11:23)
    Rationale for every rule: RULES.md
 
    Pixel grid
@@ -42,6 +42,8 @@
   --c-surface:       rgb(5 4 12 / var(--surface-alpha, 0.86));
   --c-surface-cell:  var(--p-ink-800);            /* opaque, so contrast does not depend on the art behind it */
   --c-surface-hover: var(--p-ink-600);
+  --c-scene-2016:    var(--p-ink-800);            /* placeholder scene colours until background art exists */
+  --c-scene-2026:    var(--p-ink-1000);
   --c-scrim:         rgb(5 4 12 / 0.72);          /* dims the screen behind a modal */
 
   /* Lines */
@@ -59,8 +61,6 @@
   --c-accent:        var(--p-amber-400);  /* ★ NEW, current step, selection outline */
   --c-accent-hover:  var(--p-amber-200);
   --c-check:         var(--p-lilac-400);
-  --c-gem:           var(--p-lilac-400);
-  --c-gem-empty:     var(--p-slate-500);
   --c-cursor:        var(--p-lilac-200);
   --c-cursor-ink:    var(--p-ink-1000);
   --c-focus:         var(--p-amber-400);  /* keyboard focus uses the selection colour */
@@ -120,24 +120,23 @@
   --stage-w: 1920px; --stage-h: 1080px;
   --stage-gutter: 48px; --stage-top: 40px;
 
-  --win-hud-w: 424px;  --win-hud-h: 112px;
+  --win-main-w: 1176px; --win-side-w: 616px;        /* 48 + 1176 + 32 + 616 + 48 = 1920 */
+  --win-hud-h: 112px;
   --win-menu-w: 376px; --win-menu-h: 72px;
-  --win-map-w: 1176px; --win-main-h: 544px;
-  --win-side-w: 616px;
-  --win-dialog-w: 1600px; --win-dialog-h: 232px;   /* 3 lines of dialogue + 40px padding top and bottom + borders */
+  --win-people-h: 248px;   /* 192 person tile + padding + borders */
+  --win-ask-h: 296px;      /* 3 choices (168) + gap + ask input (64), no title: the selected person and the name tab say who is asked */
+  --win-dialog-h: 232px;   /* 3 lines of dialogue + 40px padding top and bottom + borders; 60ch at 32px fits in 1176 */
   --hint-h: 48px;                                   /* key hint row at the bottom */
 
   --tab-h: 64px; --tab-offset-x: 40px; --tab-overlap: 16px;
 
   --seg-w: 40px; --seg-w-current: 64px; --seg-h: 12px; --seg-gap: 8px;
 
-  --cell-w: 168px; --cell-w-wide: 256px; --cell-h: 336px;
   --portrait-md: 120px; --portrait-sm: 96px;
 
   --list-row: 56px;        /* 37px in a 1280px browser, above the WCAG 2.5.8 24px target */
   --list-cursor: 28px;
 
-  --hull-h: 90px;
 }
 
 /* ---------- Large text: chosen in settings, or switched on by stage.js when info text would drop below 16 browser px ---------- */
@@ -155,7 +154,6 @@
   --c-text-info:    var(--p-lilac-200);
   --c-text-disabled:var(--p-lilac-400);   /* 7.4:1 */
   --c-check:        var(--p-lilac-200);
-  --c-gem:          var(--p-lilac-200);
   --c-danger:       var(--p-red-300);
   --c-line-dim:     var(--p-lilac-400);
 }

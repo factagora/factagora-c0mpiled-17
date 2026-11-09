@@ -33,7 +33,7 @@ const ro = new ResizeObserver((entries) => entries.forEach((e) => fit(e.target))
 document.querySelectorAll(".stage-viewport").forEach((vp) => { fit(vp); ro.observe(vp); });
 
 // Called from settings
-window.DeckStage = {
+window.GameStage = {
   setMode(mode) {   // "fit" | "crisp"
     document.querySelectorAll(".stage-viewport").forEach((vp) => {
       if (mode === "crisp") vp.dataset.scale = "crisp"; else delete vp.dataset.scale;
