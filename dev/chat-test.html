@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chat test</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; max-width: 720px; margin: 24px auto; padding: 0 16px; }
+    form, .row { display: flex; gap: 8px; flex-wrap: wrap; margin: 8px 0; }
+    input[name=question] { flex: 1; min-width: 200px; }
+    h2 { font-size: 18px; margin: 24px 0 8px; }
+    h3 { font-size: 15px; margin: 16px 0 4px; color: #444; }
+    p { margin: 4px 0; }
+    .who { font-weight: 600; }
+    .muted { color: #666; font-size: 14px; }
+    li button, p button { margin-left: 8px; font-size: 13px; }
+  </style>
+</head>
+<body>
+  <h1>Chat test</h1>
+  <p class="muted">A connection check, not the game screen. Turns are saved in this browser only.</p>
+
+  <div class="row">
+    <label>Time <select id="timepoint"></select></label>
+    <label>Person <select id="character"></select></label>
+    <button id="reset" type="button">New game</button>
+  </div>
+  <form id="ask">
+    <input name="question" placeholder="Ask something" required maxlength="500" autocomplete="off">
+    <button>Send</button>
+  </form>
+  <p id="error" class="muted"></p>
+
+  <h2>Pinned cards <span class="muted">(sent as evidence with every question, up to 10)</span></h2>
+  <ul id="pins"></ul>
+
+  <h2>Case log <span class="muted">(all time points, in in-game time order)</span></h2>
+  <div id="log"></div>
+
+  <script type="module">
+    import { loadGame, newGame, ask, pin, unpin, caseLog } from "/game/store.js";
+
+    const { timepoints, characters } = await (await fetch("/api/characters")).json();
+    const names = Object.fromEntries(Object.entries(characters).map(([id, c]) => [id, c.name]));
+    const labels = Object.fromEntries(timepoints.map((t) => [t.id, t.label]));
+    const tpSel = document.getElementById("timepoint");
+    const charSel = document.getElementById("character");
+    const pinsEl = document.getElementById("pins");
+    const logEl = document.getElementById("log");
+    const errorEl = document.getElementById("error");
+    let game = loadGame();
+
+    tpSel.append(...timepoints.map((t) => new Option(t.label, t.id)));
+    tpSel.value = "T2016";
+    function fillCharacters() {
+      charSel.replaceChildren(
+        ...Object.entries(characters).filter(([, c]) => c.timepoints.includes(tpSel.value)).map(([id, c]) => new Option(c.name, id)),
+      );
+    }
+    tpSel.onchange = fillCharacters;
+    fillCharacters();
+
+    function button(text, onclick) {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.textContent = text;
+      b.onclick = onclick;
+      return b;
+    }
+
+    function render() {
+      pinsEl.replaceChildren(
+        ...game.pins.map((card) => {
+          const li = document.createElement("li");
+          li.append(`${card.text} `, Object.assign(document.createElement("span"), { className: "muted", textContent: `[${card.refs.join(", ")}]` }),
+            button("Unpin", () => { unpin(game, card.text); render(); }));
+          return li;
+        }),
+      );
+      logEl.replaceChildren();
+      let current = null;
+      for (const t of caseLog(game)) {
+        if (t.timepoint !== current) {
+          current = t.timepoint;
+          const h = document.createElement("h3");
+          h.textContent = labels[current] || current;
+          logEl.append(h);
+        }
+        const q = document.createElement("p");
+        q.className = "muted";
+        q.textContent = `You → ${names[t.character] || t.character}: ${t.question}`;
+        const a = document.createElement("p");
+        const who = document.createElement("span");
+        who.className = "who";
+        who.textContent = `${names[t.character] || t.character}: `;
+        a.append(who, t.answer, button("Pin", () => { if (!pin(game, t, names)) errorEl.textContent = "Already pinned, or 10 cards are pinned."; render(); }));
+        logEl.append(q, a);
+      }
+    }
+    render();
+
+    document.getElementById("reset").onclick = () => { game = newGame(); errorEl.textContent = ""; render(); };
+
+    document.getElementById("ask").onsubmit = async (event) => {
+      event.preventDefault();
+      const form = event.target;
+      const question = form.question.value.trim();
+      if (!question) return;
+      form.question.value = "";
+      form.querySelector("button").disabled = true;
+      errorEl.textContent = "";
+      try {
+        await ask(game, charSel.value, tpSel.value, question);
+        render();
+      } catch (e) {
+        errorEl.textContent = `Error: ${e.message}`;
+      } finally {
+        form.querySelector("button").disabled = false;
+      }
+    };
+  </script>
+</body>
+</html>

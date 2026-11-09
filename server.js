@@ -1,20 +1,25 @@
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
-const { TIMEPOINTS, NAMES, appearsAt, spacesOf, hiddenRefs, systemPrompt, screenText } = require("./characters");
-const { judgeScored } = require("./scoring");
-const { createLeaderboard, createVerdictStore, parseNick } = require("./leaderboard");
-const { createLimiter, clientKey } = require("./ratelimit");
+const { TIMEPOINTS, NAMES, appearsAt, spacesOf, hiddenRefs, systemPrompt, screenText } = require("./lib/characters");
+const { judgeScored } = require("./lib/scoring");
+const { createLeaderboard, createVerdictStore, parseNick } = require("./lib/leaderboard");
+const { createLimiter, clientKey } = require("./lib/ratelimit");
+const { readSpace } = require("./lib/tckg");
+const { chat } = require("./lib/llm");
 
 const port = process.env.PORT || 3000;
 const board = createLeaderboard();
 const verdicts = createVerdictStore();
 const accuseAllowed = createLimiter({ max: 5, windowMs: 60 * 1000 });
+const askAllowed = createLimiter({ max: 30, windowMs: 60 * 1000 });   // one LLM call per question
 
 const GAME_FILE = path.join(__dirname, "game", "index.html");
 const STATIC = {
-  "/client/": path.join(__dirname, "client"),
+  "/game/": path.join(__dirname, "game"),               // game screen: style.css, main.js, store.js
   "/assets/": path.join(__dirname, "game", "assets"),   // portraits, backgrounds, item icons
+  // Developer pages (chat test) only when DEV_PAGES=1, so production does not serve them.
+  ...(process.env.DEV_PAGES === "1" ? { "/dev/": path.join(__dirname, "dev") } : {}),
 };
 
 const MIME = {
@@ -29,7 +34,6 @@ const MIME = {
   ".json": "application/json; charset=utf-8",
 };
 
-const TCKG_BASE = "https://tckg.app.factagora.com";
 const MAX_BODY = 64 * 1024;
 
 function notFound(res) {
@@ -122,47 +126,9 @@ function parseAsk(b) {
   };
 }
 
-// One retry when the connection drops ("fetch failed"); timeouts and HTTP errors are not retried.
-async function fetchRetry(url, opts) {
-  try {
-    return await fetch(url, opts);
-  } catch (e) {
-    if (e.name === "TimeoutError") throw e;
-    return fetch(url, opts);
-  }
-}
-
-// Every memory in a space known as of the time point (spaces are small, so no search; reads are free).
-async function readSpace(space, asOf) {
-  const items = [];
-  let after = null;
-  do {
-    const q = new URLSearchParams({ as_of: asOf, space, limit: "200", ...(after ? { after } : {}) });
-    const res = await fetchRetry(`${TCKG_BASE}/api/${process.env.TCKG_COLLECTION_ID}/v1/memories?${q}`, {
-      headers: { Authorization: `Bearer ${process.env.TCKG_TOKEN}` },
-      signal: AbortSignal.timeout(20000),
-    });
-    if (!res.ok) throw new Error(`tckg memories returned ${res.status}: ${(await res.text()).slice(0, 200)}`);
-    const page = await res.json();
-    items.push(...page.items);
-    after = page.next;
-  } while (after);
-  return items.map((m) => ({ id: m.id, ref: m.payload?.ref, type: m.payload?.type, said: m.asserted_at, statement: m.statement }));
-}
-
-async function chat(messages) {
-  const res = await fetchRetry(`${process.env.AOAI_ENDPOINT.replace(/\/$/, "")}/openai/v1/chat/completions`, {
-    method: "POST",
-    headers: { "api-key": process.env.AOAI_API_KEY, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: process.env.AOAI_DEPLOYMENT, messages, reasoning_effort: "low", response_format: { type: "json_object" } }),
-    signal: AbortSignal.timeout(60000),
-  });
-  if (!res.ok) throw new Error(`AOAI returned ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  return (await res.json()).choices[0].message.content.trim();
-}
-
 async function handleAsk(req, res) {
   const started = Date.now();
+  if (!askAllowed(clientKey(req))) return sendJson(res, 429, { error: "Too many questions. Wait a minute and try again." });
   let body;
   try {
     body = await readJson(req);

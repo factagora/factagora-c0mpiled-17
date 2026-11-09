@@ -1,0 +1,464 @@
+/* layout: pixel night sky behind; double-line "windows" float on top — HUD boxes, a map window + a menu window, a case-file dialogue box at the bottom */
+:root{
+  --sky1:#0d0930; --sky2:#2a1f86; --sea:#120e4c;
+  --panel:rgba(11,9,44,.88); --solid:#0b092c; --fg:#eceaff; --muted:#a3a0dc; --dim:#6f6cab;
+  --gold:#f5c451; --green:#6fdc8c; --cyan:#7fd6ff; --red:#ff6b7f; --portrait:#2c3aa8; --skin:#e2ae86;
+  --px:'DotGothic16','MS Gothic','Osaka-Mono',ui-monospace,monospace;
+  color-scheme:dark;
+}
+html,body{height:100%}
+body{background:var(--sky1);color:var(--fg);font-family:var(--px);font-size:17px;line-height:1.6;-webkit-font-smoothing:none}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:60;background:var(--sky1)}
+#sky{position:fixed;inset:0;width:100%;height:100%;z-index:0;image-rendering:pixelated}
+/* map background by timepoint: 2015-2019 office at night, 2025-2026 seoul; a scrim keeps the windows readable */
+#eraBg{position:fixed;inset:0;z-index:0;display:none;contain:strict}
+#eraBg i{position:absolute;inset:0;background:center/cover no-repeat;image-rendering:auto;opacity:0;transition:opacity .45s ease;will-change:opacity}
+#eraBg .bg-office{background-image:url("/assets/bg/bg_office_2016.webp")}
+#eraBg .bg-seoul{background-image:url("/assets/bg/bg_seoul_2026.webp")}
+#eraBg::after{content:"";position:absolute;inset:0;background:rgba(11,9,44,.55)}
+html[data-screen="map"] #eraBg,html[data-screen="places"] #eraBg{display:block}
+html[data-bg="office"] #eraBg .bg-office,html[data-bg="seoul"] #eraBg .bg-seoul{opacity:1}
+/* radio timepoints: a light static over portraits (in person in 2026, so no static) */
+#plan.radio .ph.art::after{content:"";position:absolute;inset:-48px;background-image:var(--snow);background-size:48px 48px;opacity:.16;animation:snow .5s steps(4) infinite;pointer-events:none;will-change:transform}
+@keyframes snow{0%{transform:translate(0,0)}25%{transform:translate(-17px,9px)}50%{transform:translate(11px,-21px)}75%{transform:translate(-7px,14px)}}
+@media (prefers-reduced-motion:reduce){#plan.radio .ph.art::after{animation:none}}
+#noise{position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:65;opacity:0;image-rendering:pixelated;transition:opacity .25s}
+.scanlines{position:fixed;inset:0;pointer-events:none;z-index:70;background:repeating-linear-gradient(0deg,rgba(0,0,0,.12) 0 1px,transparent 1px 3px)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+.wrap{position:relative;z-index:1;max-width:1600px;margin:0 auto;box-sizing:border-box;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:18px 40px}
+h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
+
+/* the window frame: outer thick line, gap, inner thin line */
+.win{position:relative;background:var(--panel);border:2px solid var(--fg);box-shadow:inset 0 0 0 3px var(--solid),inset 0 0 0 4px var(--fg),0 0 0 2px var(--solid);padding:22px 24px;box-sizing:border-box;min-width:0}
+.wtitle{color:var(--gold);letter-spacing:.08em;text-transform:uppercase;font-size:clamp(18px,2vw,24px)}
+.tablabel{position:absolute;top:-28px;left:36px;padding:4px 18px;font-size:clamp(17px,2vw,22px);color:var(--gold);letter-spacing:.08em}
+.tablabel.win{padding:6px 20px}
+.muted{color:var(--muted)}
+/* HUD */
+#hud{position:sticky;top:env(safe-area-inset-top,0px);z-index:50}
+#hud .wrap{padding-block:16px 6px;display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-start;gap:14px}
+.timebox{padding:12px 22px 14px;display:flex;flex-direction:column;gap:8px}
+.timebox .tt{font-size:clamp(17px,1.9vw,22px);color:var(--gold);letter-spacing:.06em;font-variant-numeric:tabular-nums}
+.bars{display:flex;gap:8px;align-items:center}
+.bars i{display:block;width:20px;height:6px;background:var(--dim)}
+.bars i.on{background:var(--gold);width:36px}
+.bars i.on26{background:var(--cyan);width:36px}
+.navbox{padding:12px 22px;display:flex;align-items:center;gap:14px;font-size:clamp(15px,1.5vw,18px);text-transform:uppercase;letter-spacing:.04em}
+.navbox button{background:transparent;border:0;padding:2px;min-height:32px;white-space:nowrap}
+.navbox button:hover,.navbox button[aria-current="true"]{color:var(--gold)}
+.navbox .sep{color:var(--muted)}
+
+/* screens */
+.screen{animation:enter .5s steps(6)}
+@keyframes enter{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+/* portrait tile */
+.ph{--suit:#3b2f7a;position:relative;background:radial-gradient(circle at 50% 40%,var(--skin) 0 19%,transparent 20%),radial-gradient(circle at 50% 30%,var(--hair,#2a1d14) 0 23%,transparent 24%),radial-gradient(ellipse at 50% 108%,var(--suit) 0 46%,transparent 47%),var(--portrait);border:2px solid var(--fg);box-sizing:border-box;display:flex;align-items:flex-end;justify-content:flex-end;padding:2px 4px;font-size:12px;color:var(--fg);image-rendering:pixelated}
+.ph.art{background:var(--portrait);padding:0;font-size:0;overflow:hidden}
+.ph img{width:100%;height:100%;object-fit:cover;display:block;image-rendering:auto}   /* painted pixel-style art: smooth sampling */
+.pol{position:relative;background:transparent;border:0;padding:24px 0 0;display:flex;flex-direction:column;align-items:center;gap:6px;width:104px;font-size:16px;transition:transform .15s steps(2),filter .35s ease}
+.pol .ph{width:96px;height:96px}
+.pol:hover{transform:translateY(-3px)}
+.pol:hover .ph{border-color:var(--gold)}
+.pol.done{color:var(--muted)}
+.pol.done .ph{border-color:var(--dim);filter:saturate(.6) brightness(.8)}
+.pol .mark,.pol .new{position:absolute;top:0;left:50%;translate:-50% 0;text-align:center;font-size:15px;white-space:nowrap}
+.pol .mark{color:var(--muted)}
+.pol .new{color:var(--gold)}
+.ghost{position:fixed;z-index:80;pointer-events:none;margin:0}
+
+/* MAP */
+.mapgrid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(0,1fr);gap:28px;align-items:stretch;margin-top:14px}
+.plan{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));grid-auto-rows:minmax(200px,auto);border:2px solid var(--fg);margin-top:14px}
+.plan.y26{grid-template-columns:repeat(3,minmax(0,1fr))}
+.cell{border:1px solid var(--fg);padding:10px 12px;display:flex;flex-direction:column;gap:6px;min-width:0;background:rgba(20,16,70,.55)}
+.cell .lbl{text-transform:uppercase;font-size:16px;letter-spacing:.04em}
+.cell .sub{font-size:13px;color:var(--muted)}
+.cell .who{display:flex;flex-wrap:wrap;gap:14px;justify-content:center;align-items:center;flex:1}
+.cell.tall{grid-row:span 2}
+.cell.wide{grid-column:span 2}
+.cell.hot{border:2px dashed var(--fg);color:var(--cyan)}
+.cell .empty{margin:auto;font-size:14px;color:var(--muted);text-align:center}
+/* people row: one slot per person; away = not in this year, shown in grayscale */
+.cell.slot{align-items:center;justify-content:center;gap:4px;text-align:center;border:0;background:transparent}   /* one open row of people, no dividing lines */
+.cell.slot .note{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pol.away{filter:grayscale(1) brightness(.55);cursor:default}
+.pol.away:hover{transform:none}
+.pol.away .ph{border-color:var(--dim)}
+.cell.slot.away .note{color:var(--dim)}
+.inv{align-self:center;background:transparent;border:2px solid var(--cyan);color:var(--cyan);padding:6px 12px;min-height:40px;font-size:15px;animation:blinkb 1.4s steps(1) infinite}
+.inv:hover{background:var(--cyan);color:var(--solid)}
+@keyframes blinkb{50%{border-color:transparent}}
+
+/* TIME SLIDER — under the people: scrub 2016 moments, last stop jumps to 2026 */
+.timeslider{margin-top:clamp(8px,1.4vh,16px);border:2px solid var(--fg);box-shadow:inset 0 0 0 2px var(--solid),inset 0 0 0 3px var(--fg);padding:6px 18px;flex:none;display:grid;grid-template-columns:auto minmax(0,1fr) 9.5em;column-gap:16px;align-items:center}
+.timeslider .wtitle{font-size:clamp(15px,1.5vw,20px);grid-row:span 2}
+.timeslider output{grid-row:span 2;text-align:right;color:var(--gold);font-size:clamp(15px,1.5vw,20px);font-variant-numeric:tabular-nums}
+.timeslider output.y26{color:var(--cyan)}
+#timeRange{width:100%;margin:2px 0 0;accent-color:var(--gold);min-height:28px}
+#timeRange.y26{accent-color:var(--cyan)}
+.tsticks{grid-column:2;display:flex;justify-content:space-between;font-size:13px;color:var(--muted);border-top:2px dashed var(--dim);padding-top:2px}
+.tsticks span:last-child{color:var(--cyan)}
+
+/* MEMO — free notes, kept only until reload */
+.memo{display:flex;flex-direction:column}
+.memo textarea{flex:1;min-height:200px;margin-top:12px;resize:none;background:repeating-linear-gradient(transparent 0 calc(1.6em - 2px),rgba(236,234,255,.12) calc(1.6em - 2px) 1.6em);border:0;border-top:2px dashed var(--dim);padding:6px 2px;color:var(--fg);font:inherit;font-size:clamp(15px,1.4vw,18px);line-height:1.6em;background-attachment:local}
+.memo textarea::placeholder{color:var(--dim)}
+.memo textarea:focus-visible{outline:none;border-top-color:var(--gold)}
+.memo small{color:var(--muted);font-size:13px;margin-top:6px}
+.mview{flex:1;min-height:0;display:flex;flex-direction:column}
+.mview[hidden]{display:none}
+.mbtns{display:flex;justify-content:flex-end;gap:10px;margin-top:10px}
+.pbtn{background:transparent;border:2px solid var(--gold);color:var(--gold);padding:0 18px;min-height:44px;text-transform:uppercase;letter-spacing:.06em}
+.pbtn:hover:not(:disabled){background:var(--gold);color:var(--solid)}
+.pbtn:disabled{border-color:var(--dim);color:var(--dim);cursor:default}
+.pbtn.ghostb{border-color:var(--muted);color:var(--muted)}
+.pbtn.ghostb:hover{background:var(--muted);color:var(--solid)}
+/* ACCUSE — replaces the memo: pick a suspect, submit */
+.mstep{color:var(--fg);font-size:15px;margin-top:10px;padding:0}
+.suslist{border:0;margin:0;padding:0;min-width:0;flex:1;min-height:0;display:flex;flex-direction:column}
+#susOpts{display:flex;flex-direction:column;gap:4px;margin-top:6px;flex:1;min-height:0;padding:4px;overflow-y:auto}
+.sus{display:flex;align-items:center;gap:10px;padding:3px 6px;border:2px solid transparent;cursor:pointer;font-size:15px;line-height:1.3}
+.sus input{position:absolute;opacity:0;pointer-events:none}
+.sus .ph{width:36px;height:36px;flex:none;border-width:2px}
+.sus small{display:block;margin:0;font-size:12px}
+.sus:hover{border-color:var(--muted)}
+.sus:has(input:checked){border-color:var(--gold);color:var(--gold)}
+.sus:has(input:focus-visible){outline:3px solid var(--gold);outline-offset:1px}
+.sus:has(input:disabled){cursor:default}
+.suslist legend b{font-weight:400;color:var(--muted)}
+.suslist legend b.on{color:var(--gold)}
+#accuseView.done .wtitle{color:var(--cyan)}
+/* VERDICT — modal result after the accusation is judged by the server */
+.verdict{color:var(--fg);background:var(--solid);width:min(680px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow-y:auto;padding:26px 30px}
+.verdict::backdrop{background:rgba(5,4,24,.78)}
+.verdict[open]{animation:enter .5s steps(6)}
+.vkicker{margin:0;color:var(--muted);font-size:14px;text-transform:uppercase;letter-spacing:.08em}
+.verdict h2{font-size:clamp(30px,5vw,48px);color:var(--gold);letter-spacing:.06em;line-height:1.1;margin:4px 0 14px}
+.verdict.bad h2{color:var(--red)}
+.vrows{display:grid;grid-template-columns:7em minmax(0,1fr);gap:8px 14px;margin:0;border-block:2px dashed var(--dim);padding-block:12px}
+.vrows dt{color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.vrows dd{margin:0}
+#vMark.ok{color:var(--gold)} #vMark.no{color:var(--red)}
+.vrows dt .vtotal{display:block;color:var(--fg);text-transform:none;letter-spacing:0;font-weight:normal}
+.sbar{display:flex;gap:10px;margin:0 0 6px;max-width:340px}   /* the culprit track is 30% of the bar (30 points), the motive track 70% */
+.sgroup{min-width:0}
+.sgroup.c{flex:3}
+.sgroup.m{flex:7}
+.sgroup .slab{display:block;font-size:14px;line-height:27px;letter-spacing:.04em}   /* label row = the SCORE label's line, so the bar sits on the total's line */
+.sgroup.c .slab{color:var(--green)}
+.sgroup.m .slab{color:var(--gold)}
+.sgroup .track{height:12px;margin:8px 0 2px;background:var(--dim)}
+.sgroup .fill{display:block;height:100%}
+.sgroup.c .fill{background:var(--green)}
+.sgroup.m .fill{background:var(--gold)}
+#vMotives{list-style:none;margin:0;padding:0;font-size:14px}
+#vMotives li{display:flex;justify-content:space-between;gap:12px;color:var(--muted)}
+#vMotives li.on{color:var(--fg)}
+.verdict blockquote{margin:14px 0 0;padding:8px 14px;border-left:4px solid var(--cyan);color:var(--cyan);font-size:15px}
+#vSummary p{margin:10px 0 0;line-height:1.5}
+.vfoot{font-size:13px;margin:14px 0 0}
+
+/* CHAT — talk to the selected person (answers come from /api/ask) */
+.chat{display:flex;flex-direction:column;min-height:220px;margin-top:40px;padding:clamp(14px,2vh,22px) 24px clamp(10px,1.6vh,16px)}
+.chatlog{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:6px}
+.chatlog .intro{margin:0;font-size:clamp(16px,1.6vw,22px);line-height:1.5}
+.msg{max-width:72%;padding:6px 12px;border:2px solid var(--muted);font-size:clamp(15px,1.4vw,18px);line-height:1.45;align-self:flex-start}
+.msg b{display:block;font-weight:400;font-size:13px;color:var(--muted)}
+.msg.me{align-self:flex-end;border-color:var(--gold);color:var(--gold)}
+.msg .tomemo{display:block;margin-top:4px;background:transparent;border:0;padding:0;color:var(--muted);font-size:13px;cursor:pointer}
+.msg .tomemo:hover,.msg .tomemo:focus-visible{color:var(--gold)}
+.chatgrip{display:none}
+.chatform{display:flex;gap:10px;margin-top:10px}
+.chatform input{flex:1;min-width:0;background:transparent;border:2px solid var(--muted);padding:8px 12px;font-size:16px}
+.chatform input:focus-visible{outline:none;border-color:var(--gold)}
+.chatform input:disabled{border-color:var(--dim)}
+.chatform button{background:transparent;border:2px solid var(--gold);color:var(--gold);padding:0 20px;min-height:44px;text-transform:uppercase;letter-spacing:.06em}
+.chatform button:hover:not(:disabled){background:var(--gold);color:var(--solid)}
+.chatform button:disabled{border-color:var(--dim);color:var(--dim);cursor:default}
+.pol.sel .ph{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold)}
+.pol.sel{color:var(--gold)}
+/* NICKNAME step inside the verdict, then the LEADERBOARD screen */
+.nickform{display:flex;flex-direction:column;gap:6px;margin-top:16px;border-top:2px dashed var(--dim);padding-top:14px}
+.nickform p{margin:0;font-size:15px}
+.nickform input{background:transparent;border:2px solid var(--muted);padding:8px 12px;font-size:18px;min-height:44px;box-sizing:border-box}
+.nickform input:focus-visible{outline:none;border-color:var(--gold)}
+.nickform input[aria-invalid="true"]{border-color:var(--red)}
+.nickform small{min-height:1.6em;font-size:14px;color:var(--muted)}
+.nickform small.err{color:var(--red)}
+.nickform[hidden],#vBtns[hidden]{display:none}
+html:not([data-screen="board"]) #s-board{display:none}
+html[data-screen="board"] #hud,html[data-screen="board"] #s-map{display:none}
+.board{max-width:760px;margin:clamp(16px,6vh,64px) auto 0}
+.bme{margin:10px 0 14px;color:var(--cyan)}
+.brows{list-style:none;margin:0;padding:0;border-block:2px dashed var(--dim)}
+.brows li{display:grid;grid-template-columns:3em minmax(0,1fr) auto 5.5em;gap:4px 14px;align-items:baseline;padding:8px 6px;border-bottom:1px solid rgba(236,234,255,.12)}
+.brows li:last-child{border-bottom:0}
+.brows .rk{color:var(--muted);font-variant-numeric:tabular-nums}
+.brows li:nth-child(-n+3) .rk{color:var(--gold)}
+.brows .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.brows .end{font-size:13px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.brows .end.ok{color:var(--gold)} .brows .end.no{color:var(--red)}
+.brows .sc{text-align:right;font-variant-numeric:tabular-nums}
+.brows li.me{background:rgba(127,214,255,.12);outline:2px solid var(--cyan);color:var(--cyan)}
+.brows li.me .rk{color:var(--cyan)}
+@media (max-width:600px){ .brows li{grid-template-columns:2.4em minmax(0,1fr) 4.5em} .brows .end{grid-column:2;grid-row:2} .brows .sc{grid-row:1;grid-column:3} }
+
+/* MAP fits one laptop screen: HUD on top, map + memo fill the rest, chat at the bottom. No page scroll. */
+@media (min-width:901px){
+  html[data-screen="map"],html[data-screen="map"] body{height:100%;overflow:hidden}
+  html[data-screen="map"] body{display:flex;flex-direction:column}
+  html[data-screen="map"] #hud{position:relative;flex:none}
+  html[data-screen="map"] #hud .wrap{padding-block:10px 4px}
+  html[data-screen="map"] .timebox{padding:6px 16px 8px;gap:4px}
+  html[data-screen="map"] .navbox{padding:4px 16px}
+  html[data-screen="map"] main{flex:1;min-height:0;display:flex}
+  html[data-screen="map"] #s-map{flex:1;min-height:0;display:flex}
+  #s-map .wrap{flex:1;min-height:0;width:100%;display:grid;padding-block:clamp(8px,1.6vh,14px) clamp(10px,2vh,18px)}
+  #s-map .mapgrid{margin-top:0;min-height:0;gap:clamp(16px,2vw,28px)}
+  #s-map .mapgrid>.win{min-height:0;display:flex;flex-direction:column;padding:clamp(12px,2vh,22px) clamp(16px,1.8vw,24px)}
+  #s-map .plan,#s-map .plan.y26{flex:1;min-height:0;margin-top:clamp(6px,1.2vh,14px);grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:minmax(0,1fr)}
+  #s-map .cell.tall{grid-row:auto}
+  #s-map .plan{container-type:size}
+  #s-map .cell{min-height:0;padding:clamp(6px,1vh,10px) 6px;gap:2px;overflow:hidden}
+  #s-map .cell .lbl,#s-map .cell .sub{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}   /* one line each, so every room has the same overhead */
+  #s-map .cell .lbl{position:relative}
+  /* shortcut: the room-search button is hidden in the one-screen layout until the search screen exists */
+  #s-map .cell .inv{display:none}
+  /* one portrait size for every room: limited by the row height (minus label, sub line, badge, name) and by a column's width */
+  #s-map .pol{padding-top:20px;gap:2px;width:auto;font-size:15px}
+  /* rooms are as wide as their headcount (--cols, set by renderMap; --u = total share), so people in a room stay on one row
+     and every portrait in a year has the same size and the same top */
+
+  #s-map .cell .who{flex-wrap:nowrap;gap:8px}
+  #s-map .pol{min-width:0}
+  #s-map .pol>span:not(.new):not(.mark){max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #s-map .pol .ph{--sz:clamp(48px,min(100cqh - 110px,100cqw / 6 - 16px),160px);width:var(--sz);height:var(--sz)}
+  /* compact people row when a tall chat squeezes the map: drop the NEW badge and role line, fit face + name in the height left */
+  @container (max-height:170px){
+    #s-map .pol{padding-top:0;gap:0}
+    #s-map .pol .new{display:none}
+    #s-map .cell.slot .note{display:none}
+    #s-map .cell.slot{padding-block:2px}
+    #s-map .pol .ph{--sz:clamp(24px,min(100cqh - 30px,100cqw / 6 - 16px),160px)}
+  }
+  #s-map .pol .new,#s-map .pol .mark{font-size:13px}
+  #s-map .chat{margin-top:0;min-height:0}
+  #s-map .memo textarea{min-height:0}
+  #s-map .wrap{--topMin:280px;grid-template-rows:minmax(var(--topMin),1fr) min(var(--chatH,clamp(160px,26vh,260px)),max(120px,calc(100% - var(--topMin) - 40px)));row-gap:40px}
+  #s-map .mapgrid>.win.memo{overflow-y:auto}   /* evidence + memo scroll inside the window instead of spilling out */
+  /* drag the chat's top edge to change its height; the tab label stays above the grip */
+  #s-map .chatgrip{display:block;position:absolute;left:0;right:0;top:-30px;height:34px;cursor:row-resize;touch-action:none;z-index:1}
+  /* the whole top edge lights up on hover/drag, like an editor's panel divider */
+  #s-map .chatgrip::before{content:"";position:absolute;left:0;right:0;bottom:3px;height:3px;background:var(--gold);opacity:0;transition:opacity .15s}
+  #s-map .chatgrip:hover::before,#s-map .chatgrip:focus-visible::before,#s-map .chatgrip.drag::before{opacity:1}
+  #s-map .chatgrip:focus-visible{outline:none}
+  /* a visible tab in the middle of the edge: up/down arrows + label say "drag me up or down" */
+  #s-map .griptab{position:absolute;left:50%;top:2px;translate:-50% 0;display:flex;align-items:center;gap:12px;padding:3px 18px;background:var(--solid);border:2px solid var(--muted);color:var(--fg);font-size:16px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap}
+  #s-map .griptab i{width:0;height:0;border:7px solid transparent}
+  #s-map .griptab i:first-child{border-bottom-color:var(--gold);margin-top:-7px}
+  #s-map .griptab i:last-child{border-top-color:var(--gold);margin-top:7px}
+  #s-map .chatgrip:hover .griptab,#s-map .chatgrip:focus-visible .griptab,#s-map .chatgrip.drag .griptab{border-color:var(--gold);color:var(--gold)}
+  #s-map .chat .tablabel{z-index:2}
+  #s-map .mapgrid>.win.memo{padding-bottom:clamp(10px,1.6vh,18px)}
+}
+
+/* TITLE — follows wireframe "01 Title": evidence room, logo, radio window, lede, answer button.
+   Tune the radio to 11.23 MHz, then answer it; answering opens the map. */
+html[data-screen="title"] #hud,html[data-screen="title"] #s-map{display:none}
+html:not([data-screen="title"]) #s-title{display:none}
+#s-title{position:fixed;inset:0;z-index:1;display:flex;align-items:center;justify-content:center;background:#0b092c url("/assets/bg/bg_evidence_room.webp") center/cover no-repeat;image-rendering:auto}
+#s-title::before{content:"";position:absolute;inset:0;background:rgba(11,9,44,.62)}
+#s-title .wrap{position:relative;display:flex;flex-direction:column;align-items:center;gap:clamp(14px,3vh,32px);text-align:center;width:100%}
+.t-eyebrow{margin:0;color:var(--muted);letter-spacing:6px;text-transform:uppercase;font-size:clamp(14px,1.4vw,20px)}
+.t-logo{font-size:clamp(96px,11vw,160px);line-height:1;color:var(--gold)}
+.t-logo.live{animation:tflick 2.4s steps(1,end) infinite}
+@keyframes tflick{0%,100%{color:var(--gold)}7%{color:var(--cyan)}8%{color:var(--gold)}61%{color:var(--fg)}62%{color:var(--gold)}}
+.t-radio{display:flex;gap:32px;align-items:center;padding:32px 40px;max-width:100%}
+.t-speaker{flex:none;width:96px;height:96px;border:2px solid var(--dim);background:var(--solid);overflow:hidden}
+.t-speaker canvas{display:block;width:100%;height:100%;image-rendering:pixelated}   /* static lives only in the speaker, not over the whole screen */
+.t-speaker.live{border-color:var(--gold)}
+.t-body{display:flex;flex-direction:column;gap:12px;text-align:left;min-width:0}
+.t-clock{align-self:flex-start;border:2px solid var(--gold);color:var(--gold);padding:0 12px;font-size:clamp(24px,2.6vw,32px);font-variant-numeric:tabular-nums}
+.t-clock.live i{animation:blinkb 1s steps(1) infinite}
+.t-dialbox{position:relative;width:min(520px,60vw);padding-bottom:36px;cursor:grab}
+.t-dialbox:active{cursor:grabbing}
+.t-tuner{position:relative;height:40px;border:2px solid var(--dim)}
+.t-tuner.live{border-color:var(--gold)}
+.t-needle{position:absolute;top:0;bottom:0;left:25%;width:4px;background:var(--red);pointer-events:none}
+.t-ticks{position:absolute;left:8px;right:8px;bottom:2px;display:flex;justify-content:space-between;font-size:16px;color:var(--muted);pointer-events:none}
+#dial{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:inherit;z-index:2}   /* the tuner bar and knob track are one big dial */
+/* knob under the needle: a big handle with arrows, nudging until the player first touches it */
+.t-knob{position:absolute;bottom:0;left:25%;translate:-50% 0;display:flex;align-items:center;gap:6px;padding:2px 10px;background:var(--gold);color:var(--solid);font-size:18px;line-height:1.3;white-space:nowrap;pointer-events:none}
+.t-knob::before{content:"";position:absolute;left:50%;top:-8px;translate:-50% 0;border:6px solid transparent;border-top:0;border-bottom:8px solid var(--gold)}
+.t-dialbox:not(.touched) .t-knob{animation:tnudge 1.2s steps(2,end) infinite}
+@keyframes tnudge{0%,100%{translate:-50% 0}50%{translate:calc(-50% + 10px) 0}}
+#dial:focus-visible~.t-knob{outline:3px solid var(--fg);outline-offset:2px}
+.t-target{color:var(--gold)}
+.t-hint{margin:0;color:var(--fg);font-size:20px}
+.t-hint.live{color:var(--gold)}
+.t-lede{margin:0;font-size:clamp(18px,2vw,24px)}
+.t-answer{background:var(--panel);border:2px solid var(--fg);box-shadow:inset 0 0 0 2px var(--solid),inset 0 0 0 3px var(--fg);color:var(--gold);padding:10px 32px;min-height:56px;font-size:clamp(18px,2vw,24px)}
+.t-answer:hover:not(:disabled){background:var(--gold);color:var(--solid)}
+.t-answer:disabled{color:var(--dim);border-color:var(--dim);box-shadow:inset 0 0 0 2px var(--solid),inset 0 0 0 3px var(--dim);cursor:default}
+.t-keys{position:absolute;right:clamp(16px,6vw,112px);bottom:24px;display:flex;gap:24px;font-size:16px;color:var(--muted)}
+.t-keys b{font-weight:400;border:2px solid var(--muted);padding:0 6px;margin-right:8px;color:var(--fg)}
+@media (max-width:600px){.t-radio{padding:20px}.t-speaker{display:none}.t-keys{display:none}}
+@media (prefers-reduced-motion:reduce){.t-logo.live,.t-dialbox .t-knob{animation:none}}
+
+/* BRIEF — one short case briefing between the title and the map: the case, the two time rules, how to play */
+html[data-screen="brief"] #hud,html[data-screen="brief"] #s-map{display:none}
+html:not([data-screen="brief"]) #s-brief{display:none}
+#s-brief{position:fixed;inset:0;z-index:1;overflow:hidden;background:#0b092c url("/assets/bg/bg_evidence_room.webp") center/cover no-repeat}
+#s-brief::before{content:"";position:fixed;inset:0;background:rgba(11,9,44,.78)}
+#s-brief .wrap{max-width:900px;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:0;padding-block:10px 16px;position:relative}
+/* typewriter scene: the briefing is typed onto paper that feeds up out of the roller */
+.tw-win{width:min(760px,100%);flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;scrollbar-width:none;position:relative;z-index:1}
+.tw-win::-webkit-scrollbar{display:none}
+.tw-sheet{margin-top:auto;display:flex;flex-direction:column;gap:clamp(10px,1.8vh,16px);padding:clamp(22px,3vh,36px) clamp(22px,4vw,48px) 34px;color:#2b2540;
+  background:linear-gradient(90deg,rgba(43,37,64,.06) 0 2px,transparent 2px) 34px 0/100% 100% no-repeat,repeating-linear-gradient(#efe7d2 0 30px,#e9e0c8 30px 31px);box-shadow:0 0 0 3px #2b2540,6px 0 0 3px rgba(0,0,0,.25)}
+#s-brief .tw-sheet .t-eyebrow{color:#6b6280;letter-spacing:.2em}
+#s-brief .tw-sheet .b-head h2{color:#8a1f2e}
+#s-brief .tw-sheet .b-lede,#s-brief .tw-sheet .b-steps{color:#2b2540}
+#s-brief .tw-sheet .b-report{border-left-color:#b3263a;color:#2b2540;padding-right:clamp(90px,12vw,120px)}   /* room for the FILED stamp */
+#s-brief .tw-sheet .b-report b{color:#b3263a}
+#s-brief .tw-sheet .b-modes .win{background:transparent;border:2px dashed #2b2540;box-shadow:none;color:#2b2540}
+#s-brief .tw-sheet .b-modes h3{color:#8a1f2e}
+#s-brief .tw-sheet .b-modes .now h3{color:#1f4f8a}
+#s-brief .tw-sheet .b-steps b{color:#8a1f2e}
+#s-brief.playing .tw-sheet.strike{animation:twjolt .08s steps(1) infinite}
+@keyframes twjolt{50%{transform:translateX(-1px)}}
+.typewriter{position:relative;width:min(860px,100%);z-index:2;margin-top:-14px;flex:none}
+.tw-roller{height:26px;margin:0 6%;background:linear-gradient(#5a5470,#2b2540 55%,#16122a);border:3px solid #0b092c;position:relative}
+.tw-roller i{position:absolute;top:-3px;bottom:-3px;width:22px;background:#3a3456;border:3px solid #0b092c}
+.tw-roller i:first-child{left:-26px}.tw-roller i:last-child{right:-26px}
+.tw-body{height:clamp(90px,15vh,140px);background:linear-gradient(#2e2852,#1b1638);border:3px solid #0b092c;border-top:0;clip-path:polygon(4% 0,96% 0,100% 100%,0 100%);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding-top:6px}
+.tw-keys{width:72%;height:54%;background:radial-gradient(circle,#e8e2cf 0 34%,#0b092c 36% 46%,transparent 48%) 0 0/calc(100% / 11) 33.3%}
+.tw-space{width:36%;height:12px;background:#e8e2cf;border:3px solid #0b092c}
+#s-brief .b-go{margin-top:12px}
+.b-head h2{font-size:clamp(24px,3.4vw,38px);color:var(--gold);line-height:1.25;margin-top:4px}
+.b-lede{margin:0;font-size:clamp(15px,1.5vw,18px)}
+.b-report{margin:0;border-left:4px solid var(--red);padding:4px 14px;font-size:clamp(14px,1.3vw,16px)}
+.b-report b{font-weight:400;color:var(--red);text-transform:uppercase;letter-spacing:.06em;margin-right:8px}
+.b-modes{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.b-modes .win{padding:14px 18px}
+.b-modes h3{font-size:clamp(16px,1.6vw,20px);color:var(--gold);letter-spacing:.06em;text-transform:uppercase}
+.b-modes .now h3{color:var(--cyan)}
+.b-modes p{margin:6px 0 0;font-size:clamp(14px,1.3vw,16px);line-height:1.5}
+.b-steps{margin:0;padding:0 0 0 1.6em;display:grid;gap:4px;font-size:clamp(14px,1.3vw,16px);line-height:1.5}
+.b-steps b{font-weight:400;color:var(--gold)}
+.b-go{align-self:center}
+@media (max-width:700px){.b-modes{grid-template-columns:minmax(0,1fr)}}
+/* brief intro: parts step in one after another like a case file being laid out; click / Space / Enter skips */
+#s-brief.playing .bx:not(.in){display:none}   /* parts not typed yet take no room, so the paper feeds up as it fills */
+#s-brief.playing .bx.in{visibility:visible;animation:bin .42s steps(4) both}
+@keyframes bin{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+#s-brief .typing::after{content:"▌";color:#8a1f2e;animation:blinkb .8s steps(1) infinite}
+.b-report{position:relative}
+#s-brief.playing .b-report.in{animation:bin .3s steps(3) both}
+@keyframes bslide{from{opacity:0;transform:translateX(-24px)}to{opacity:1;transform:none}}
+.b-report::after{content:"FILED";position:absolute;right:10px;top:50%;translate:0 -50%;rotate:-8deg;border:3px solid var(--red);color:var(--red);padding:0 8px;font-size:clamp(14px,1.4vw,18px);letter-spacing:.12em}
+#s-brief.playing .b-report.in::after{animation:bstamp .5s steps(3) .5s both}
+@keyframes bstamp{0%{opacity:0;scale:2.2}70%{opacity:1;scale:.92}100%{opacity:1;scale:1}}
+.b-skip{position:fixed;right:clamp(16px,4vw,48px);bottom:20px;z-index:2;font-size:13px;color:var(--muted)}
+#s-brief:not(.playing) .b-skip{display:none}
+@media (prefers-reduced-motion:reduce){#s-brief.playing .bx:not(.in){display:revert}#s-brief .bx.in,#s-brief .b-report.in::after{animation:none}}
+
+/* window header: title on top, the date / scene line always right under it (every year the same) */
+.phead{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+
+
+/* EVIDENCE — icon slots under the memo; a slot fills when a chat answer or a searched place turns up that clue */
+.evi{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:6px;margin-top:10px}
+.evi button{position:relative;aspect-ratio:1;padding:0;background:var(--solid);border:2px dashed var(--dim);color:var(--dim);font-size:14px;min-width:0}
+.evi button img{width:100%;height:100%;display:block;image-rendering:auto}
+.evi button.got{border:2px solid var(--fg);cursor:pointer}
+.evi button.got:hover,.evi button.sel{border-color:var(--gold)}
+.evi button.fresh{animation:evinew .9s steps(3) 3}
+@keyframes evinew{50%{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold)}}
+.evinote{margin-top:6px;font-size:13px;line-height:1.4;min-height:1.4em;color:var(--muted)}
+.evinote b{font-weight:400;color:var(--gold)}
+.evinote button{margin-left:6px;background:transparent;border:2px solid var(--gold);color:var(--gold);font-size:12px;padding:0 6px}
+/* SHOW — cards the player shows to people: pinned answers and evidence go with every question */
+.evi button.shown{border-color:var(--gold);box-shadow:inset 0 0 0 2px var(--gold)}
+.msg .acts{display:flex;gap:16px;margin-top:4px}
+.msg .acts .tomemo{margin-top:0}
+.msg .tomemo.on{color:var(--gold)}
+
+/* PLACES — a page of the year's places; go into one, see who is there, search spots for record cards */
+html:not([data-screen="places"]) #s-places{display:none}
+html[data-screen="places"] #s-map{display:none}
+#s-places .wrap{padding-block:clamp(8px,1.6vh,14px) 24px}
+.pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:14px}
+.pcard{position:relative;min-height:170px;border:3px solid var(--fg);padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:4px;cursor:pointer;color:var(--fg);
+  background:linear-gradient(rgba(11,9,44,.78),rgba(20,16,70,.3) 45%,rgba(11,9,44,.86)),var(--art) var(--ax) var(--ay)/cover no-repeat;image-rendering:auto}
+.pcard:hover{outline:3px solid var(--gold);outline-offset:-6px}
+.pcard .lbl{text-transform:uppercase;letter-spacing:.04em;text-shadow:2px 2px 0 var(--solid)}
+.pcard .sub{font-size:13px;color:var(--muted);text-shadow:1px 1px 0 var(--solid)}
+.pcard .faces{margin-top:auto;display:flex;gap:6px}
+.pcard .faces img{width:40px;height:40px;border:2px solid var(--fg);image-rendering:auto}
+.pcard .go{position:absolute;right:10px;bottom:8px;color:var(--gold);font-size:14px;text-shadow:1px 1px 0 var(--solid)}
+.room{position:relative;border:3px solid var(--fg);margin-top:14px;min-height:min(62vh,560px);overflow:hidden;
+  background:linear-gradient(rgba(11,9,44,.55),rgba(20,16,70,.15) 40%,rgba(11,9,44,.8)),var(--art) var(--ax) var(--ay)/cover no-repeat;image-rendering:auto}
+.room[hidden],.pgrid[hidden]{display:none!important}
+.room-head{position:absolute;inset:10px 12px auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;z-index:2}
+.room-head .back{background:var(--solid);border:2px solid var(--fg);color:var(--fg);padding:2px 10px;min-height:32px}
+.room-head .back:hover{border-color:var(--gold);color:var(--gold)}
+.room-head .rname{color:var(--gold);text-transform:uppercase;letter-spacing:.06em;text-shadow:2px 2px 0 var(--solid)}
+.room-head .rsub{color:var(--muted);font-size:14px;text-shadow:1px 1px 0 var(--solid)}
+.room-people{position:absolute;left:14px;bottom:12px;display:flex;gap:12px;z-index:2}
+.room-people button{background:transparent;border:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:2px;color:var(--fg);text-shadow:2px 2px 0 var(--solid)}
+.room-people img{width:80px;height:80px;border:3px solid var(--fg);image-rendering:auto}
+.room-people button:hover img{border-color:var(--gold)}
+.spot{position:absolute;translate:-50% -50%;z-index:2;background:var(--solid);border:3px solid var(--cyan);padding:3px;width:72px;height:72px;box-sizing:content-box}
+.spot img{width:100%;height:100%;display:block;image-rendering:auto}
+.spot::after{content:"?";position:absolute;right:-10px;top:-12px;background:var(--cyan);color:var(--solid);font-size:14px;padding:0 5px}
+.spot:not(.found):not(.locked){animation:blinkb 1.4s steps(1) infinite}
+.spot.found{border-color:var(--gold)}
+.spot.found::after{content:"✓";background:var(--gold)}
+.spot.locked{border-color:var(--dim);filter:grayscale(1) brightness(.5)}
+.spot.locked::after{content:"🔒";background:var(--dim)}
+.spot:hover{outline:3px solid var(--fg)}
+.room-card{position:absolute;right:14px;bottom:12px;z-index:3;width:min(380px,60%);background:var(--panel);border:3px solid var(--fg);box-shadow:inset 0 0 0 3px var(--solid),inset 0 0 0 5px var(--fg);padding:12px 14px;display:flex;gap:12px}
+.room-card[hidden]{display:none}
+.room-card img{width:64px;height:64px;flex:none}
+.room-card b{display:block;font-weight:400;color:var(--gold)}
+.room-card p{margin:4px 0 0;font-size:15px;line-height:1.45}
+.room-card small{display:block;margin-top:6px;color:var(--muted);font-size:12px}
+.room-empty{position:absolute;left:50%;top:50%;translate:-50% -50%;color:var(--muted);z-index:2;text-shadow:1px 1px 0 var(--solid);text-align:center}
+@media (max-width:900px){.pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (prefers-reduced-motion:reduce){.spot,.evi button.fresh{animation:none!important}}
+
+/* window header: title on top, the date / scene line always right under it (every year the same) */
+.phead{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+
+/* VHS */
+#vhs{position:fixed;inset:0;z-index:75;pointer-events:none;display:none;overflow:hidden}
+#vhs.run{display:block}
+#vhs .band{position:absolute;left:0;width:100%;height:12%;background:rgba(236,234,255,.12);animation:band .7s steps(10)}
+#vhs .label{position:absolute;top:16%;left:50%;transform:translateX(-50%);font-size:clamp(24px,4vw,44px);letter-spacing:.2em;color:var(--fg);text-shadow:3px 0 var(--red),-3px 0 var(--cyan);white-space:nowrap}
+#vhs.run::before{content:"";position:absolute;inset:0;background:rgba(127,214,255,.12);animation:tint .7s steps(4)}
+@keyframes band{from{transform:translateY(-120%)}to{transform:translateY(900%)}}
+@keyframes tint{0%,100%{opacity:0}30%{opacity:1}}
+
+#toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));translate:-50% 0;z-index:95;background:var(--solid);color:var(--fg);border:2px solid var(--fg);padding:10px 16px;font-size:15px;max-width:min(90vw,520px);opacity:0;transition:opacity .2s;pointer-events:none}
+#toast.on{opacity:1}
+
+@media (max-width:900px){
+  .mapgrid{grid-template-columns:minmax(0,1fr)}
+  .plan,.plan.y26{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .cell.tall{grid-row:auto}
+  .win{padding:18px 16px}
+  #hud{position:relative}
+  #hud .wrap{gap:10px}
+  .timebox{padding:10px 14px 12px;flex:1 1 100%}
+  .navbox{padding:6px 14px;font-size:16px;flex:1 1 100%;justify-content:space-between;gap:8px}
+  .pol{width:84px}
+  .pol .ph{width:76px;height:76px}
+  .plan,.plan.y26{grid-auto-rows:minmax(150px,auto)}
+}
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
+}
