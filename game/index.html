@@ -422,6 +422,9 @@ html[data-screen="places"] #s-map{display:none}
 @media (max-width:900px){.pgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (prefers-reduced-motion:reduce){.spot,.evi button.fresh{animation:none!important}}
 
+/* window header: title on top, the date / scene line always right under it (every year the same) */
+.phead{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+
 /* VHS */
 #vhs{position:fixed;inset:0;z-index:75;pointer-events:none;display:none;overflow:hidden}
 #vhs.run{display:block}
@@ -544,7 +547,7 @@ html[data-screen="places"] #s-map{display:none}
   <div class="wrap">
     <div class="mapgrid">
       <div class="win">
-        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px"><span class="wtitle" id="planTitle"></span><span class="muted" id="planDate"></span></div>
+        <div class="phead"><span class="wtitle" id="planTitle"></span><span class="muted" id="planDate"></span></div>
         <div class="plan" id="plan"></div>
         <div class="timeslider">
           <label class="wtitle" for="timeRange">time</label>
