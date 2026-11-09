@@ -87,6 +87,13 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .cell.wide{grid-column:span 2}
 .cell.hot{border:2px dashed var(--fg);color:var(--cyan)}
 .cell .empty{margin:auto;font-size:14px;color:var(--muted);text-align:center}
+/* people row: one slot per person; away = not in this year, shown in grayscale */
+.cell.slot{align-items:center;justify-content:center;gap:4px;text-align:center;border:0;background:transparent}   /* one open row of people, no dividing lines */
+.cell.slot .note{font-size:13px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.pol.away{filter:grayscale(1) brightness(.55);cursor:default}
+.pol.away:hover{transform:none}
+.pol.away .ph{border-color:var(--dim)}
+.cell.slot.away .note{color:var(--dim)}
 .inv{align-self:center;background:transparent;border:2px solid var(--cyan);color:var(--cyan);padding:6px 12px;min-height:40px;font-size:15px;animation:blinkb 1.4s steps(1) infinite}
 .inv:hover{background:var(--cyan);color:var(--solid)}
 @keyframes blinkb{50%{border-color:transparent}}
@@ -230,11 +237,11 @@ html[data-screen="board"] #hud,html[data-screen="board"] #s-map{display:none}
   #s-map .pol{padding-top:20px;gap:2px;width:auto;font-size:15px}
   /* rooms are as wide as their headcount (--cols, set by renderMap; --u = total share), so people in a room stay on one row
      and every portrait in a year has the same size and the same top */
-  #s-map .plan[style*="--cols"]{grid-template-columns:var(--cols)}
+
   #s-map .cell .who{flex-wrap:nowrap;gap:8px}
   #s-map .pol{min-width:0}
   #s-map .pol>span:not(.new):not(.mark){max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  #s-map .pol .ph{--sz:clamp(40px,min(100cqh - 124px,100cqw / var(--u,7) - 32px),96px);width:var(--sz);height:var(--sz)}
+  #s-map .pol .ph{--sz:clamp(48px,min(100cqh - 110px,100cqw / 6 - 40px),160px);width:var(--sz);height:var(--sz)}
   #s-map .pol .new,#s-map .pol .mark{font-size:13px}
   #s-map .chat{margin-top:0;min-height:0}
   #s-map .memo textarea{min-height:0}
@@ -527,21 +534,9 @@ const POS = {
   '2025':{dohyun:'lounge', hana:'lounge', minjae:'@nova hq'},
   '2026':{dohyun:'@moonlight hq', minjae:'@nova hq', hana:'@newsroom', kim:"@ken's home", grace:'@vc office'}
 };
-const ROOMS = [['dev_floor','dev floor'],['ceo_room','ceo room'],['server_room','server room'],['lounge','lounge'],['lobby','lobby · security desk']];
-const SUB26 = {'moonlight hq':'pangyo · a unicorn now', 'nova hq':'the competitor', 'newsroom':'it desk', "ken's home":'retired, wants to talk', 'vc office':'keeps her last email'};
-// six cells per year: five office rooms + elsewhere by radio, or five places + evidence storage in 2026
-function cellsOf(era){
-  const pos=POS[era], at=place=>Object.keys(pos).filter(k=>pos[k]===place);
-  const away=[...new Set(Object.values(pos).filter(v=>v[0]==='@'))];
-  if (era==='2026') return [
-    ...away.map(pl=>({lbl:pl.slice(1), sub:SUB26[pl.slice(1)], people:at(pl)})),
-    {lbl:'evidence storage', sub:'case 2016-0315, boxed since 2016', people:[], cls:'hot', room:true, empty:'(julia · not reachable)'}
-  ];
-  return [
-    ...ROOMS.map(([id,lbl])=>({lbl, people:at(id), cls: id==='server_room' && era==='2016' ? 'hot' : '', room: id==='server_room', sub: id==='server_room' ? 'deploy-bot logs live here' : ''})),
-    {lbl:'elsewhere', sub: away.length ? away.map(v=>v.slice(1)).join(' · ')+' · by radio' : 'by radio', people: away.flatMap(at)}
-  ];
-}
+// who can be talked to in a year: anyone with a position that year in data/case.json
+const ORDER = ['jisoo','dohyun','minjae','hana','kim','grace'];
+const isHere = (k, era) => k in POS[era];
 const S = {era:'2016', visited:new Set(), person:null};
 
 /* ---------- SKY (pixel stars, moon, horizon) ---------- */
@@ -596,53 +591,38 @@ function updateHud(){
 }
 
 /* ---------- ERA ---------- */
+// moving the time bar switches the year at once: no VHS bands or static burst
 function setEra(era){
   if (era===S.era) return;
-  const back = era < S.era, vhs=$('#vhs'); vhs.innerHTML='';
-  if (!reduced){ for (let i=0;i<4;i++) vhs.append(h('div',{class:'band',style:`top:${i*-30}%;animation-delay:${i*0.08}s`})); vhs.append(h('div',{class:'label',text:(back ? '◀◀ REWIND ' : '▶▶ FWD ')+era})); vhs.classList.add('run'); burst(380); }
-  setTimeout(()=>{
-    S.era=era;
-    if (S.person && !(S.person in POS[era])) S.person=null;   // only people present in that year can be asked
-    updateHud(); renderMap(true); renderChat();
-  }, reduced?0:230);
-  setTimeout(()=>vhs.classList.remove('run'), 720);
+  S.era=era;
+  if (S.person && !(S.person in POS[era])) S.person=null;   // only people present in that year can be asked
+  updateHud(); renderMap(); renderChat();
 }
 $('#timeRange').addEventListener('input', e=>setEra(ERAS[+e.target.value]));
 
 /* ---------- MAP (main screen) ---------- */
 const pols={};
 Object.keys(PEOPLE).forEach(k=>{ const b=h('button',{class:'pol','data-p':k,'aria-label':'question '+PEOPLE[k].name}, phEl(k), h('span',{text:PEOPLE[k].short})); b.addEventListener('click', ()=>openTalk(k)); pols[k]=b; });
-function openTalk(k){ S.visited.add(k+S.era); S.person=k; polBadges(); renderChat(); $('#chatInput').focus(); }
+function openTalk(k){ if (!isHere(k, S.era)) return; S.visited.add(k+S.era); S.person=k; polBadges(); renderChat(); $('#chatInput').focus(); }
 const status = k => S.visited.has(k+S.era) ? 'some' : 'new';
-function polBadges(){ Object.entries(pols).forEach(([k,el])=>{ el.querySelectorAll('.mark,.new').forEach(n=>n.remove()); el.classList.toggle('sel', k===S.person); if (status(k)==='new') el.append(h('span',{class:'new',text:'★ NEW'})); }); }
-function renderMap(animate){
-  const era=S.era, plan=$('#plan'), first={};
+function polBadges(){ Object.entries(pols).forEach(([k,el])=>{ el.querySelectorAll('.mark,.new').forEach(n=>n.remove()); el.classList.toggle('sel', k===S.person); if (isHere(k, S.era) && status(k)==='new') el.append(h('span',{class:'new',text:'★ NEW'})); }); }
+function renderMap(){
+  const era=S.era, plan=$('#plan');
   Object.entries(pols).forEach(([k,el])=>setFace(el.querySelector('.ph'), k, era));
-  if (animate) Object.entries(pols).forEach(([k,el])=>{ if (el.isConnected) first[k]=el.getBoundingClientRect(); });
   plan.classList.toggle('y26', era==='2026');
   plan.classList.toggle('radio', era!=='2026');
   document.documentElement.dataset.bg = era>='2025' ? 'seoul' : 'office';
   $('#planTitle').textContent = era==='2026' ? 'Seoul · 2026' : 'Moonlight Labs · Pangyo';
   $('#planDate').textContent = era==='2026' ? 'where are they now' : `${era}-03-15 · 22:50 · ${ERA_NOTE[era]}`;
   plan.innerHTML='';
-  const placed=new Set();
-  const cells=cellsOf(era), share=cells.map(c=>c.people.length || .7);   // empty rooms stay narrow
-  plan.style.setProperty('--cols', share.map(n=>`minmax(0,${n}fr)`).join(' ')); plan.style.setProperty('--u', share.reduce((a,b)=>a+b,0));
-  cells.forEach(c=>{
-    const who=h('div',{class:'who'});
-    plan.append(h('div',{class:'cell '+(c.cls||'')}, h('span',{class:'lbl',text:c.lbl}), h('span',c.sub?{class:'sub',text:c.sub}:{class:'sub',text:'\u00a0','aria-hidden':'true'}), who));   // every room keeps a sub line so portraits line up across rooms
-    c.people.forEach(p=>{ who.append(pols[p]); placed.add(p); });
-    if (c.empty || !c.people.length) who.append(h('span',c.empty ? {class:'empty',text:c.empty} : {class:'empty',text:'—','aria-label':'nobody here'}));
-    if (c.room) who.append(h('button',{class:'inv',text:'search ▶',onclick:soon}));
+  // all six people every year; the ones not in this year are grayed out and cannot be asked
+  ORDER.forEach(k=>{
+    const here=isHere(k, era), el=pols[k];
+    el.classList.toggle('away', !here); el.disabled=!here;
+    el.setAttribute('aria-label', here ? 'question '+PEOPLE[k].name : `${PEOPLE[k].name} is not here in ${era}`);
+    plan.append(h('div',{class:'cell slot'+(here?'':' away')}, el, h('span',{class:'note',text: here ? roleOf(k, +era) : `not in ${era}`})));
   });
   polBadges();
-  if (animate && !reduced){
-    Object.entries(pols).forEach(([k,el])=>{
-      const f=first[k];
-      if (placed.has(k)){ const l=el.getBoundingClientRect(); if (f) el.animate([{transform:`translate(${f.left-l.left}px,${f.top-l.top}px)`},{transform:'none'}],{duration:900,easing:'steps(12)'}); else el.animate([{opacity:0},{opacity:1}],{duration:600,delay:300,fill:'backwards',easing:'steps(6)'}); }
-      else if (f){ const g=el.cloneNode(true); g.classList.add('ghost'); g.style.left=f.left+'px'; g.style.top=f.top+'px'; document.body.append(g); g.animate([{opacity:1},{opacity:0,transform:'translateY(-40px)'}],{duration:1100,easing:'steps(8)'}).onfinish=()=>g.remove(); }
-    });
-  }
 }
 /* ---------- CHAT (answers from /api/ask; turns are kept in localStorage by /client/game.js) ---------- */
 // The case data calls Julia "jisoo"; the map era picks the case time point.
