@@ -65,7 +65,13 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 /* portrait tile */
 .ph{--suit:#3b2f7a;position:relative;background:radial-gradient(circle at 50% 40%,var(--skin) 0 19%,transparent 20%),radial-gradient(circle at 50% 30%,var(--hair,#2a1d14) 0 23%,transparent 24%),radial-gradient(ellipse at 50% 108%,var(--suit) 0 46%,transparent 47%),var(--portrait);border:2px solid var(--fg);box-sizing:border-box;display:flex;align-items:flex-end;justify-content:flex-end;padding:2px 4px;font-size:12px;color:var(--fg);image-rendering:pixelated}
 .ph.art{background:var(--portrait);padding:0;font-size:0;overflow:hidden}
-.ph img{width:100%;height:100%;object-fit:cover;display:block;image-rendering:auto}   /* painted pixel-style art: smooth sampling */
+.ph img{width:100%;height:100%;object-fit:cover;display:block;image-rendering:auto}
+/* year change: the next look fades in over the old one, then the old one is removed */
+.ph img.next{position:absolute;inset:0;opacity:0;transition:opacity .45s ease}
+.ph img.next.on{opacity:1}
+.cell.slot .note{transition:opacity .25s ease}
+.cell.slot .note.swap{opacity:0}
+@media (prefers-reduced-motion:reduce){.ph img.next{transition:none}}   /* painted pixel-style art: smooth sampling */
 .pol{position:relative;background:transparent;border:0;padding:24px 0 0;display:flex;flex-direction:column;align-items:center;gap:6px;width:104px;font-size:16px;transition:transform .15s steps(2),filter .35s ease}
 .pol .ph{width:96px;height:96px}
 .pol:hover{transform:none}   /* no lift on hover: the row stays still, the gold frame shows the target */
@@ -401,7 +407,7 @@ html[data-screen="places"] #s-map{display:none}
 #s-places .wrap{padding-block:clamp(8px,1.6vh,14px) 24px}
 .pgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-top:14px}
 .pcard{position:relative;min-height:170px;border:3px solid var(--fg);padding:10px 12px;text-align:left;display:flex;flex-direction:column;gap:4px;cursor:pointer;color:var(--fg);
-  background:linear-gradient(rgba(11,9,44,.78),rgba(20,16,70,.3) 45%,rgba(11,9,44,.86)),var(--art) var(--ax) var(--ay)/cover no-repeat;image-rendering:auto}
+  background:linear-gradient(rgba(11,9,44,.78),rgba(20,16,70,.3) 45%,rgba(11,9,44,.86)),var(--art) var(--ax) var(--ay)/var(--az,cover) no-repeat;image-rendering:auto}
 .pcard:hover{outline:3px solid var(--gold);outline-offset:-6px}
 .pcard .lbl{text-transform:uppercase;letter-spacing:.04em;text-shadow:2px 2px 0 var(--solid)}
 .pcard .sub{font-size:13px;color:var(--muted);text-shadow:1px 1px 0 var(--solid)}
@@ -409,7 +415,7 @@ html[data-screen="places"] #s-map{display:none}
 .pcard .faces img{width:40px;height:40px;border:2px solid var(--fg);image-rendering:auto}
 .pcard .go{position:absolute;right:10px;bottom:8px;color:var(--gold);font-size:14px;text-shadow:1px 1px 0 var(--solid)}
 .room{position:relative;border:3px solid var(--fg);margin-top:14px;min-height:min(62vh,560px);overflow:hidden;
-  background:linear-gradient(rgba(11,9,44,.55),rgba(20,16,70,.15) 40%,rgba(11,9,44,.8)),var(--art) var(--ax) var(--ay)/cover no-repeat;image-rendering:auto}
+  background:linear-gradient(rgba(11,9,44,.55),rgba(20,16,70,.15) 40%,rgba(11,9,44,.8)),var(--art) var(--ax) var(--ay)/var(--azr,cover) no-repeat;image-rendering:auto}
 .room[hidden],.pgrid[hidden]{display:none!important}
 .room-head{position:absolute;inset:10px 12px auto;display:flex;align-items:center;gap:12px;flex-wrap:wrap;z-index:2}
 .room-head .back{background:var(--solid);border:2px solid var(--fg);color:var(--fg);padding:2px 10px;min-height:32px}
@@ -742,13 +748,15 @@ function placesOf(era){
   ];
 }
 // each place shows a crop of existing background art: [image, x%, y%]
+// each place zooms into its own part of the existing background art: [image, x%, y%, zoom]
+// zoom is the art's height relative to the card, so 300 shows about a third of the picture (desks, glass office, exit corridor ...)
 const ART = {
-  dev_floor:['bg_office_2016',14,52], ceo_room:['bg_office_2016',74,36], server_room:['bg_server_hall',30,45], lounge:['bg_office_2016',48,34],
-  lobby:['bg_office_2016',88,34], elsewhere:['bg_seoul_2026',70,45],
-  'moonlight hq':['bg_seoul_2026',27,40], 'nova hq':['bg_seoul_2026',40,40], newsroom:['bg_office_2016',36,42],
-  "ken's home":['bg_seoul_2026',88,44], 'vc office':['bg_office_2016',72,32], 'evidence storage':['bg_evidence_room',50,50]
+  dev_floor:['bg_office_2016',10,58,280], ceo_room:['bg_office_2016',78,36,380], server_room:['bg_server_hall',30,42,190],
+  lounge:['bg_office_2016',52,30,380], lobby:['bg_office_2016',90,32,420], elsewhere:['bg_seoul_2026',72,46,240],
+  'moonlight hq':['bg_seoul_2026',24,34,320], 'nova hq':['bg_seoul_2026',46,36,340], newsroom:['bg_office_2016',34,46,320],
+  "ken's home":['bg_seoul_2026',94,46,380], 'vc office':['bg_office_2016',64,24,420], 'evidence storage':['bg_evidence_room',40,58,220]
 };
-const artStyle = key => { const a=ART[key]; return a ? `--art:url("/assets/bg/${a[0]}.webp");--ax:${a[1]}%;--ay:${a[2]}%` : ''; };
+const artStyle = key => { const a=ART[key]; return a ? `--art:url("/assets/bg/${a[0]}.webp");--ax:${a[1]}%;--ay:${a[2]}%;--az:auto ${a[3]}%;--azr:auto ${Math.max(140, a[3]*.55|0)}%` : ''; };   // --azr: rooms are taller boxes, so less zoom shows the same part
 // record cards (data/case.json records); found by searching a place, only after visiting available_from or later
 const RECORDS = {
   report:    {title:'Incident report (Mar 16, 2016)', line:'Server-rack cover found open. Log-server disk missing. No witness statements filed.', icon:'report', from:null},
@@ -814,12 +822,26 @@ function typeInto(el, text, speed){ const tok=++typeTok; if (reduced){ el.textCo
 function phEl(k, style){ const p=PEOPLE[k], el=h('div',{class:'ph',text:p.ini,style:`--hair:${p.hair};--suit:${p.suit};${style||''}`}); setFace(el, k, S.era); return el; }
 // swap the drawn placeholder for the portrait of this era. With no art for this era (julia in 2026) keep the
 // current picture, so the leaving portrait fades out as itself; the initials show only if a file fails to load
-function setFace(ph, k, era){
-  const src=portraitSrc(k, era); let img=ph.querySelector('img');
+function setFace(ph, k, era, delay=0){
+  const src=portraitSrc(k, era); let img=ph.querySelector('img:not(.next)');
   if (!src) return;
-  if (!img){ img=h('img',{alt:'',decoding:'async'}); img.addEventListener('error',()=>{ img.remove(); ph.classList.remove('art'); }); ph.append(img); }
-  if (img.getAttribute('src')!==src){ img.dataset.want=src; const next=new Image(); next.src=src;
-    next.decode().catch(()=>{}).then(()=>{ if (img.dataset.want===src) img.src=src; }); }
+  if (!img){ img=h('img',{alt:'',decoding:'async',src}); img.addEventListener('error',()=>{ img.remove(); ph.classList.remove('art'); }); ph.append(img); ph.classList.add('art'); return; }
+  // back on the look already shown (fast scrubbing): cancel any pending or half-faded swap
+  if (img.getAttribute('src')===src){ ph.dataset.want=src; ph.querySelectorAll('img.next').forEach(n=>n.remove()); return; }
+  if (ph.dataset.want===src) return;
+  ph.dataset.want=src;
+  // decode first, then fade the new look in over the old one and drop the old image
+  const next=h('img',{alt:'',class:'next',decoding:'async',src});
+  // ready = loaded, then decoded (capped at 250ms so a stalled decode never blocks the swap)
+  const loaded = next.complete ? Promise.resolve() : new Promise(r=>{ next.addEventListener('load', r, {once:true}); next.addEventListener('error', r, {once:true}); });
+  loaded.then(()=>Promise.race([next.decode().catch(()=>{}), new Promise(r=>setTimeout(r,250))])).then(()=>setTimeout(()=>{
+    if (ph.dataset.want!==src) return;
+    ph.querySelectorAll('img.next').forEach(n=>{ if (n!==next) n.remove(); });
+    ph.append(next); void next.offsetWidth; next.classList.add('on');   // reflow so the fade starts from opacity 0
+    const done=()=>{ if (!next.isConnected) return; img.remove(); next.classList.remove('next','on'); };
+    if (reduced) done(); else next.addEventListener('transitionend', done, {once:true});
+    setTimeout(done, 700);
+  }, reduced ? 0 : delay));
   ph.classList.add('art');
 }
 
@@ -850,7 +872,7 @@ const status = k => S.visited.has(k+S.era) ? 'some' : 'new';
 function polBadges(){ Object.entries(pols).forEach(([k,el])=>{ el.classList.toggle('sel', k===S.person); const want = isHere(k, S.era) && status(k)==='new', tag=el.querySelector('.new'); if (want && !tag) el.append(h('span',{class:'new',text:'★ NEW'})); else if (!want && tag) tag.remove(); }); }
 function renderMap(){
   const era=S.era, plan=$('#plan');
-  Object.entries(pols).forEach(([k,el])=>setFace(el.querySelector('.ph'), k, era));
+  ORDER.forEach((k,i)=>setFace(pols[k].querySelector('.ph'), k, era, i*45));   // a light left-to-right ripple
   plan.classList.toggle('y26', era==='2026');
   plan.classList.toggle('radio', era!=='2026');
   document.documentElement.dataset.bg = era>='2025' ? 'seoul' : 'office';
@@ -863,7 +885,9 @@ function renderMap(){
     const k=slot.dataset.k, here=isHere(k, era), el=pols[k];
     slot.classList.toggle('away', !here); el.classList.toggle('away', !here); el.disabled=!here;
     el.setAttribute('aria-label', here ? 'question '+PEOPLE[k].name : `${PEOPLE[k].name} is not here in ${era}`);
-    slot.lastElementChild.textContent = here ? roleOf(k, +era) : `not in ${era}`;
+    const note=slot.lastElementChild, text = here ? roleOf(k, +era) : `not in ${era}`;
+    if (note.textContent && note.textContent!==text && !reduced){ note.classList.add('swap'); setTimeout(()=>{ note.textContent=text; note.classList.remove('swap'); }, 160); }
+    else note.textContent=text;
   });
   polBadges();
 }
