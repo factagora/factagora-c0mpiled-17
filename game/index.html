@@ -10,7 +10,7 @@
 :root{
   --sky1:#0d0930; --sky2:#2a1f86; --sea:#120e4c;
   --panel:rgba(11,9,44,.88); --solid:#0b092c; --fg:#eceaff; --muted:#a3a0dc; --dim:#6f6cab;
-  --gold:#f5c451; --cyan:#7fd6ff; --red:#ff6b7f; --portrait:#2c3aa8; --skin:#e2ae86;
+  --gold:#f5c451; --green:#6fdc8c; --cyan:#7fd6ff; --red:#ff6b7f; --portrait:#2c3aa8; --skin:#e2ae86;
   --px:'DotGothic16','MS Gothic','Osaka-Mono',ui-monospace,monospace;
   color-scheme:dark;
 }
@@ -148,9 +148,18 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .vrows dt{color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
 .vrows dd{margin:0}
 #vMark.ok{color:var(--gold)} #vMark.no{color:var(--red)}
-.segments{display:flex;gap:4px;margin:6px 0}
-.segments i{flex:1;max-width:28px;height:12px;background:var(--dim)}
-.segments i.on{background:var(--gold)}
+.vrows dt .vtotal{display:block;color:var(--fg);text-transform:none;letter-spacing:0;font-weight:normal}
+.sbar{display:flex;gap:10px;margin:0 0 6px;max-width:340px}   /* the culprit track is 30% of the bar (30 points), the motive track 70% */
+.sgroup{min-width:0}
+.sgroup.c{flex:3}
+.sgroup.m{flex:7}
+.sgroup .slab{display:block;font-size:14px;line-height:27px;letter-spacing:.04em}   /* label row = the SCORE label's line, so the bar sits on the total's line */
+.sgroup.c .slab{color:var(--green)}
+.sgroup.m .slab{color:var(--gold)}
+.sgroup .track{height:12px;margin:8px 0 2px;background:var(--dim)}
+.sgroup .fill{display:block;height:100%}
+.sgroup.c .fill{background:var(--green)}
+.sgroup.m .fill{background:var(--gold)}
 #vMotives{list-style:none;margin:0;padding:0;font-size:14px}
 #vMotives li{display:flex;justify-content:space-between;gap:12px;color:var(--muted)}
 #vMotives li.on{color:var(--fg)}
@@ -417,7 +426,7 @@ html:not([data-screen="brief"]) #s-brief{display:none}
       <li><b>Pick a year</b> on the time slider under the map.</li>
       <li><b>Click someone</b> on the map and ask them anything.</li>
       <li><b>Compare</b> what the same person says in different years. Keep the lies in your memo.</li>
-      <li><b>Accuse</b> one person. You get one try.</li>
+      <li><b>Accuse</b> one person. Your memo is read as the motive and scored. You get one try.</li>
     </ol>
     <button class="t-answer b-go" id="bStart">Start the investigation ▶</button>
   </div>
@@ -450,7 +459,7 @@ html:not([data-screen="brief"]) #s-brief{display:none}
             <legend id="susLegend" class="mstep">who did it? <b id="susPicked">pick one</b></legend>
             <div id="susOpts"></div>
           </fieldset>
-          <small id="accuseMsg" aria-live="polite">pick one person to submit.</small>
+          <small id="accuseMsg" aria-live="polite">pick one person to submit. your memo is scored as the motive.</small>
           <div class="mbtns">
             <button type="button" class="pbtn ghostb" id="toMemo">◀ memo</button>
             <button class="pbtn" id="accuseSubmit">submit</button>
@@ -476,7 +485,7 @@ html:not([data-screen="brief"]) #s-brief{display:none}
   <h2 id="vTitle"></h2>
   <dl class="vrows">
     <dt>culprit</dt><dd><span id="vWho"></span> <b id="vMark"></b></dd>
-    <dt>motive</dt><dd><span id="vScore"></span><div class="segments" id="vSeg" aria-hidden="true"></div><ul id="vMotives"></ul></dd>
+    <dt>score<b class="vtotal" id="vScore"></b></dt><dd><div class="sbar" id="vSeg" aria-hidden="true"></div><ul id="vMotives"></ul></dd>
   </dl>
   <blockquote id="vQuote"></blockquote>
   <div id="vSummary"></div>
@@ -747,7 +756,7 @@ $('#accuseView').addEventListener('submit', e=>{
   if (!pick){ msg.textContent='pick who did it.'; $('#susOpts input').focus(); return; }
   const lock = on => $('#accuseView').querySelectorAll('input,#accuseSubmit').forEach(el=>el.disabled=on);
   lock(true); msg.textContent='sending…';
-  fetch('/api/accuse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({who:pick.value})})
+  fetch('/api/accuse',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({who:pick.value, memo:$('#memo').value.slice(-8000)})})
     .then(r=>{ if (!r.ok) throw new Error(r.status); return r.json(); })
     .then(v=>{
       S.verdict=v;
@@ -766,12 +775,21 @@ function showVerdict(v, who){
   $('#vWho').textContent=PEOPLE[who].name;
   $('#vMark').textContent = v.correct ? '✓ correct' : '! wrong';
   $('#vMark').className = v.correct ? 'ok' : 'no';
-  $('#vScore').textContent = `${v.score} / 100`;
+  const total = v.total_score ?? v.score;   // culprit points + motive points
+  $('#vScore').textContent = `${total} / 100`;
+  // the bar is 100 points wide: the culprit track (green) is 30 of them, the motive track (gold) 70; each fills by the points earned
+  const culprit = v.culprit_points ?? (v.correct ? 30 : 0);
+  const motive = v.motive_points ?? total - culprit;
+  const part = (cls, label, points, max) => {
+    const pct = Math.min(100, points / max * 100);
+    return h('div',{class:'sgroup '+cls}, h('span',{class:'slab',text:label}),
+      h('div',{class:'track'}, h('i',{class:'fill',style:`width:${pct}%${pct>0?';min-width:3px':''}`})));
+  };
   const seg=$('#vSeg'); seg.innerHTML='';
-  for (let i=0;i<10;i++) seg.append(h('i',{class: i < v.score/10 ? 'on' : ''}));
+  seg.append(part('c','culprit',culprit,30), part('m','motive',motive,70));
   const ul=$('#vMotives'); ul.innerHTML='';
   if (!v.motives.length) ul.append(h('li',{text:'no known motive found in what you wrote.'}));
-  v.motives.forEach(m=>ul.append(h('li',{class:m.counted?'on':''}, h('span',{text:(m.counted?'✓ ':'— ')+m.label}), h('span',{text:m.counted?m.points:0}))));
+  v.motives.forEach(m=>ul.append(h('li',{class:m.counted?'on':''}, h('span',{text:(m.counted?'✓ ':'— ')+m.label}), h('span',{text:m.counted?(m.earned ?? m.points):0}))));
   $('#vQuote').textContent=`${PEOPLE[who].short}: “${v.reaction}”`;
   const sm=$('#vSummary'); sm.innerHTML=''; v.summary.forEach(t=>sm.append(h('p',{text:t})));
   d.showModal();
@@ -813,7 +831,7 @@ $('#nickForm').addEventListener('submit', e=>{
   if (BOARD.some(r=>r.nick.toLowerCase()===nick.toLowerCase())) return fail('that name is taken. try another.');
   $('#nick').disabled=$('#nickSubmit').disabled=true; msg.className=''; msg.textContent='registering…';
   setTimeout(()=>{   // stands in for the network round trip
-    myEntry={nick, ending:S.verdict.ending, score:S.verdict.score, me:true};
+    myEntry={nick, ending:S.verdict.ending, score:S.verdict.total_score ?? S.verdict.score, me:true};
     BOARD.push(myEntry);
     $('#vRegister').textContent='leaderboard ▶';
     showNick(false);
