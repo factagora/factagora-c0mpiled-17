@@ -1,21 +1,21 @@
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
-const { TIMEPOINTS, NAMES, appearsAt, spacesOf, hiddenRefs, systemPrompt, screenText } = require("./characters");
-const { judgeScored } = require("./scoring");
-const { createLeaderboard, createVerdictStore, parseNick } = require("./leaderboard");
-const { createLimiter, clientKey } = require("./ratelimit");
+const { TIMEPOINTS, NAMES, appearsAt, spacesOf, hiddenRefs, systemPrompt, screenText } = require("./lib/characters");
+const { judgeScored } = require("./lib/scoring");
+const { createLeaderboard, createVerdictStore, parseNick } = require("./lib/leaderboard");
+const { createLimiter, clientKey } = require("./lib/ratelimit");
+const { readSpace } = require("./lib/tckg");
+const { chat } = require("./lib/llm");
 
 const port = process.env.PORT || 3000;
 const board = createLeaderboard();
 const verdicts = createVerdictStore();
 const accuseAllowed = createLimiter({ max: 5, windowMs: 60 * 1000 });
+const askAllowed = createLimiter({ max: 30, windowMs: 60 * 1000 });   // one LLM call per question
 
-const GAME_FILE = path.join(__dirname, "game", "index.html");
-const STATIC = {
-  "/client/": path.join(__dirname, "client"),
-  "/assets/": path.join(__dirname, "game", "assets"),   // portraits, backgrounds, item icons
-};
+// The React app (web/) is built into web/dist: index.html, app/ (scripts, styles) and assets/ (game art).
+const WEB_DIR = path.join(__dirname, "web", "dist");
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -29,7 +29,6 @@ const MIME = {
   ".json": "application/json; charset=utf-8",
 };
 
-const TCKG_BASE = "https://tckg.app.factagora.com";
 const MAX_BODY = 64 * 1024;
 
 function notFound(res) {
@@ -42,18 +41,17 @@ function sendJson(res, status, body) {
   res.end(JSON.stringify(body));
 }
 
-function serveStatic(prefix, pathname, res) {
-  const dir = STATIC[prefix];
+function serveStatic(pathname, res) {
   let rel;
   try {
-    rel = decodeURIComponent(pathname.slice(prefix.length)) || "index.html";
+    rel = decodeURIComponent(pathname).replace(/^\/+/, "") || "index.html";
   } catch {
     return notFound(res);
   }
   // A null byte makes fs throw, which would take the whole server down.
   if (rel.includes("\0")) return notFound(res);
-  const file = path.join(dir, rel);
-  if (!file.startsWith(dir + path.sep)) return notFound(res);
+  const file = path.join(WEB_DIR, rel);
+  if (!file.startsWith(WEB_DIR + path.sep)) return notFound(res);
 
   fs.stat(file, (err, stat) => {
     if (err || !stat.isFile()) return notFound(res);
@@ -61,7 +59,7 @@ function serveStatic(prefix, pathname, res) {
       "Content-Type": MIME[path.extname(file).toLowerCase()] || "application/octet-stream",
       "Content-Length": stat.size,
       // Art in /assets/ changes rarely: let browsers reuse it for an hour and refresh in the background after that.
-      "Cache-Control": prefix === "/assets/" ? "public, max-age=3600, stale-while-revalidate=86400" : "no-cache",
+      "Cache-Control": rel.startsWith("assets/") ? "public, max-age=3600, stale-while-revalidate=86400" : "no-cache",
     });
     // An unreadable file must end this one response, not crash the server.
     fs.createReadStream(file).on("error", () => res.destroy()).pipe(res);
@@ -126,47 +124,9 @@ function parseAsk(b) {
   };
 }
 
-// One retry when the connection drops ("fetch failed"); timeouts and HTTP errors are not retried.
-async function fetchRetry(url, opts) {
-  try {
-    return await fetch(url, opts);
-  } catch (e) {
-    if (e.name === "TimeoutError") throw e;
-    return fetch(url, opts);
-  }
-}
-
-// Every memory in a space known as of the time point (spaces are small, so no search; reads are free).
-async function readSpace(space, asOf) {
-  const items = [];
-  let after = null;
-  do {
-    const q = new URLSearchParams({ as_of: asOf, space, limit: "200", ...(after ? { after } : {}) });
-    const res = await fetchRetry(`${TCKG_BASE}/api/${process.env.TCKG_COLLECTION_ID}/v1/memories?${q}`, {
-      headers: { Authorization: `Bearer ${process.env.TCKG_TOKEN}` },
-      signal: AbortSignal.timeout(20000),
-    });
-    if (!res.ok) throw new Error(`tckg memories returned ${res.status}: ${(await res.text()).slice(0, 200)}`);
-    const page = await res.json();
-    items.push(...page.items);
-    after = page.next;
-  } while (after);
-  return items.map((m) => ({ id: m.id, ref: m.payload?.ref, type: m.payload?.type, said: m.asserted_at, statement: m.statement }));
-}
-
-async function chat(messages) {
-  const res = await fetchRetry(`${process.env.AOAI_ENDPOINT.replace(/\/$/, "")}/openai/v1/chat/completions`, {
-    method: "POST",
-    headers: { "api-key": process.env.AOAI_API_KEY, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: process.env.AOAI_DEPLOYMENT, messages, reasoning_effort: "low", response_format: { type: "json_object" } }),
-    signal: AbortSignal.timeout(60000),
-  });
-  if (!res.ok) throw new Error(`AOAI returned ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  return (await res.json()).choices[0].message.content.trim();
-}
-
 async function handleAsk(req, res) {
   const started = Date.now();
+  if (!askAllowed(clientKey(req))) return sendJson(res, 429, { error: "Too many questions. Wait a minute and try again." });
   let body;
   try {
     body = await readJson(req);
@@ -307,14 +267,8 @@ function handle(req, res) {
       if (!res.headersSent) sendJson(res, 500, { error: "Something went wrong." });
     });
   }
-  const prefix = Object.keys(STATIC).find((p) => pathname.startsWith(p));
-  if (prefix) return serveStatic(prefix, pathname, res);
-
-  if (pathname === "/") {
-    res.writeHead(200, { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "no-cache" });
-    return fs.createReadStream(GAME_FILE).pipe(res);
-  }
-  notFound(res);
+  if (req.method !== "GET" && req.method !== "HEAD") return sendJson(res, 405, { error: "Use GET." });
+  serveStatic(pathname, res);
 }
 
 if (require.main === module) {

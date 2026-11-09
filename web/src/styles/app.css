@@ -1,0 +1,2 @@
+/* The game CSS lays out #hud and main as direct children of body; let React's root box disappear from layout. */
+#root{display:contents}
