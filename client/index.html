@@ -72,7 +72,8 @@
       pinsEl.replaceChildren(
         ...game.pins.map((card) => {
           const li = document.createElement("li");
-          li.append(card, button("Unpin", () => { unpin(game, card); render(); }));
+          li.append(`${card.text} `, Object.assign(document.createElement("span"), { className: "muted", textContent: `[${card.refs.join(", ")}]` }),
+            button("Unpin", () => { unpin(game, card.text); render(); }));
           return li;
         }),
       );
