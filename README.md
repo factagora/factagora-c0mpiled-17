@@ -125,6 +125,6 @@ A push to `main` deploys to Azure App Service through GitHub Actions; CI runs `t
 ## Team
 
 - **Minchur**: environment, server, TCKG integration
-- **Sky (Haneul)**: story, case data, TCKG seed
+- **Haneul**: story, case data, TCKG seed
 - **Minji**: design system, game screens
 - **Jiwon**: characters and art, game UI
