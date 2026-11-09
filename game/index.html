@@ -150,6 +150,34 @@ input[type=range]{width:100%;accent-color:var(--gold);min-height:32px}
 .casebox{margin-top:54px;min-height:150px;display:flex;flex-direction:column;justify-content:center}
 .casebox p{margin:0;font-size:clamp(19px,2.3vw,28px);line-height:1.7;letter-spacing:.02em}
 .more{position:absolute;right:28px;bottom:16px;color:var(--fg);animation:more 1s steps(2) infinite}
+
+/* MAP fits one laptop screen: HUD on top, map + list fill the rest, case file at the bottom. No page scroll. */
+@media (min-width:901px){
+  html[data-screen="map"],html[data-screen="map"] body{height:100%;overflow:hidden}
+  html[data-screen="map"] body{display:flex;flex-direction:column}
+  html[data-screen="map"] #hud{position:relative;flex:none}
+  html[data-screen="map"] #hud .wrap{padding-block:10px 4px}
+  html[data-screen="map"] .timebox{padding:8px 18px 10px;gap:6px}
+  html[data-screen="map"] .navbox{padding:8px 18px}
+  html[data-screen="map"] main{flex:1;min-height:0;display:flex}
+  html[data-screen="map"] #s-map{flex:1;min-height:0;display:flex}
+  #s-map .wrap{flex:1;min-height:0;width:100%;display:grid;grid-template-rows:minmax(0,1fr) auto;padding-block:clamp(8px,1.6vh,14px) clamp(10px,2vh,18px)}
+  #s-map .mapgrid{margin-top:0;min-height:0;gap:clamp(16px,2vw,28px)}
+  #s-map .mapgrid>.win{min-height:0;display:flex;flex-direction:column;padding:clamp(12px,2vh,22px) clamp(16px,1.8vw,24px)}
+  #s-map .plan{flex:1;min-height:0;margin-top:clamp(6px,1.2vh,14px);grid-template-rows:repeat(2,minmax(0,1fr));grid-auto-rows:minmax(0,1fr)}
+  #s-map .plan{container-type:size}
+  #s-map .cell{min-height:0;padding:clamp(6px,1vh,10px) 12px;gap:2px;overflow:hidden}
+  /* one portrait size for every room, from the height of one row: row minus label, sub line, badge and name */
+  #s-map .pol{padding-top:20px;gap:2px;width:auto;font-size:15px}
+  #s-map .pol .ph{width:clamp(40px,calc(50cqh - 116px),96px);height:clamp(40px,calc(50cqh - 116px),96px)}
+  #s-map .pol .new,#s-map .pol .mark{font-size:13px}
+  #s-map .golist{margin-top:clamp(6px,1.2vh,18px);flex:1;min-height:0;gap:0;justify-content:space-between}
+  #s-map .golist button{min-height:0;padding:clamp(2px,.6vh,8px) 4px;font-size:clamp(15px,1.5vw,20px);line-height:1.3}
+  #s-map .golist small{display:inline!important;margin-left:.6em}   /* place on the same line keeps 7 rows short */
+  #s-map .diamonds{margin-top:clamp(6px,1.2vh,18px)!important}
+  #s-map .casebox{margin-top:34px;min-height:0;padding:clamp(12px,2vh,22px) 24px}
+  #s-map .casebox p{font-size:clamp(16px,1.6vw,22px);line-height:1.5;min-height:3em}
+}
 @keyframes more{50%{transform:translateY(4px)}}
 
 /* VHS */
@@ -400,7 +428,7 @@ function phEl(k, style){ const p=PEOPLE[k]; return h('div',{class:'ph',text:p.in
 /* ---------- NAV ---------- */
 const SCREENS=['title','brief','map'];
 function go(name){
-  S.screen=name;
+  S.screen=name; document.documentElement.dataset.screen=name;
   SCREENS.forEach(n=>{ $('#s-'+n).hidden = n!==name; });
   const sc=$('#s-'+name); sc.classList.remove('screen'); void sc.offsetWidth; sc.classList.add('screen');
   $('#hud').hidden = name!=='map';
