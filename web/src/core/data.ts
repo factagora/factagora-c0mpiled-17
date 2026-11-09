@@ -14,10 +14,11 @@ export interface Person {
   suit: string;
   img: string;
   face: Partial<Record<Look, string>>;
+  died?: string; // YYYY-MM-DD; from the next year on the person shows as dead
 }
 
 export const PEOPLE: Record<PersonId, Person> = {
-  jisoo: { name: "Julia Han", short: "Julia", ini: "JH", hair: "#1a1230", suit: "#2f6f8f", img: "jisoo", face: { "2016": "neutral" } },
+  jisoo: { name: "Julia Han", short: "Julia", ini: "JH", hair: "#1a1230", suit: "#2f6f8f", img: "jisoo", face: { "2016": "neutral" }, died: "2016-03-15" },
   dohyun: { name: "Daniel Kang", short: "Daniel", ini: "DK", hair: "#2a1d14", suit: "#4a4a6a", img: "dohyun", face: { "2016": "neutral", mid: "neutral", "2026": "defensive" } },
   minjae: { name: "Marcus Oh", short: "Marcus", ini: "MO", hair: "#141018", suit: "#6a3a5a", img: "minjae", face: { "2016": "neutral", mid: "neutral", "2026": "neutral" } },
   hana: { name: "Hannah Yoo", short: "Hannah", ini: "HY", hair: "#5a2e1a", suit: "#c9a24a", img: "hana", face: { "2016": "neutral", mid: "neutral", "2026": "neutral" } },
@@ -42,14 +43,16 @@ export function roleOf(k: PersonId, y: number): string {
 // Seven time points: March 15 at 22:50 by radio, 2026 in person.
 export const ERAS: Era[] = ["2015", "2016", "2017", "2018", "2019", "2025", "2026"];
 export const ERA_NOTE: Record<Era, string> = {
-  "2015": "year one, prototype all-nighter",
-  "2016": "33 minutes before",
-  "2017": "first memorial, ken's last shift",
-  "2018": "second memorial, hannah's first article",
-  "2019": "third memorial, fellowship prep",
-  "2025": "ninth memorial, after hannah finds the contract",
-  "2026": "present",
+  "2015": "a year before julia dies · prototype all-nighter",
+  "2016": "33 minutes before julia dies",
+  "2017": "1 year after julia's death · ken's last shift",
+  "2018": "2 years after julia's death · hannah's first article",
+  "2019": "3 years after julia's death · fellowship prep",
+  "2025": "9 years after julia's death · hannah found the contract",
+  "2026": "10 years after julia's death · where are they now",
 };
+// Julia Han is found dead on March 15, 2016 at 23:23, 33 minutes after the 2016 radio call.
+export const isDead = (k: PersonId, era: Era) => !!PEOPLE[k].died && era > PEOPLE[k].died!.slice(0, 4);
 export const timepointOf = (era: Era) => `T${era}`;
 
 // Portrait looks: 2016 covers 2015-2016, mid covers 2017-2019, 2026 covers 2025-2026.

@@ -1,6 +1,6 @@
 // A person's portrait for a year, over a drawn placeholder with initials (shown only if the image fails).
 // On a year change the next look is decoded first, then fades in over the old one (delay staggers a row).
-import { useEffect, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import { type Era, type PersonId, PEOPLE, portraitSrc } from "../core/data";
 import { reduced } from "../core/fx";
 
@@ -19,7 +19,7 @@ function fadeIn(el: HTMLImageElement | null) {
   if (el?.classList.contains("next")) { void el.offsetWidth; el.classList.add("on"); }
 }
 
-export function Portrait({ who, era, delay = 0 }: { who: PersonId; era: Era; delay?: number }) {
+export function Portrait({ who, era, delay = 0, children }: { who: PersonId; era: Era; delay?: number; children?: ReactNode }) {
   const p = PEOPLE[who];
   const src = portraitSrc(who, era);
   const [shown, setShown] = useState(src);
@@ -53,6 +53,7 @@ export function Portrait({ who, era, delay = 0 }: { who: PersonId; era: Era; del
         <img key={s} ref={fadeIn} src={s} alt="" decoding="async" className={s === shown ? undefined : "next"}
           onError={() => setFailed(s)} onTransitionEnd={s === shown ? undefined : () => setShown(s)} />
       ))}
+      {children}
     </div>
   );
 }

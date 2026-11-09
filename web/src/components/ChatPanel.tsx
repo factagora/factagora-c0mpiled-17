@@ -8,8 +8,10 @@ import { toast, useUi } from "../store/ui";
 
 const introOf = (era: string) =>
   era === "2026"
-    ? "Ten years later. The survivors remember less and hide more. Ask the same things and listen for what changed."
-    : `March 15, ${era}, 22:50 · ${ERA_NOTE[era as keyof typeof ERA_NOTE]}. The radio is live and nobody knows what is coming. Pick someone on the map to talk.`;
+    ? "Ten years after Julia Han was found dead in the server room. The survivors remember less and hide more. Ask the same things and listen for what changed."
+    : era <= "2016"
+      ? `March 15, ${era}, 22:50 · ${ERA_NOTE[era as keyof typeof ERA_NOTE]}. Julia Han is still alive: on March 15, 2016 at 23:23 she is found dead in the server room. The radio is live and nobody knows what is coming. Pick someone on the map to talk.`
+      : `March 15, ${era}, 22:50 · ${ERA_NOTE[era as keyof typeof ERA_NOTE]}. Julia Han was found dead in the server room on March 15, 2016 at 23:23. Pick someone on the map to talk.`;
 
 // drag the grip (or arrow keys) to resize the chat; kept only for this page load
 function useResize(wrap: RefObject<HTMLDivElement>, chat: RefObject<HTMLDivElement>) {
