@@ -19,8 +19,14 @@ export function saveGame(game) {
   }
 }
 
+// A new game wipes the previous one from this browser (turns, pins and memo).
 export function newGame() {
-  const game = { id: crypto.randomUUID(), turns: [], pins: [] };
+  try {
+    localStorage.removeItem(KEY);
+  } catch {
+    // Storage blocked: nothing to wipe.
+  }
+  const game = { id: crypto.randomUUID(), turns: [], pins: [], memo: "" };
   saveGame(game);
   return game;
 }
@@ -29,7 +35,9 @@ export function loadGame() {
   try {
     const game = JSON.parse(localStorage.getItem(KEY));
     if (game && game.id && Array.isArray(game.turns)) {
-      game.pins = Array.isArray(game.pins) ? game.pins : [];
+      // Older saves kept pins as plain text.
+      game.pins = (Array.isArray(game.pins) ? game.pins : []).map((c) => (typeof c === "string" ? { text: c, refs: [] } : c));
+      game.memo = typeof game.memo === "string" ? game.memo : "";
       return game;
     }
   } catch {
@@ -38,19 +46,24 @@ export function loadGame() {
   return newGame();
 }
 
-// A card is one line the player pinned: "who (time point): what they said".
-export const cardOf = (turn, names = {}) => `${names[turn.character] || turn.character} (${turn.timepoint}): ${turn.answer}`;
+// A card is one answer the player pinned: its text plus the refs of the memories behind it.
+// Showing a card with the right refs to someone else opens what they were keeping back.
+export const cardOf = (turn, names = {}) => ({
+  text: `${names[turn.character] || turn.character} (${turn.timepoint}): ${turn.answer}`,
+  refs: turn.refs || [],
+});
 
-export function pin(game, turn, names) {
-  const card = cardOf(turn, names);
-  if (game.pins.includes(card) || game.pins.length >= MAX_PINS) return false;
+// Record cards from the case data (data/case.json is safe to send to the browser) can be pinned as { text, refs } too.
+export function pin(game, turnOrCard, names) {
+  const card = "answer" in turnOrCard ? cardOf(turnOrCard, names) : turnOrCard;
+  if (game.pins.some((c) => c.text === card.text) || game.pins.length >= MAX_PINS) return false;
   game.pins.push(card);
   saveGame(game);
   return true;
 }
 
-export function unpin(game, card) {
-  game.pins = game.pins.filter((c) => c !== card);
+export function unpin(game, text) {
+  game.pins = game.pins.filter((c) => c.text !== text);
   saveGame(game);
 }
 
@@ -74,7 +87,7 @@ export async function ask(game, character, timepoint, question) {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error);
-  const turn = { character, timepoint, question, answer: data.answer, at: Date.now() };
+  const turn = { character, timepoint, question, answer: data.answer, refs: data.refs || [], at: Date.now() };
   game.turns.push(turn);
   saveGame(game);
   return turn;

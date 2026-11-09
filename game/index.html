@@ -167,6 +167,8 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .msg{max-width:72%;padding:6px 12px;border:2px solid var(--muted);font-size:clamp(15px,1.4vw,18px);line-height:1.45;align-self:flex-start}
 .msg b{display:block;font-weight:400;font-size:13px;color:var(--muted)}
 .msg.me{align-self:flex-end;border-color:var(--gold);color:var(--gold)}
+.msg .tomemo{display:block;margin-top:4px;background:transparent;border:0;padding:0;color:var(--muted);font-size:13px;cursor:pointer}
+.msg .tomemo:hover,.msg .tomemo:focus-visible{color:var(--gold)}
 .chatgrip{display:none}
 .chatform{display:flex;gap:10px;margin-top:10px}
 .chatform input{flex:1;min-width:0;background:transparent;border:3px solid var(--muted);padding:8px 12px;font-size:16px}
@@ -646,7 +648,19 @@ function renderMap(animate){
 // The case data calls Julia "jisoo"; the map era picks the case time point.
 const apiId = k => k;   // screen ids are the case data ids (jisoo, dohyun, ...)
 let G=null, game=null, asking=false;
-import('/client/game.js').then(m=>{ G=m; game=G.loadGame(); updateLogCount(); renderChat(); }).catch(()=>toast('could not load the chat'));
+// Every answered radio call is a new game, so people sharing one browser never see each other's chats.
+let fresh=false;
+function startGame(){ fresh=true; $('#memo').value=''; if (!G) return; game=G.newGame(); updateLogCount(); renderChat(); }
+import('/client/game.js').then(m=>{ G=m; game = fresh ? G.newGame() : G.loadGame(); $('#memo').value=game.memo; updateLogCount(); renderChat(); }).catch(()=>toast('could not load the chat'));
+// The memo is part of the game save; a new game clears it.
+$('#memo').addEventListener('input', e=>{ if (!game) return; game.memo=e.target.value; G.saveGame(game); });
+// Copies one answer into the memo with when and who, so the player can line up statements across time points.
+function toMemo(t, p){
+  const when = t.timepoint==='T2026' ? '2026 · now' : `${t.timepoint.slice(1)}-03-15 22:50`;
+  const memo=$('#memo'), line=`[${when} · ${p.short}] ${t.answer}`;
+  memo.value = memo.value ? `${memo.value.replace(/\s+$/,'')}\n${line}` : line;
+  game.memo=memo.value; G.saveGame(game); memo.scrollTop=memo.scrollHeight; toast('added to memo');
+}
 const turnsHere = () => game ? game.turns.filter(t=>t.character===apiId(S.person) && t.timepoint==='T'+S.era) : [];
 function updateLogCount(){ $('#logCount').textContent = game ? game.turns.length : 0; }
 const introOf = era => era==='2026'
@@ -662,7 +676,7 @@ function renderChat(){
   if (!msgs.length && !asking) log.append(h('p',{class:'intro muted',text:`${p.name} · ${roleOf(S.person, +S.era)} · ${S.era}. Ask anything.`}));
   msgs.forEach(t=>log.append(
     h('div',{class:'msg me'}, h('b',{text:'you'}), t.question),
-    h('div',{class:'msg'}, h('b',{text:p.short}), t.answer)));
+    h('div',{class:'msg'}, h('b',{text:p.short}), t.answer, h('button',{type:'button',class:'tomemo',text:'→ memo',onclick:()=>toMemo(t, p)}))));
   if (asking) log.append(h('div',{class:'msg me'}, h('b',{text:'you'}), asking), h('p',{class:'intro muted',text:`${p.short} is answering…`}));
   log.scrollTop=log.scrollHeight;
 }
@@ -848,6 +862,7 @@ const tClock = setInterval(()=>{ if (tuned) return; tSecs=(tSecs+1)%60; $('#tTim
 function answer(){
   if (!tuned || answered) return;
   answered=true; dial.disabled=true; $('#tAnswer').disabled=true; clearInterval(tClock);
+  startGame();
   $('#tStatus').textContent='connecting…';
   burst(reduced?0:420);
   setTimeout(()=>{ document.documentElement.dataset.screen='map'; renderMap(false); $('#timeRange').focus(); }, reduced?0:420);

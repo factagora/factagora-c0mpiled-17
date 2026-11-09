@@ -1,7 +1,7 @@
 const http = require("node:http");
 const fs = require("node:fs");
 const path = require("node:path");
-const { TIMEPOINTS, NAMES, appearsAt, spacesOf, systemPrompt } = require("./characters");
+const { TIMEPOINTS, NAMES, appearsAt, spacesOf, hiddenRefs, systemPrompt } = require("./characters");
 const { judge } = require("./accuse");
 
 const port = process.env.PORT || 3000;
@@ -100,10 +100,12 @@ function parseAsk(b) {
   if (!Array.isArray(history) || history.length > 20 || !history.every(goodTurn)) {
     return { error: "history must be at most 20 items of { role: user | assistant, content }." };
   }
-  // Pinned cards from other time points that the player shows to the character.
-  const evidence = b.evidence ?? [];
-  if (!Array.isArray(evidence) || evidence.length > 10 || !evidence.every((e) => isText(e, 500))) {
-    return { error: "evidence must be at most 10 texts of up to 500 characters." };
+  // Pinned cards the player shows to the character: { text, refs } (refs open locked memories), or plain text.
+  const evidence = (b.evidence ?? []);
+  const goodRefs = (r) => r === undefined || (Array.isArray(r) && r.length <= 10 && r.every((x) => typeof x === "string" && /^[A-Z]\d{2}$/.test(x)));
+  const goodCard = (e) => isText(e, 500) || (e && typeof e === "object" && isText(e.text, 500) && goodRefs(e.refs));
+  if (!Array.isArray(evidence) || evidence.length > 10 || !evidence.every(goodCard)) {
+    return { error: "evidence must be at most 10 cards of { text, refs } (or text) up to 500 characters." };
   }
   return {
     gameId: b.gameId ?? null,
@@ -111,27 +113,43 @@ function parseAsk(b) {
     timepoint: b.timepoint,
     question: b.question.trim(),
     history: history.map(({ role, content }) => ({ role, content })),
-    evidence,
+    evidence: evidence.map((e) => (typeof e === "string" ? { text: e, refs: [] } : { text: e.text, refs: e.refs || [] })),
   };
 }
 
-// The time point decides as_of, so a 2016 call only sees what was known in 2016.
-async function searchSpace(space, asOf, query) {
-  const res = await fetch(`${TCKG_BASE}/api/${process.env.TCKG_COLLECTION_ID}/v1/search`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${process.env.TCKG_TOKEN}`, "Content-Type": "application/json" },
-    body: JSON.stringify({ query, as_of: asOf, space, limit: 8 }),
-    signal: AbortSignal.timeout(20000),
-  });
-  if (!res.ok) throw new Error(`tckg search returned ${res.status}: ${(await res.text()).slice(0, 200)}`);
-  return (await res.json()).hits.map((h) => ({ id: h.node.id, statement: h.node.statement }));
+// One retry when the connection drops ("fetch failed"); timeouts and HTTP errors are not retried.
+async function fetchRetry(url, opts) {
+  try {
+    return await fetch(url, opts);
+  } catch (e) {
+    if (e.name === "TimeoutError") throw e;
+    return fetch(url, opts);
+  }
+}
+
+// Every memory in a space known as of the time point (spaces are small, so no search; reads are free).
+async function readSpace(space, asOf) {
+  const items = [];
+  let after = null;
+  do {
+    const q = new URLSearchParams({ as_of: asOf, space, limit: "200", ...(after ? { after } : {}) });
+    const res = await fetchRetry(`${TCKG_BASE}/api/${process.env.TCKG_COLLECTION_ID}/v1/memories?${q}`, {
+      headers: { Authorization: `Bearer ${process.env.TCKG_TOKEN}` },
+      signal: AbortSignal.timeout(20000),
+    });
+    if (!res.ok) throw new Error(`tckg memories returned ${res.status}: ${(await res.text()).slice(0, 200)}`);
+    const page = await res.json();
+    items.push(...page.items);
+    after = page.next;
+  } while (after);
+  return items.map((m) => ({ id: m.id, ref: m.payload?.ref, type: m.payload?.type, said: m.asserted_at, statement: m.statement }));
 }
 
 async function chat(messages) {
-  const res = await fetch(`${process.env.AOAI_ENDPOINT.replace(/\/$/, "")}/openai/v1/chat/completions`, {
+  const res = await fetchRetry(`${process.env.AOAI_ENDPOINT.replace(/\/$/, "")}/openai/v1/chat/completions`, {
     method: "POST",
     headers: { "api-key": process.env.AOAI_API_KEY, "Content-Type": "application/json" },
-    body: JSON.stringify({ model: process.env.AOAI_DEPLOYMENT, messages, reasoning_effort: "low" }),
+    body: JSON.stringify({ model: process.env.AOAI_DEPLOYMENT, messages, reasoning_effort: "low", response_format: { type: "json_object" } }),
     signal: AbortSignal.timeout(60000),
   });
   if (!res.ok) throw new Error(`AOAI returned ${res.status}: ${(await res.text()).slice(0, 200)}`);
@@ -151,29 +169,49 @@ async function handleAsk(req, res) {
   const { gameId, character, timepoint, question, history, evidence } = ask;
 
   // ponytail: a tckg failure still lets the character answer (with no memories) so the demo keeps going; the log shows it.
-  let facts = [];
+  let all = [];
   try {
     const asOf = TIMEPOINTS[timepoint].asOf;
-    facts = (await Promise.all(spacesOf(character).map((space) => searchSpace(space, asOf, question)))).flat();
+    all = (await Promise.all(spacesOf(character).map((space) => readSpace(space, asOf)))).flat();
   } catch (e) {
     console.error(JSON.stringify({ event: "tckg_error", gameId, character, timepoint, error: e.message }));
   }
+  // Locked memories stay out of the prompt until the pinned cards open them.
+  const hidden = hiddenRefs(character, timepoint, evidence.flatMap((e) => e.refs));
+  const facts = all.filter((m) => !hidden.has(m.ref)).sort((a, b) => String(a.said).localeCompare(String(b.said)));
+  facts.forEach((m, i) => (m.key = `M${i + 1}`));
+  const list = (ms, said) => ms.map((m) => `${m.key}. ${said ? `(${String(m.said).slice(0, 4)}) ` : ""}${m.statement}`).join("\n") || "- (없음)";
 
-  const memories = facts.map((f) => `- ${f.statement}`).join("\n") || "- (떠오르는 것이 없다)";
-  let system = `${systemPrompt(character, timepoint)}\n\n[기억]\n${memories}`;
-  if (evidence.length) system += `\n\n[형사가 보여 주는 증거]\n${evidence.map((e) => `- ${e}`).join("\n")}`;
+  let system = `${systemPrompt(character, timepoint)}
 
-  let answer;
+[내가 아는 것]
+${list(facts.filter((m) => m.type !== "claim"))}
+
+[내가 전에 한 말]
+${list(facts.filter((m) => m.type === "claim"), true)}`;
+  if (evidence.length) system += `\n\n[형사가 보여 주는 증거]\n${evidence.map((e) => `- ${e.text}`).join("\n")}`;
+  system += `\n\n답은 JSON 하나로만 낸다: {"answer": "<대답>", "used": ["<대답에 실제로 쓴 기억 번호, 예: M3>"]}`;
+
+  let answer, used;
   try {
-    answer = await chat([{ role: "system", content: system }, ...history, { role: "user", content: question }]);
+    const raw = await chat([{ role: "system", content: system }, ...history, { role: "user", content: question }]);
+    try {
+      ({ answer, used } = JSON.parse(raw));
+    } catch {
+      answer = raw; // ponytail: if the model ever skips JSON, show the text and attach no refs
+    }
+    if (typeof answer !== "string" || !answer.trim()) throw new Error(`no answer in model output: ${String(raw).slice(0, 200)}`);
   } catch (e) {
     console.error(JSON.stringify({ event: "aoai_error", gameId, character, timepoint, error: e.message }));
     return sendJson(res, 502, { error: "The character could not answer. Try again." });
   }
+  // Refs of the memories the answer used; the browser keeps them on the turn so a pinned card can open locks.
+  const usedSet = new Set(Array.isArray(used) ? used : []);
+  const refs = [...new Set(facts.filter((m) => usedSet.has(m.key) && m.ref).map((m) => m.ref))];
 
   // Conversation log. Azure keeps stdout in the app's log stream.
-  console.log(JSON.stringify({ event: "ask", gameId, character, timepoint, question, evidence, answer, facts: facts.map((f) => f.id), ms: Date.now() - started }));
-  sendJson(res, 200, { answer });
+  console.log(JSON.stringify({ event: "ask", gameId, character, timepoint, question, evidence, answer: answer.trim(), refs, hidden: [...hidden], facts: facts.length, ms: Date.now() - started }));
+  sendJson(res, 200, { answer: answer.trim(), refs });
 }
 
 function handle(req, res) {

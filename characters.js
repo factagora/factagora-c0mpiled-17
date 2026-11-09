@@ -44,6 +44,20 @@ const appearsAt = (character, timepoint) => Boolean(serverData.personas[`${chara
 // tckg spaces, as in data/tckg-seed.json. Agents read public + their own space, never the truth space.
 const spacesOf = (character) => ["moonlight.public", `moonlight.char.${character}`];
 
+// Memories a character keeps to themselves at a time point (case data statements and personas.never_reveal).
+// A ref is locked if it is in never_reveal or behind a locked question, unless an open question at the same
+// time point already gives it away. A locked ref opens when the pinned cards meet one of its questions'
+// conditions (requires_any: one of the refs, requires_all: every ref). never_reveal refs with no question stay shut.
+function hiddenRefs(character, timepoint, pinnedRefs = []) {
+  const pinned = new Set(pinnedRefs);
+  const mine = serverData.statements.filter((s) => s.id.startsWith(`${character}.${timepoint}.`));
+  const locked = (s) => Boolean(s.requires_any || s.requires_all);
+  const open = new Set(mine.filter((s) => !locked(s)).flatMap((s) => s.refs));
+  const opens = (s) => (s.requires_all ? s.requires_all.every((r) => pinned.has(r)) : s.requires_any.some((r) => pinned.has(r)));
+  const candidates = new Set([...(serverData.personas[`${character}.${timepoint}`]?.never_reveal || []), ...mine.filter(locked).flatMap((s) => s.refs)]);
+  return new Set([...candidates].filter((ref) => !open.has(ref) && !mine.some((s) => locked(s) && s.refs.includes(ref) && opens(s))));
+}
+
 function systemPrompt(character, timepoint) {
   const [date, clock] = TIMEPOINTS[timepoint].time.split("T");
   const [y, m, d] = date.split("-").map(Number);
@@ -59,7 +73,8 @@ function systemPrompt(character, timepoint) {
     `지금은 ${y}년 ${m}월 ${d}일 ${hh < 12 ? "오전" : "오후"} ${hh % 12 || 12}시 ${mm}분이다.${place ? ` 지금 있는 곳: ${place}.` : ""}`,
     now ? `지금의 너: ${now}` : "",
     contact,
-    "아래 [기억]에 있는 것과 이때까지 일어난 일만 안다. 그 뒤의 일은 모른다.",
+    "아래 [내가 아는 것]과 [내가 전에 한 말]에 있는 것만 안다. 그 뒤의 일은 모른다.",
+    "[내가 전에 한 말]은 네가 예전에 실제로 한 말이다. 사실과 달라도 네가 한 말이므로, 몰리기 전까지는 그 말과 어긋나지 않게 말한다.",
     "진짜 그 시각, 그 자리에 있는 그 사람처럼 말한다. 게임이나 AI 이야기는 하지 않고, 기억을 목록처럼 읽어 주지 않는다.",
     "어떤 언어로 물어도 반드시 영어로, 말하듯 1~3문장으로 답한다. 사람 이름은 모두 영어 이름으로 부른다.",
     "이름 대응(기억에는 원래 이름이 나온다): Jisoo/한지수 = Julia Han, Dohyun/강도현 = Daniel Kang, Minjae/오민재 = Marcus Oh, Hana/유하나 = Hannah Yoo, Mr. Kim/김씨 = Ken Kim.",
@@ -68,4 +83,4 @@ function systemPrompt(character, timepoint) {
     .join("\n");
 }
 
-module.exports = { TIMEPOINTS, NAMES, appearsAt, spacesOf, systemPrompt };
+module.exports = { TIMEPOINTS, NAMES, appearsAt, spacesOf, hiddenRefs, systemPrompt };
