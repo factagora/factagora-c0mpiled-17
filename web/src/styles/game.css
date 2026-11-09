@@ -94,6 +94,11 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .pol.away:hover{transform:none}
 .pol.away .ph{border-color:var(--dim)}
 .cell.slot.away .note{color:var(--dim)}
+/* dead (Julia from 2017 on): red frame and a date band in the portrait; only the picture is grayed so the red stays red */
+.pol.dead{cursor:default;color:var(--dim)}
+.pol.dead .ph{border-color:var(--red)}
+.pol.dead .ph img{filter:grayscale(1) brightness(.55)}
+.pol .died{position:absolute;left:0;right:0;bottom:0;background:var(--red);color:var(--solid);font-size:12px;line-height:18px;text-align:center;white-space:nowrap}
 .inv{align-self:center;background:transparent;border:2px solid var(--cyan);color:var(--cyan);padding:6px 12px;min-height:40px;font-size:15px;animation:blinkb 1.4s steps(1) infinite}
 .inv:hover{background:var(--cyan);color:var(--solid)}
 @keyframes blinkb{50%{border-color:transparent}}
@@ -106,7 +111,11 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 #timeRange{width:100%;margin:2px 0 0;accent-color:var(--gold);min-height:28px}
 #timeRange.y26{accent-color:var(--cyan)}
 .tsticks{grid-column:2;display:flex;justify-content:space-between;font-size:13px;color:var(--muted);border-top:2px dashed var(--dim);padding-top:2px}
-.tsticks span:last-child{color:var(--cyan)}
+.tsticks span:nth-last-child(2){color:var(--cyan)}
+/* the night Julia dies sits between the 2016 and 2017 stops */
+.tsticks{position:relative}
+.tsticks .death{position:absolute;left:calc(25% + 6px);top:-8px;translate:-50% 0;display:flex;flex-direction:column;align-items:center;font-style:normal;color:var(--red);line-height:1.1}   /* half way between the 2016 and 2017 labels */
+.tsticks .death::before{content:"";width:2px;height:8px;background:var(--red)}
 
 /* MEMO — free notes, kept only until reload */
 .memo{display:flex;flex-direction:column}

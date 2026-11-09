@@ -14,7 +14,10 @@ export function TimeSlider() {
         onChange={(e) => setEra(ERAS[+e.target.value])}
       />
       <output id="timeOut" htmlFor="timeRange" className={now ? "y26" : ""}>{now ? "in person" : "radio 22:50"}</output>
-      <div className="tsticks" aria-hidden="true">{ERAS.map((e) => <span key={e}>{e}</span>)}</div>
+      <div className="tsticks" aria-hidden="true">
+        {ERAS.map((e) => <span key={e}>{e}</span>)}
+        <i className="death" title="Julia Han found dead, 2016-03-15 23:23">†</i>
+      </div>
     </div>
   );
 }
