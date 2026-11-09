@@ -4,6 +4,8 @@
 
 **A murder mystery that spans ten years, built on a time-aware knowledge graph (TCKG).** The player questions people in the past (2015–2025) by radio and the survivors in the present (2026) face to face, then names the killer by finding where the same person tells a different story at different times.
 
+TCKG is [Factagora](https://app.factagora.com)'s time-aware knowledge graph. It stores claims in [FactBlock](https://github.com/factagora/factblock), Factagora's open format for claims and their history, so you can ask what was known at any point in time.
+
 Every character's memory lives in TCKG. For each question, the server rebuilds **what that person knew and had said at that moment** with a time-scoped TCKG read. The lines come from facts placed in time, not from a script.
 
 Built for the c0mpiled-17 hackathon (2026-11-09) · **Play:** https://factagora-c0mpiled-17.azurewebsites.net
