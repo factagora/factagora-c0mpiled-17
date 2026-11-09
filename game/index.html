@@ -98,7 +98,7 @@ h1,h2,h3{font-weight:400;margin:0;text-wrap:balance}
 .memo textarea:focus-visible{outline:none;border-top-color:var(--gold)}
 .memo small{color:var(--muted);font-size:13px;margin-top:6px}
 
-/* CHAT — talk to the selected person (UI only, not connected yet) */
+/* CHAT — talk to the selected person (answers come from /api/ask) */
 .chat{display:flex;flex-direction:column;min-height:220px;margin-top:40px;padding:clamp(14px,2vh,22px) 24px clamp(10px,1.6vh,16px)}
 .chatlog{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:8px;padding-right:6px}
 .chatlog .intro{margin:0;font-size:clamp(16px,1.6vw,22px);line-height:1.5}
@@ -332,7 +332,7 @@ const CELLS = {
     {lbl:'evidence storage', sub:'case 2016-0315, boxed since 2016',people:[], cls:'hot', room:true, empty:'(julia · not reachable)'}
   ]
 };
-const S = {era:'2016', t:2, visited:new Set(), person:null, chats:{}};
+const S = {era:'2016', t:2, visited:new Set(), person:null};
 // time slider stops: index → HUD label; the last stop is 2026
 const STOPS = ['3/15  21:00','3/15  22:30','3/15  22:50','3/15  23:00','3/15  23:23','NOW  2026'];
 
@@ -430,28 +430,40 @@ function renderMap(animate){
     });
   }
 }
-/* ---------- CHAT (UI only: messages stay local, nobody answers yet) ---------- */
+/* ---------- CHAT (answers from /api/ask; turns are kept in localStorage by /client/game.js) ---------- */
+// The case data calls Julia "jisoo"; the map era picks the case time point.
+const apiId = k => k==='jisu' ? 'jisoo' : k;
+const TP = {'2016':'T2016','2026':'T2026'};
+let G=null, game=null, asking=false;
+import('/client/game.js').then(m=>{ G=m; game=G.loadGame(); updateLogCount(); renderChat(); }).catch(()=>toast('could not load the chat'));
+const turnsHere = () => game ? game.turns.filter(t=>t.character===apiId(S.person) && t.timepoint===TP[S.era]) : [];
+function updateLogCount(){ $('#logCount').textContent = game ? game.turns.length : 0; }
 const INTRO = {
   '2016':'The radio is live. Everyone is honest in 2016, but nobody knows what is coming. Pick someone on the map to talk.',
   '2026':'Ten years later. The survivors remember less and hide more. Ask the same things and listen for what changed.'
 };
-const chatKey = () => S.person+'-'+S.era;
 function renderChat(){
   const log=$('#chatlog'), p=PEOPLE[S.person]; log.innerHTML='';
   $('#chatTab').textContent = p ? `chat · ${p.short} · ${S.era}` : 'CASE FILE';
-  $('#chatInput').disabled = $('#chatSend').disabled = !p;
+  $('#chatInput').disabled = $('#chatSend').disabled = !p || !game || asking;
   $('#chatInput').placeholder = p ? `message ${p.short} (${S.era === '2016' ? 'by radio' : 'in person'})…` : 'pick someone on the map to talk';
   if (!p) { log.append(h('p',{class:'intro',text:INTRO[S.era]})); return; }
-  const msgs = S.chats[chatKey()] || [];
-  if (!msgs.length) log.append(h('p',{class:'intro muted',text:`${p.name} · ${S.era==='2016' ? p.r16 : p.r26}. Ask anything.`}));
-  msgs.forEach(m=>log.append(h('div',{class:'msg me'}, h('b',{text:'you'}), m)));
+  const msgs = turnsHere();
+  if (!msgs.length && !asking) log.append(h('p',{class:'intro muted',text:`${p.name} · ${S.era==='2016' ? p.r16 : p.r26}. Ask anything.`}));
+  msgs.forEach(t=>log.append(
+    h('div',{class:'msg me'}, h('b',{text:'you'}), t.question),
+    h('div',{class:'msg'}, h('b',{text:p.short}), t.answer)));
+  if (asking) log.append(h('div',{class:'msg me'}, h('b',{text:'you'}), asking), h('p',{class:'intro muted',text:`${p.short} is answering…`}));
   log.scrollTop=log.scrollHeight;
 }
-$('#chatform').addEventListener('submit', e=>{
+$('#chatform').addEventListener('submit', async e=>{
   e.preventDefault();
-  const v=$('#chatInput').value.trim(); if (!v || !S.person) return;
-  (S.chats[chatKey()] ||= []).push(v);
-  $('#chatInput').value=''; renderChat();
+  const v=$('#chatInput').value.trim(); if (!v || !S.person || !game || asking) return;
+  const who=S.person, era=S.era;
+  asking=v; $('#chatInput').value=''; renderChat();
+  try { await G.ask(game, apiId(who), TP[era], v); }
+  catch (err) { toast(err.message || 'no answer, try again'); $('#chatInput').value=v; }
+  finally { asking=false; updateLogCount(); renderChat(); $('#chatInput').focus(); }
 });
 
 /* ---------- TITLE: tune to 11.23 MHz, answer, then the map opens ---------- */

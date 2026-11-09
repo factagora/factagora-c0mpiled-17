@@ -44,7 +44,7 @@ function systemPrompt(character, timepoint) {
   return `${PERSONAS[character]}
 
 지금은 ${y}년 ${m}월 ${d}일 ${hh}시 ${mm}분이다. 아래 [기억]에 있는 것과 이때까지 일어난 일만 안다.
-한국어로, 말하듯 1~3문장으로 답한다.`;
+형사가 쓴 말과 같은 언어로, 말하듯 1~3문장으로 답한다.`;
 }
 
 module.exports = { TIMEPOINTS, NAMES, appearsAt, spacesOf, systemPrompt };
