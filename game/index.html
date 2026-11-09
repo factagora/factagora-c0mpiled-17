@@ -325,6 +325,9 @@ html:not([data-screen="brief"]) #s-brief{display:none}
 .b-go{align-self:center}
 @media (max-width:700px){.b-modes{grid-template-columns:minmax(0,1fr)}}
 
+/* window header: title on top, the date / scene line always right under it (every year the same) */
+.phead{display:flex;flex-direction:column;align-items:flex-start;gap:2px}
+
 /* VHS */
 #vhs{position:fixed;inset:0;z-index:75;pointer-events:none;display:none;overflow:hidden}
 #vhs.run{display:block}
@@ -437,7 +440,7 @@ html:not([data-screen="brief"]) #s-brief{display:none}
   <div class="wrap">
     <div class="mapgrid">
       <div class="win">
-        <div style="display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px"><span class="wtitle" id="planTitle"></span><span class="muted" id="planDate"></span></div>
+        <div class="phead"><span class="wtitle" id="planTitle"></span><span class="muted" id="planDate"></span></div>
         <div class="plan" id="plan"></div>
         <div class="timeslider">
           <label class="wtitle" for="timeRange">time</label>
