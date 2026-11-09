@@ -27,9 +27,16 @@ Moonlight Labs에 투자하려는 VC 투자자다. 차분하고 정확하다.
 
 // Case times are KST without an offset ("2016-03-15T22:50").
 const TIMEPOINTS = Object.fromEntries(
-  caseData.timepoints.map((t) => [t.id, { asOf: `${t.time}:00+09:00`, time: t.time, label: t.label }]),
+  caseData.timepoints.map((t) => [t.id, { asOf: `${t.time}:00+09:00`, time: t.time, label: t.label, radio: t.contact === "radio" }]),
 );
 const NAMES = Object.fromEntries(caseData.characters.map((c) => [c.id, c.name]));
+const PLACE_NAMES = Object.fromEntries(caseData.places.map((p) => [p.id, p.name]));
+
+// Where the character is at the time point (case data positions). "offsite" places carry their own label.
+function placeOf(character, timepoint) {
+  const p = caseData.positions[timepoint]?.[character];
+  return p ? p.label || PLACE_NAMES[p.place] || p.place : null;
+}
 
 // A character is at a time point only if the case data has a persona entry there ("minjae.T2016").
 const appearsAt = (character, timepoint) => Boolean(serverData.personas[`${character}.${timepoint}`]);
@@ -37,15 +44,27 @@ const appearsAt = (character, timepoint) => Boolean(serverData.personas[`${chara
 // tckg spaces, as in data/tckg-seed.json. Agents read public + their own space, never the truth space.
 const spacesOf = (character) => ["moonlight.public", `moonlight.char.${character}`];
 
-// lang: the language to answer in, picked by the server from the question ("한국어" or "영어").
-function systemPrompt(character, timepoint, lang) {
+function systemPrompt(character, timepoint) {
   const [date, clock] = TIMEPOINTS[timepoint].time.split("T");
   const [y, m, d] = date.split("-").map(Number);
   const [hh, mm] = clock.split(":").map(Number);
-  return `${PERSONAS[character]}
-
-지금은 ${y}년 ${m}월 ${d}일 ${hh}시 ${mm}분이다. 아래 [기억]에 있는 것과 이때까지 일어난 일만 안다.
-반드시 ${lang}로, 말하듯 1~3문장으로 답한다.${lang === "영어" ? " 사람 이름은 모두 영어 이름으로 부른다." : ""}`;
+  const place = placeOf(character, timepoint);
+  const now = serverData.personas[`${character}.${timepoint}`]?.voice;
+  const contact = TIMEPOINTS[timepoint].radio
+    ? "낡은 무전기에서 모르는 사람(형사 서진)의 목소리가 들려 대화하고 있다. 그 사람이 미래에서 왔다는 건 모른다."
+    : "미제사건팀 형사 서진이 직접 찾아와 마주 보고 이야기하고 있다.";
+  return [
+    PERSONAS[character],
+    "",
+    `지금은 ${y}년 ${m}월 ${d}일 ${hh < 12 ? "오전" : "오후"} ${hh % 12 || 12}시 ${mm}분이다.${place ? ` 지금 있는 곳: ${place}.` : ""}`,
+    now ? `지금의 너: ${now}` : "",
+    contact,
+    "아래 [기억]에 있는 것과 이때까지 일어난 일만 안다. 그 뒤의 일은 모른다.",
+    "진짜 그 시각, 그 자리에 있는 그 사람처럼 말한다. 게임이나 AI 이야기는 하지 않고, 기억을 목록처럼 읽어 주지 않는다.",
+    "어떤 언어로 물어도 반드시 영어로, 말하듯 1~3문장으로 답한다. 사람 이름은 모두 영어 이름으로 부른다.",
+  ]
+    .filter((line, i) => line || i === 1)
+    .join("\n");
 }
 
 module.exports = { TIMEPOINTS, NAMES, appearsAt, spacesOf, systemPrompt };
