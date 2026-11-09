@@ -8,6 +8,7 @@ const port = process.env.PORT || 3000;
 const GAME_FILE = path.join(__dirname, "game", "index.html");
 const STATIC = {
   "/client/": path.join(__dirname, "client"),
+  "/assets/": path.join(__dirname, "game", "assets"),   // portraits, backgrounds, item icons
 };
 
 const MIME = {
@@ -17,6 +18,7 @@ const MIME = {
   ".md": "text/markdown; charset=utf-8",
   ".svg": "image/svg+xml",
   ".png": "image/png",
+  ".jpg": "image/jpeg",
   ".webp": "image/webp",
   ".json": "application/json; charset=utf-8",
 };
