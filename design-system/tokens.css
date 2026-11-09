@@ -1,0 +1,161 @@
+/* =========================================================
+   DECK SEVEN — Design Tokens v4
+   Visual source: Figma "Deck Seven 스타일 시안", node 26:67
+   Rationale for every rule: RULES.md
+
+   Pixel grid
+     Stage 1920×1080 = 2× the logical art resolution of 960×540.
+     1 art pixel (--u) = 2 stage px. Every dimension is a whole multiple of --u.
+
+   Layers
+     1) primitive --p-*   2) semantic --c-* --fs-* --sp-*   3) component
+     Screen code uses layers 2 and 3 only.
+   ========================================================= */
+
+@import url("https://fonts.googleapis.com/css2?family=DotGothic16&display=swap");
+@import url("https://cdn.jsdelivr.net/npm/galmuri@2.40.3/dist/galmuri.css");
+
+:root {
+  /* =========== 0. GRID =========== */
+  --u: 2px;                       /* 1 art pixel */
+
+  /* =========== 1. PRIMITIVE (fixed palette; no translucent text) =========== */
+  --p-ink-1000: #05040c;
+  --p-ink-800:  #1a1640;
+  --p-ink-600:  #2a2470;
+
+  --p-paper-50:  #f4f1ff;
+  --p-lilac-200: #c9c0ff;
+  --p-lilac-400: #9c8cff;
+  --p-lilac-600: #7a6fcc;         /* disabled text (3.5:1) */
+  --p-slate-500: #807c9c;         /* remaining progress segments (UI graphic, 3.7:1) */
+
+  --p-amber-400: #ffc35a;
+  --p-amber-200: #ffe1a3;
+  --p-red-400:   #ff6b6b;
+  --p-red-300:   #ff8a8a;
+  --p-green-400: #7ee0a4;
+
+  /* =========== 2. SEMANTIC =========== */
+  /* Surfaces: only window backgrounds are translucent (86%). Text, lines and marks are always opaque. */
+  --c-canvas:        var(--p-ink-1000);
+  --c-surface:       rgb(5 4 12 / var(--surface-alpha, 0.86));
+  --c-surface-cell:  var(--p-ink-800);            /* opaque, so contrast does not depend on the art behind it */
+  --c-surface-hover: var(--p-ink-600);
+  --c-scrim:         rgb(5 4 12 / 0.72);          /* dims the screen behind a modal */
+
+  /* Lines */
+  --c-line:          var(--p-paper-50);
+  --c-line-dim:      var(--p-slate-500);
+
+  /* Text. Contrast is measured worst-case: a white image behind the 86% window. */
+  --c-text:          var(--p-paper-50);   /* 13.3:1 */
+  --c-text-title:    var(--p-amber-400);  /*  9.3:1 */
+  --c-text-visited:  var(--p-lilac-400);  /*  5.4:1  still selectable, so it must pass 4.5 */
+  --c-text-info:     var(--p-lilac-400);  /*  5.4:1 */
+  --c-text-disabled: var(--p-lilac-600);  /*  3.5:1  not selectable, must pass 2.5 */
+
+  /* Marks */
+  --c-accent:        var(--p-amber-400);  /* ★ NEW, current step, selection outline */
+  --c-accent-hover:  var(--p-amber-200);
+  --c-check:         var(--p-lilac-400);
+  --c-gem:           var(--p-lilac-400);
+  --c-gem-empty:     var(--p-slate-500);
+  --c-cursor:        var(--p-lilac-200);
+  --c-cursor-ink:    var(--p-ink-1000);
+  --c-focus:         var(--p-amber-400);  /* keyboard focus uses the selection colour */
+
+  --c-danger:        var(--p-red-400);    /* 5.3:1 */
+  --c-success:       var(--p-green-400);  /* 9.2:1 */
+
+  /* Visited portraits: desaturate and darken instead of fading (stays opaque) */
+  --fx-visited: grayscale(0.7) brightness(0.55);
+
+  /* Fonts
+     DotGothic16 covers Latin and Japanese on a 16px grid but has no Hangul, so Korean falls back to Galmuri11. */
+  --font-pixel: "DotGothic16", "Galmuri11", ui-monospace, monospace;
+  --font-ko:    "Galmuri11", "DotGothic16", monospace;   /* Korean build: 12px grid → 24 · 36 · 48 */
+
+  /* Type sizes (web)
+     Stage px shrink with the fill scale: a 1440px browser = ×0.75, 1280px = ×0.667.
+     Targets in browser px: info text ≥ 16 (web body minimum), dialogue 21–24, display 32–36.
+     → stage values 24 / 32 / 48. Multiples of 8 (half an art pixel) keep glyph strokes even.
+     Build hierarchy with colour, case and position rather than size. */
+  --fs-ui:      24px;   /* 1440 → 18px  menus, lists, names, labels (minimum for information) */
+  --fs-hero:    32px;   /* 1440 → 24px  dialogue, narration */
+  --fs-display: 48px;   /* 1440 → 36px  chapter titles, result screens */
+  --fs-deco:    16px;   /* 1440 → 12px  decoration only, never information */
+
+  --lh-ui:     1.5;    /* 24 → 36 */
+  --lh-hero:   1.5;    /* 32 → 48 */
+
+  --ls-title:  0.08em;   /* 2px at 24px = 1u */
+
+  /* Spacing: whole multiples of --u */
+  --sp-1: calc(var(--u) * 2);   /*  4 */
+  --sp-2: calc(var(--u) * 4);   /*  8 */
+  --sp-3: calc(var(--u) * 8);   /* 16 */
+  --sp-4: calc(var(--u) * 12);  /* 24 */
+  --sp-5: calc(var(--u) * 16);  /* 32 */
+  --sp-6: calc(var(--u) * 24);  /* 48 */
+
+  /* Borders: in art pixels, no rounded corners (curves create blurry edge pixels) */
+  --bw-outer:    calc(var(--u) * 2);   /* 4 */
+  --bw-inner:    var(--u);             /* 2 */
+  --frame-inset: calc(var(--u) * 4);   /* 8: outer edge of the frame → inner line */
+  --radius-win:  0;
+
+  /* Motion: stepped, blinking below 3Hz */
+  --dur-fast:  100ms;
+  --dur-base:  200ms;
+  --ease-step: steps(2, end);
+  --blink:     1.2s;              /* 0.83Hz */
+  --type-slow:   45ms;            /* three dialogue speeds (setting) */
+  --type-normal: 25ms;
+  --type-instant: 0ms;
+
+  --z-window: 10; --z-tab: 11; --z-toast: 40; --z-modal: 50;
+
+  /* =========== 3. COMPONENT =========== */
+  --stage-w: 1920px; --stage-h: 1080px;
+  --stage-gutter: 48px; --stage-top: 40px;
+
+  --win-hud-w: 424px;  --win-hud-h: 112px;
+  --win-menu-w: 376px; --win-menu-h: 72px;
+  --win-map-w: 1176px; --win-main-h: 544px;
+  --win-side-w: 616px;
+  --win-dialog-w: 1600px; --win-dialog-h: 232px;   /* 3 lines of dialogue + 40px padding top and bottom + borders */
+  --hint-h: 48px;                                   /* key hint row at the bottom */
+
+  --tab-h: 64px; --tab-offset-x: 40px; --tab-overlap: 16px;
+
+  --seg-w: 40px; --seg-w-current: 64px; --seg-h: 12px; --seg-gap: 8px;
+
+  --cell-w: 168px; --cell-w-wide: 256px; --cell-h: 336px;
+  --portrait-md: 120px; --portrait-sm: 96px;
+
+  --list-row: 56px;        /* 37px in a 1280px browser, above the WCAG 2.5.8 24px target */
+  --list-cursor: 28px;
+
+  --hull-h: 90px;
+}
+
+/* ---------- Large text: chosen in settings, or switched on by stage.js when info text would drop below 16 browser px ---------- */
+:root[data-text-size="large"], .stage-viewport[data-text-auto="large"] {
+  --fs-ui:   32px;
+  --fs-hero: 40px;
+  --lh-ui:   1.25;
+}
+
+/* ---------- High contrast: every text colour at 7:1 or more (XAG 101) ---------- */
+:root[data-contrast="high"] {
+  --surface-alpha: 1;
+  --c-surface-cell: var(--p-ink-1000);
+  --c-text-visited: var(--p-lilac-200);   /* 12:1 */
+  --c-text-info:    var(--p-lilac-200);
+  --c-text-disabled:var(--p-lilac-400);   /* 7.4:1 */
+  --c-check:        var(--p-lilac-200);
+  --c-gem:          var(--p-lilac-200);
+  --c-danger:       var(--p-red-300);
+  --c-line-dim:     var(--p-lilac-400);
+}
