@@ -1,0 +1,10 @@
+{
+  "name": "factagora-c0mpiled-17",
+  "private": true,
+  "scripts": {
+    "start": "node server.js"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
